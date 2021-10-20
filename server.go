@@ -26,6 +26,6 @@ func main() {
 		fmt.Fprintf(w, getDirections(strings.Split(r.URL.Path, "/")[2], strings.Split(r.URL.Path, "/")[3]))
 	})
 
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":0", nil))
 
 }
