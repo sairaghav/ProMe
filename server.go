@@ -25,7 +25,7 @@ func main() {
 	port := os.Getenv("PORT")
 
 	if port == "" {
-		port = "443"
+		port = "8000"
 	}
 	http.HandleFunc("/directions/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
