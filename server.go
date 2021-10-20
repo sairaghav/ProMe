@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -21,11 +22,16 @@ func getDirections(from string, to string) string {
 }
 
 func main() {
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "443"
+	}
 	http.HandleFunc("/directions/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, getDirections(strings.Split(r.URL.Path, "/")[2], strings.Split(r.URL.Path, "/")[3]))
 	})
 
-	log.Fatal(http.ListenAndServe(":0", nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 
 }
