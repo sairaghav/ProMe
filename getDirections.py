@@ -10,6 +10,8 @@ def getStreets(fromSrc,toDst):
     mapFinalUrl = config.mapBaseUrl + "/directions/v2/route?key=" + config.mapApiKey + "&from=" + fromSrc + "&to=" + toDst + "&routeType=pedestrian"
     response = requests.get(mapFinalUrl)
     responseData = json.loads(response.text)
+
+    print(responseData)
     
     street = {}
     result = []
