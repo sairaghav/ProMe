@@ -1,11 +1,16 @@
 import json, requests, datetime
+import urllib.parse
 from bs4 import BeautifulSoup as BS
 import config
 
 def getStreets(fromSrc,toDst):
-    response = requests.get(config.mapFinalUrl)
-    responseData = json.loads(response.text)
+    fromSrc = urllib.parse.quote_plus(fromSrc)
+    toDst = urllib.parse.quote_plus(toDst)
 
+    mapFinalUrl = config.mapBaseUrl + "/directions/v2/route?key=" + config.mapApiKey + "&from=" + fromSrc + "&to=" + toDst + "&routeType=pedestrian"
+    response = requests.get(mapFinalUrl)
+    responseData = json.loads(response.text)
+    
     street = {}
     result = []
     for leg in responseData['route']['legs']:
@@ -47,21 +52,3 @@ def getNewsData(street):
         street['risk_score'] = len(relatedNews.keys())
     
     return street
-
-
-def processRequest(fromSrc,toDst):
-    streets = getStreets(fromSrc,toDst)
-
-    results = {}
-    result = []
-
-    for street in streets:
-        result.append(getNewsData(street))
-
-    results['result'] = result
-
-    with open("test.json","w+") as f:
-        f.write(json.dumps(results))
-
-
-processRequest(config.fromSrc,config.toDst)
