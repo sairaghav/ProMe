@@ -1,7 +1,9 @@
+import os
+
 trackingTags = ['furti','droga','arresti','incidenti','rapine','vandali','incidenti-stradali','aggressioni']
 
 mapBaseUrl = "http://open.mapquestapi.com"
-mapApiKey = "RErLEHOyAx6DKiFoJeJv8uDAkLe9LnGR"
+mapApiKey = os.environ['MAPS_API_KEY']
 
 newsBaseUrl = "https://www.milanotoday.it"
 
