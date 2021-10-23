@@ -3,11 +3,11 @@ import urllib.parse
 from bs4 import BeautifulSoup as BS
 import config
 
-def getStreets(fromSrc,toDst):
+def getStreets(fromSrc,toDst,mode="fastest"):
     fromSrc = urllib.parse.quote_plus(fromSrc)
     toDst = urllib.parse.quote_plus(toDst)
 
-    mapFinalUrl = config.mapBaseUrl + "/directions/v2/route?key=" + config.mapApiKey + "&from=" + fromSrc + "&to=" + toDst# + "&routeType=pedestrian"
+    mapFinalUrl = config.mapBaseUrl + "/directions/v2/route?key=" + config.mapApiKey + "&from=" + fromSrc + "&to=" + toDst + "&routeType="+mode
     response = requests.get(mapFinalUrl)
     responseData = json.loads(response.text)
 

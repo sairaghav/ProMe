@@ -22,5 +22,24 @@ def directions(fromSrc,toDst):
         200
     )
 
+@api.route('/directions/pedestrian/<fromSrc>/<toDst>', methods=['GET'])
+def directionsPedestrian(fromSrc,toDst):
+    headers = {"Content-Type": "application/json"}
+
+    streets = getDirections.getStreets(fromSrc,toDst,"pedestrian")
+
+    results = {}
+    result = []
+
+    for street in streets:
+        result.append(getDirections.getNewsData(street))
+
+    results['result'] = result
+
+    return make_response(
+        results,
+        200
+    )
+
 if __name__ == '__main__':
     api.run()
