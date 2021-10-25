@@ -21,3 +21,12 @@ For each street, following values will be returned:
 
 
 `https://prome-api.herokuapp.com/directions/pedestrian/<from>/<to>` will return the same values but mode of transport will only be considered as *WALKING*
+
+**Example usage:** http://prome-api.herokuapp.com/directions/Via%20Risorgimento%20237/Piazza%20Leonardo%20da%20Vinci,%20Milan
+![sample](examples/images/sample.png)
+
+## TODO
+- Improve news article detection and scoring
+- User Authentication
+- Add infrastructure-related data to street data
+- Add more news sources
