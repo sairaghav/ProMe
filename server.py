@@ -9,7 +9,7 @@ Description: Defines the routes for the API: https://developer.mapquest.com/docu
 '''
 from flask import Flask, make_response
 import getDirections
-from news import getMilanoToday
+from news import getRiskScore
 
 api = Flask(__name__)
 
@@ -22,7 +22,7 @@ def directions(fromSrc,toDst):
     streets = getDirections.getStreets(fromSrc,toDst)
 
     for street in streets:
-        result.append(getMilanoToday.getNewsData(street,noOfDays))
+        result.append(getRiskScore.getNewsData(street,noOfDays))
 
     results['result'] = result
 
@@ -36,7 +36,7 @@ def directionsPedestrian(fromSrc,toDst,modeOfTransport):
     streets = getDirections.getStreets(fromSrc,toDst,modeOfTransport)
 
     for street in streets:
-        result.append(getMilanoToday.getNewsData(street,noOfDays))
+        result.append(getRiskScore.getNewsData(street,noOfDays))
 
     results['result'] = result
 
