@@ -9,6 +9,7 @@ Description: Defines the routes for the API: https://developer.mapquest.com/docu
 '''
 from flask import Flask, make_response
 import getDirections
+from news import getMilanoToday
 
 api = Flask(__name__)
 
@@ -30,40 +31,12 @@ def directions(fromSrc,toDst):
         200
     )
 
-@api.route('/directions/pedestrian/<fromSrc>/<toDst>', methods=['GET'])
-def directionsPedestrian(fromSrc,toDst):
-    streets = getDirections.getStreets(fromSrc,toDst,"pedestrian")
+@api.route('/directions/<modeOfTransport>/<fromSrc>/<toDst>', methods=['GET'])
+def directionsPedestrian(fromSrc,toDst,modeOfTransport):
+    streets = getDirections.getStreets(fromSrc,toDst,modeOfTransport)
 
     for street in streets:
-        result.append(getDirections.getNewsData(street,noOfDays))
-
-    results['result'] = result
-
-    return make_response(
-        results,
-        200
-    )
-
-@api.route('/directions/shortest/<fromSrc>/<toDst>', methods=['GET'])
-def directionsShortest(fromSrc,toDst):
-    streets = getDirections.getStreets(fromSrc,toDst,"shortest")
-
-    for street in streets:
-        result.append(getDirections.getNewsData(street,noOfDays))
-
-    results['result'] = result
-
-    return make_response(
-        results,
-        200
-    )
-
-@api.route('/directions/bicycle/<fromSrc>/<toDst>', methods=['GET'])
-def directionsBicycle(fromSrc,toDst):
-    streets = getDirections.getStreets(fromSrc,toDst,"bicycle")
-
-    for street in streets:
-        result.append(getDirections.getNewsData(street,noOfDays))
+        result.append(getMilanoToday.getNewsData(street,noOfDays))
 
     results['result'] = result
 
