@@ -1,7 +1,7 @@
 '''
 Author: Sairaghav (https://github.com/sairaghav)
 
-Description: Returns the streets between source and destination with risk_score calculated by scraping news articles and tags
+Description: Returns the streets between source and destination
 
 getStreets(from, to, modeOfTransport): Returns the following fields for all the streets between a source and destination
     name: Name of street
@@ -25,7 +25,7 @@ def getStreets(fromSrc,toDst,mode="fastest"):
     response = requests.get(mapFinalUrl)
     responseData = json.loads(response.text)
 
-    #print(responseData)
+    print(responseData)
     
     street = {}
     result = []

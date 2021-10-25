@@ -1,7 +1,7 @@
 '''
 Author: Sairaghav (https://github.com/sairaghav)
 
-Description: Returns risk_score for input street calculated by scraping news articles and tags
+Description: Returns risk_score and risk_metadata for input street calculated by scraping news articles and tags
 
 getNewsData(street,noOfDays): Returns risk_score and metadata of news articles/tags for specified noOfDays for a single street name
     risk_score: Score calculated by sum of articles returned
@@ -23,7 +23,7 @@ def getNewsData(street,noOfDays):
     for newsSource in config.newsBaseUrl:
         url = newsSource+"/search/query/"+street['name'].replace(' ','+')+"/from/"+startDate+"/to/"+endDate
         response = requests.get(url)
-
+        
         soup = BS(response.text,'html.parser')
 
         for article in soup.findAll('article', attrs={'data-channel':'/notizie/'}):
