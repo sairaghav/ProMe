@@ -5,7 +5,7 @@ Description: Returns risk_score and risk_metadata for input street calculated by
 
 getNewsData(street,noOfDays): Returns risk_score and metadata of news articles/tags for specified noOfDays for a single street name
     risk_score: Score calculated by sum of articles returned
-    metadata: Dict of links to news articles and related tag
+    risk_metadata: Dict of links to news articles and related tag
 
 '''
 
