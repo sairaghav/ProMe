@@ -20,7 +20,7 @@ noOfDays = 30
 @api.route('/directions/<fromSrc>/<toDst>', methods=['GET'])
 def directions(fromSrc,toDst):
     streets = getDirections.getStreets(fromSrc,toDst)
-    streets = getPlacesOfInterest.getInfraData(streets)
+    #streets = getPlacesOfInterest.getInfraData(streets)
 
     for street in streets:
         result.append(getRiskScore.getNewsData(street,noOfDays))
@@ -35,7 +35,7 @@ def directions(fromSrc,toDst):
 @api.route('/directions/<modeOfTransport>/<fromSrc>/<toDst>', methods=['GET'])
 def directionsPedestrian(fromSrc,toDst,modeOfTransport):
     streets = getDirections.getStreets(fromSrc,toDst,modeOfTransport)
-    streets = getPlacesOfInterest.getInfraData(streets)
+    #streets = getPlacesOfInterest.getInfraData(streets)
 
     for street in streets:
         result.append(getRiskScore.getNewsData(street,noOfDays))
