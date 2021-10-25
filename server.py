@@ -22,7 +22,7 @@ def directions(fromSrc,toDst):
     streets = getDirections.getStreets(fromSrc,toDst)
 
     for street in streets:
-        result.append(getDirections.getNewsData(street,noOfDays))
+        result.append(getMilanoToday.getNewsData(street,noOfDays))
 
     results['result'] = result
 
