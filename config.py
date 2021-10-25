@@ -7,3 +7,5 @@ mapApiKey = os.environ['MAPS_API_KEY']
 
 newsSource = {"MilanoToday": "https://www.milanotoday.it"} #Other news sources can be added in the same format
 
+placesOfInterest = ["hospitals", "police", "bus", "metro","tram"]
+

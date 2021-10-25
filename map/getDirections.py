@@ -33,7 +33,8 @@ def getStreets(fromSrc,toDst,mode="fastest"):
     for leg in responseData['route']['legs']:
         for maneuver in leg['maneuvers']:
             if len(maneuver['streets']) > 0:
-                street['name'] = maneuver['streets'][0]
+                street['name'] = '/'.join(maneuver['streets'])
+                street['narrative'] = maneuver['narrative']
                 street['distance'] = maneuver['distance']
                 street['lng'] = maneuver['startPoint']['lng']
                 street['lat'] = maneuver['startPoint']['lat']

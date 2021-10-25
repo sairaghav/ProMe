@@ -9,14 +9,13 @@ getNewsData(street,noOfDays): Returns risk_score and metadata of news articles/t
 
 '''
 
-#Returns news data for the last few days for a street on specified news URL
 import config
 import datetime, requests
 from bs4 import BeautifulSoup as BS
 from collections import defaultdict
 
 def getMilanoToday(street,startDate,endDate):
-    newsUrlData = defaultdict(list)
+    newsData = defaultdict(list)
     url = config.newsSource["MilanoToday"]+"/search/query/"+street['name'].replace(' ','+')+"/from/"+startDate+"/to/"+endDate
     response = requests.get(url)
     
@@ -29,10 +28,11 @@ def getMilanoToday(street,startDate,endDate):
                     tagValue = li.find('a')['href'].replace('/tag/','')[:-1]
                     #Check if only the news with interested tags are taken into consideration
                     if tagValue.lower() in config.trackingTags:
-                        newsUrlData[config.newsSource["MilanoToday"]+div.find('header').find('a')['href']].append(tagValue)
+                        newsData[config.newsSource["MilanoToday"]+div.find('header').find('a')['href']].append(tagValue)
 
-    return newsUrlData
-
+    return newsData
+    
+#Returns news data for the last few days for a street on specified news URL
 def getNewsData(street,noOfDays):
     endDate = datetime.datetime.now().strftime("%Y-%m-%d")
     startDate = (datetime.datetime.now() - datetime.timedelta(days = noOfDays)).strftime("%Y-%m-%d") #timedelta specified to 30 days
