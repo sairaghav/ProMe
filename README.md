@@ -4,6 +4,8 @@ API Prototype for ProMe app
 - Uses `https://developer.mapquest.com/` for maps
 - Other values provided in [config file](config.py)
 
+**Start with server.py**
+
 ## Description
 
 Calling `https://prome-api.herokuapp.com/directions/<from>/<to>` returns the route from the source (from) to destination (to), as a list of streets
@@ -27,6 +29,6 @@ For each street, following values will be returned:
 
 ## TODO
 - Improve news article detection and scoring
-- User Authentication
+- User Authentication and DB
 - Add infrastructure-related data to street data
 - Add more news sources

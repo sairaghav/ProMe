@@ -8,7 +8,7 @@ Description: Defines the routes for the API: https://developer.mapquest.com/docu
     /directions/bicycle/<fromSrc>/<toDst>: Returns the streets on which bicycling is appropriate
 '''
 from flask import Flask, make_response
-import getDirections
+from map import getDirections
 from news import getRiskScore
 
 api = Flask(__name__)
