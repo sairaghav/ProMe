@@ -48,7 +48,8 @@ def getStreets(fromSrc,toDst,mode="fastest"):
                 street['risk_score'] = 0
                 street['infra_score'] = 0
                 results.append(street.copy())
-    
+
+    #Add starting and ending points for the journey
     locations = responseData['route']['locations']
 
     for i in range(len(locations)):
