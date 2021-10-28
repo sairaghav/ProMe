@@ -24,8 +24,8 @@ def calcRiskScore(street):
     relatedNews = {}
     relatedNews = getNewsArticles.getNewsData(street,startDate,endDate)
 
-    if len(relatedNews.keys()) > 0:
+    if len(relatedNews) > 0:
         street['risk_metadata'] = relatedNews
-        street['risk_score'] = len(relatedNews.keys()) #Calculate score based on number of articles - need to define better
+        street['risk_score'] = len(relatedNews) #Calculate score based on number of articles - need to define better
     
     return street
