@@ -35,15 +35,13 @@ For each street, following values will be returned:
 ### Get all news articles related to a particular street between a date range
 Calling `https://prome-api.herokuapp.com/news/<street name>/<start date>/<end date>` will return all news articles between the date range in the configured sources in config.py related to the specified street
 
-Return format: 
-```
-{
-    "street name": {
-        "article link": ["tag1", "tag2"],
-        ....
-    }
-}
-```
+For each street, following values will be returned:
+- street: Name of street
+- source: Source of news
+- tags: Associated tags
+- link: Link for news article
+- date: Date of news article
+- time: Time of news article
 
 **Example usage:** 
 
@@ -52,6 +50,7 @@ Return format:
 ![sample news](examples/images/sample-news.png)
 
 ## TODO
+- Generated tagged dataset from news data
 - Improve news article detection and scoring
 - User Authentication and DB
 - Add infrastructure-related data to street data
