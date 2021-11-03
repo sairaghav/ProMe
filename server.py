@@ -60,7 +60,7 @@ def newsStreet(streetName,fromDate,toDate):
 
     street = {}
     street['name'] = streetName
-    results[streetName] = getNewsArticles.getNewsData(street,fromDate,toDate)
+    results[streetName] = getNewsArticles.collect_all(street, fromDate, toDate)
 
     response = make_response(results,200)
 

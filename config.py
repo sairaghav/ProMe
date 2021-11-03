@@ -1,5 +1,7 @@
 import os
 
+from news.parsers import MilanoToday
+
 trackingTags = ['furti', 'droga', 'arresti', 'incidenti', 'rapine', 'vandali', 'incidenti-stradali', 'aggressioni',
                 'indagini', 'morti']  # Will hold exhaustive collection of all tags to check
 
@@ -11,11 +13,8 @@ if not mapApiKey:
     Hint: Check out the Telegram group for it ;)
     """)
 
-newsSource = {
-    "MilanoToday": "https://www.milanotoday.it"
-}
-# Other news sources can be added in the same format. If news source is added, specify
-# function with format `get{$source}` in news/getNewsArticles.py
+sources = [MilanoToday]
+# Other news sources can be added in news/parsers/ directory.
 newsNoOfDays = 14  # No. of days to search news for
 
 placesOfInterest = ["hospitals", "police", "bus", "metro", "tram"]

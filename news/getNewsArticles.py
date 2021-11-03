@@ -45,64 +45,32 @@ getMilanoToday(street,startDate,endDate): Scraps the search results for MilanoTo
 import config
 import requests
 from bs4 import BeautifulSoup as BS
-from collections import defaultdict
+from .parsers.classes import *
 
-def getMilanoToday(street,startDate,endDate):
-    news = defaultdict(list)
-    newsData = {}
-    allData = []
-    
-    #Configure URL for MilanoToday
-    url = config.newsSource["MilanoToday"]+"/search/query/"+street['name'].replace(' ','+')+"/from/"+startDate+"/to/"+endDate
-    response = requests.get(url)
-    lastPage = 1
-    
-    soup = BS(response.text,'html.parser')
-    #Get total number of pages of results
-    for pageItem in soup.findAll('div',attrs={'class':'c-pagination'}):
-        lastPage = int(pageItem.find_all('a')[-1]['href'].split('/')[-1])
-    
-    #Get data from all pages of results
-    for i in range(1,lastPage+1):
-        url = config.newsSource["MilanoToday"]+"/search/query/"+street['name'].replace(' ','+')+"/from/"+startDate+"/to/"+endDate+"/pag/"+str(i)
-        response = requests.get(url)
-        soup = BS(response.text,'html.parser')
 
-        for article in soup.findAll('article', attrs={'data-channel':'/notizie/'}):
-            for div in article.findAll('div', attrs={'class':'c-story__content'}):
-                for listitem in div.findAll('ul'):
-                    for li in listitem.findAll('li'):
-                        try:
-                            tagValue = li.find('a')['href'].replace('/tag/','')[:-1]
-                            #Consider only the news     with interested tags
-                            if tagValue.lower() in config.trackingTags:
-                                news[config.newsSource["MilanoToday"]+div.find('header').find('a')['href']].append(tagValue)
-                        except TypeError:
-                            break
+def fetch_soup(url: str) -> BS:
+    return BS(requests.get(url).text, "html.parser")
 
-    #Data enrichment for news article data
-    for link in news.keys():
-        newsData['source'] = "MilanoToday"
-        newsData['link'] = link
-        newsData['tags'] = ','.join(set(news[link]))
-        newsData['street'] = street['name']
 
-        response = requests.get(link)
-        soup = BS(response.text,'html.parser')
+def collect(street: str, start_date: str, end_date: str, source: AbstractNewsSource) -> List[News]:
+    results = []
+    query = NewsQuery(street, start_date, end_date)
+    pagination_url = source.get_url(query)
+    for page in source.parse_page_ids(fetch_soup(pagination_url)):
+        query = query._replace(page=page)
+        page_url = source.get_url(query)
+        for partial_news in source.parse_news_list(fetch_soup(page_url)):
+            if not any(tag in config.trackingTags for tag in partial_news.tags):
+                continue  # No tag we want is included in the news, skip
+            result = source.parse_news_page(fetch_soup(partial_news.link), partial_news)
+            result = result._replace(source=source.name, street=street)
+            results.append(result)
+    return results
 
-        timestamp = soup.find('span',attrs={'data-timestamp':True}).contents[0]
-        
-        newsData['date'] = ' '.join(timestamp.split(' ')[:3])
-        newsData['time'] = timestamp.split(' ')[3]
 
-        allData.append(newsData.copy())
-
-    return allData
-    
-#Returns news data for the last few days for a street on specified news URL
-def getNewsData(street,startDate,endDate):
-    for source in config.newsSource.keys():
-        processFunction = globals()["get"+str(source)]
-        relatedNews = processFunction(street,startDate,endDate)
-
-    return relatedNews
+# Returns news data for the last few days for a street on specified news URL
+def collect_all(street, start_date, end_date):
+    news = []
+    for source in config.sources:
+        news.append(collect(street, start_date, end_date, source))
+    return news

@@ -15,17 +15,18 @@ from bs4 import BeautifulSoup as BS
 from collections import defaultdict
 
 from . import getNewsArticles
- 
-#Returns news data for the last few days for a street on specified news URL
+
+
+# Returns news data for the last few days for a street on specified news URL
 def calcRiskScore(street):
     endDate = datetime.datetime.now().strftime("%Y-%m-%d")
-    startDate = (datetime.datetime.now() - datetime.timedelta(days = config.newsNoOfDays)).strftime("%Y-%m-%d") #timedelta taken from config.py
+    startDate = (datetime.datetime.now() - datetime.timedelta(days=config.newsNoOfDays)).strftime(
+        "%Y-%m-%d")  # timedelta taken from config.py
 
-    relatedNews = {}
-    relatedNews = getNewsArticles.getNewsData(street,startDate,endDate)
+    relatedNews = getNewsArticles.collect_all(street, startDate, endDate)
 
     if len(relatedNews) > 0:
         street['risk_metadata'] = relatedNews
-        street['risk_score'] = len(relatedNews) #Calculate score based on number of articles - need to define better
-    
+        street['risk_score'] = len(relatedNews)  # Calculate score based on number of articles - need to define better
+
     return street
