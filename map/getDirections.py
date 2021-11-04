@@ -32,8 +32,6 @@ class Instruction(NamedTuple):  # TODO: Better name
     risk_score: int
 
 
-
-
 def getStreets(from_source, to_destination, mode="fastest") -> List[Instruction]:
     from_source = urllib.parse.quote_plus(from_source)
     to_destination = urllib.parse.quote_plus(to_destination)
@@ -49,8 +47,8 @@ def getStreets(from_source, to_destination, mode="fastest") -> List[Instruction]
     if response_data['info']['messages']:
         return [response_data]
 
-    start_point, *destination_points = response_data['route'][
-        'locations']  # Can we actually have multiple destinations?
+    start_point, *destination_points = response_data['route']['locations']
+    # Can we actually have multiple destinations?
     for leg in response_data['route']['legs']:
         for maneuver in leg['maneuvers']:
             if maneuver['streets']:

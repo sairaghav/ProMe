@@ -3,6 +3,12 @@ import config
 from collections import defaultdict
 
 
+def is_north_east_of(target, location):
+    # Given we are in Italy (North of Equator, East of Greenwich)
+    # Why one is lon and other is lng? Can't we have a convention?
+    return float(target['lat']) >= location['lat'] and float(target['lon']) >= location['lng']
+
+
 def get_infrastructure_data(streets):
     for i in range(len(streets) - 1):
         score = 0
@@ -15,14 +21,14 @@ def get_infrastructure_data(streets):
             response_data = requests.get(map_final_url).json()
 
             for place_detail in response_data:
-                if (streets[i]['lat'] <= float(place_detail['lat']) >= streets[i + 1]['lat']) and (
-                        streets[i]['lng'] <= float(place_detail['lon']) >= streets[i + 1]['lng']):
+                # But why?
+                if is_north_east_of(place_detail, streets[i]) and is_north_east_of(place_detail, streets[i + 1]):
                     place[place_detail['display_name']]['lat'] = place_detail['lat']
                     place[place_detail['display_name']]['lng'] = place_detail['lon']
 
             if place:
                 related_places[placeType].append(place)
-                score += len(place.keys())
+                score += len(place)
 
         if related_places:
             streets[i]['infra_metadata'] = related_places
