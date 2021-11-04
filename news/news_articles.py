@@ -52,7 +52,7 @@ def fetch_soup(url: str) -> BS:
     return BS(requests.get(url).text, "html.parser")
 
 
-def collect(street: str, start_date: str, end_date: str, source: AbstractNewsSource) -> List[News]:
+def fetch_from_source(street: str, start_date: str, end_date: str, source: AbstractNewsSource) -> List[News]:
     results = []
     query = NewsQuery(street, start_date, end_date)
     pagination_url = source.get_url(query)
@@ -69,8 +69,8 @@ def collect(street: str, start_date: str, end_date: str, source: AbstractNewsSou
 
 
 # Returns news data for the last few days for a street on specified news URL
-def collect_from_all_sources(street: str, start_date: str, end_date: str):
+def fetch_from_all_sources(street: str, start_date: str, end_date: str) -> List[News]:
     news = []
     for source in config.sources:
-        news.append(collect(street, start_date, end_date, source))
+        news.extend(fetch_from_source(street, start_date, end_date, source))
     return news

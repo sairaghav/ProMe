@@ -8,7 +8,7 @@ Description: Defines the routes for the API: https://developer.mapquest.com/docu
     /directions/bicycle/<fromSrc>/<toDst>: Returns the streets on which bicycling is appropriate
 '''
 from flask import Flask, make_response
-from map import getDirections
+from map import routing, significant_places
 from news import risk, news_articles
 
 api = Flask(__name__)
@@ -18,8 +18,8 @@ api = Flask(__name__)
 def directions(fromSrc, toDst):
     result = []
 
-    streets = getDirections.getStreets(fromSrc, toDst)
-    # streets = getPlacesOfInterest.getInfraData(streets)
+    streets = routing.fetch_instructions(fromSrc, toDst)
+    # streets = significant_places.collect_on_route(streets)
 
     if 'name' in streets[0]:
         for street in streets:
@@ -36,10 +36,10 @@ def directions(fromSrc, toDst):
 def directionsMode(fromSrc, toDst, modeOfTransport):
     result = []
 
-    streets = getDirections.getStreets(fromSrc, toDst, modeOfTransport)
+    streets = routing.fetch_instructions(fromSrc, toDst, modeOfTransport)
 
     if 'name' in streets[0]:
-        # streets = getPlacesOfInterest.getInfraData(streets)
+        # streets = significant_places.collect_on_route(streets)
 
         for street in streets:
             result.append(risk.calculate_score(street))
@@ -53,7 +53,7 @@ def directionsMode(fromSrc, toDst, modeOfTransport):
 
 @api.route('/news/<street_name>/<from_date>/<to_date>', methods=['GET'])
 def newsStreet(street_name: str, from_date: str, to_date: str):
-    street_news = news_articles.collect_from_all_sources(street_name, from_date, to_date)
+    street_news = news_articles.fetch_from_all_sources(street_name, from_date, to_date)
 
     return make_response({
         street_name: street_news

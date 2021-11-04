@@ -9,12 +9,12 @@ def is_north_east_of(target, location):
     return float(target['lat']) >= location['lat'] and float(target['lon']) >= location['lng']
 
 
-def get_infrastructure_data(streets):
+def collect_on_route(streets):
     for i in range(len(streets) - 1):
         score = 0
         related_places = defaultdict(list)
 
-        for placeType in config.placesOfInterest:
+        for placeType in config.significant_place_types:
             place = defaultdict(dict)
             map_final_url = f"{config.mapBaseUrl}/nominatim/v1/search.php?routeWidth=0.000001&bounded=1&osm_type=way&format=json&key={config.mapApiKey}&q={streets[i]['name']}, milano+[{placeType}]&addressdetails=0"
 

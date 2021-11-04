@@ -15,6 +15,6 @@ if not mapApiKey:
 
 sources = [MilanoToday]
 # Other news sources can be added in news/parsers/ directory.
-newsNoOfDays = 14  # No. of days to search news for
+fetch_news_for_interval_days = 14
 
-placesOfInterest = ["hospitals", "police", "bus", "metro", "tram"]
+significant_place_types = ["hospitals", "police", "bus", "metro", "tram"]

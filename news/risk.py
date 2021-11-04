@@ -18,7 +18,7 @@ from . import news_articles
 # Returns news data for the last few days for a street on specified news URL
 def calculate_score(street):
     end_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    start_date = (datetime.datetime.now() - datetime.timedelta(days=config.newsNoOfDays)).strftime(
+    start_date = (datetime.datetime.now() - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime(
         "%Y-%m-%d")  # timedelta taken from config.py
 
     related_news = [] # news_articles.collect_from_all_sources(street, start_date, end_date)
