@@ -69,7 +69,7 @@ def collect(street: str, start_date: str, end_date: str, source: AbstractNewsSou
 
 
 # Returns news data for the last few days for a street on specified news URL
-def collect_all(street, start_date, end_date):
+def collect_from_all_sources(street: str, start_date: str, end_date: str):
     news = []
     for source in config.sources:
         news.append(collect(street, start_date, end_date, source))

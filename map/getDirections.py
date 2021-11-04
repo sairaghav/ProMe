@@ -13,56 +13,66 @@ getStreets(from, to, modeOfTransport): Returns the following fields for all the 
     risk_score: Score calculated for risk initialized to 0
     infra_score: Score calculated for infrastructure available initialized to 0
 '''
-import json, requests
+
+import requests
 import urllib.parse
 import config
+from typing import NamedTuple, List
 
-def getStreets(fromSrc,toDst,mode="fastest"):
-    fromSrc = urllib.parse.quote_plus(fromSrc)
-    toDst = urllib.parse.quote_plus(toDst)
 
-    mapFinalUrl = config.mapBaseUrl + "/directions/v2/route?key=" + config.mapApiKey + "&from=" + fromSrc + "&to=" + toDst + "&routeType="+mode + "&unit=k"
-    response = requests.get(mapFinalUrl)
-    responseData = json.loads(response.text)
+class Instruction(NamedTuple):  # TODO: Better name
+    direction: str
+    distance: int
+    infra_score: int
+    lat: float
+    lng: float
+    mode: str
+    name: str
+    narrative: str
+    risk_score: int
 
-    print(response)
-    
-    street = {}
-    results = []
-    #https://developer.mapquest.com/documentation/open/directions-api/route/get/
 
-    if len(responseData['info']['messages']) > 0:
-        results.append(responseData)
-        return results
 
-    for leg in responseData['route']['legs']:
+
+def getStreets(from_source, to_destination, mode="fastest") -> List[Instruction]:
+    from_source = urllib.parse.quote_plus(from_source)
+    to_destination = urllib.parse.quote_plus(to_destination)
+
+    map_final_url = f"{config.mapBaseUrl}/directions/v2/route?key={config.mapApiKey}&from={from_source}&to={to_destination}&routeType={mode}&unit=k"
+    response_data = requests.get(map_final_url).json()
+
+    print(response_data)
+
+    results: List[Instruction] = []
+    # https://developer.mapquest.com/documentation/open/directions-api/route/get/
+
+    if response_data['info']['messages']:
+        return [response_data]
+
+    start_point, *destination_points = response_data['route'][
+        'locations']  # Can we actually have multiple destinations?
+    for leg in response_data['route']['legs']:
         for maneuver in leg['maneuvers']:
-            if len(maneuver['streets']) > 0:
-                street['name'] = '/'.join(maneuver['streets'])
-                street['narrative'] = maneuver['narrative']
-                street['distance'] = maneuver['distance']
-                street['lng'] = maneuver['startPoint']['lng']
-                street['lat'] = maneuver['startPoint']['lat']
-                street['direction'] = maneuver['directionName']
-                street['mode'] = maneuver['transportMode']
-                street['risk_score'] = 0
-                street['infra_score'] = 0
-                results.append(street.copy())
+            if maneuver['streets']:
+                lat, lng = maneuver['startPoint']
+                name = "/".join(maneuver['streets'])
+                maneuver_street = Instruction(name=name, lat=lat, lng=lng, distance=maneuver['distance'],
+                                              direction=maneuver['directionName'], mode=maneuver['transportMode'],
+                                              risk_score=0, infra_score=0, narrative=maneuver['narrative'])
+                results.append(maneuver_street)
 
-    #Add starting and ending points for the journey
-    locations = responseData['route']['locations']
+    # Add the start point for the journey
+    start_street = Instruction(name=start_point["street"], distance=0, lng=start_point["latLng"]["lng"],
+                               lat=start_point["latLng"]["lat"], direction=results[0].direction, mode=results[0].mode,
+                               risk_score=0, infra_score=0, narrative="Starting Point")
+    results.insert(0, start_street)
 
-    for i in range(len(locations)):
-        street['name'] = locations[i]['street']
-        street['narrative'] = 'Starting Point' if i == 0 else "End point"
-        street['distance'] = 0
-        street['lng'] = locations[i]['latLng']['lng']
-        street['lat'] = locations[i]['latLng']['lat']
-        street['direction'] = results[0]['direction'] if i == 0 else results[len(results)-1]['direction']
-        street['mode'] = results[0]['mode'] if i == 0 else results[len(results)-1]['mode']
-        street['risk_score'] = 0
-        street['infra_score'] = 0
-
-        results.insert(0,street.copy()) if i == 0 else results.insert(len(results),street.copy())
+    # Add the destination points for the journey
+    for destination_point in destination_points:
+        destination_street = Instruction(name=destination_point["street"], distance=0,
+                                         lng=destination_point["latLng"]["lng"], lat=destination_point["latLng"]["lat"],
+                                         direction=results[-1].direction, mode=results[-1].mode, risk_score=0,
+                                         infra_score=0, narrative="End Point")
+        results.append(destination_street)
 
     return results

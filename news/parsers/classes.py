@@ -23,14 +23,18 @@ class AbstractNewsSource:
     name: str
     _base_url: str
 
-    def parse_news_page(self, soup: BeautifulSoup, partial: Optional[News]) -> News:
+    @staticmethod
+    def parse_news_page(soup: BeautifulSoup, partial: Optional[News]) -> News:
         raise NotImplementedError()
 
-    def parse_news_list(self, soup: BeautifulSoup) -> List[News]:
+    @staticmethod
+    def parse_news_list(soup: BeautifulSoup) -> List[News]:
         raise NotImplementedError()
 
-    def parse_page_ids(self, soup: BeautifulSoup) -> List[str]:
+    @staticmethod
+    def parse_page_ids(soup: BeautifulSoup) -> List[str]:
         raise NotImplementedError()
 
-    def get_url(self, *query: NewsQuery) -> str:
+    @staticmethod
+    def get_url(query: NewsQuery) -> str:
         raise NotImplementedError()

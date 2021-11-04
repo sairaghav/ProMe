@@ -8,63 +8,57 @@ Description: Defines the routes for the API: https://developer.mapquest.com/docu
     /directions/bicycle/<fromSrc>/<toDst>: Returns the streets on which bicycling is appropriate
 '''
 from flask import Flask, make_response
-from map import getDirections, getPlacesOfInterest
-from news import getRiskScore, getNewsArticles
+from map import getDirections
+from news import risk, news_articles
 
 api = Flask(__name__)
 
-@api.route('/directions/<fromSrc>/<toDst>', methods=['GET'])
-def directions(fromSrc,toDst):
-    results = {}
-    result = []
-    
-    streets = getDirections.getStreets(fromSrc,toDst)
-    #streets = getPlacesOfInterest.getInfraData(streets)
 
-    if 'name' in streets[0].keys():
+@api.route('/directions/<fromSrc>/<toDst>', methods=['GET'])
+def directions(fromSrc, toDst):
+    result = []
+
+    streets = getDirections.getStreets(fromSrc, toDst)
+    # streets = getPlacesOfInterest.getInfraData(streets)
+
+    if 'name' in streets[0]:
         for street in streets:
-            result.append(getRiskScore.calcRiskScore(street))
+            result.append(risk.calculate_score(street))
     else:
         result.append(streets)
 
-    results['results'] = result
+    results = {'results': result}
 
-    response = make_response(results,200)
+    return make_response(results, 200)
 
-    return response
 
 @api.route('/directions/<modeOfTransport>/<fromSrc>/<toDst>', methods=['GET'])
-def directionsMode(fromSrc,toDst,modeOfTransport):
-    results = {}
+def directionsMode(fromSrc, toDst, modeOfTransport):
     result = []
-    
-    streets = getDirections.getStreets(fromSrc,toDst,modeOfTransport)
-    
-    if 'name' in streets[0].keys():
-        #streets = getPlacesOfInterest.getInfraData(streets)
+
+    streets = getDirections.getStreets(fromSrc, toDst, modeOfTransport)
+
+    if 'name' in streets[0]:
+        # streets = getPlacesOfInterest.getInfraData(streets)
 
         for street in streets:
-            result.append(getRiskScore.calcRiskScore(street))
+            result.append(risk.calculate_score(street))
     else:
         result.append(streets)
 
-    results['results'] = result
+    return make_response({
+        "results": result
+    }, 200)
 
-    response = make_response(results,200)
 
-    return response
+@api.route('/news/<street_name>/<from_date>/<to_date>', methods=['GET'])
+def newsStreet(street_name: str, from_date: str, to_date: str):
+    street_news = news_articles.collect_from_all_sources(street_name, from_date, to_date)
 
-@api.route('/news/<streetName>/<fromDate>/<toDate>', methods=['GET'])
-def newsStreet(streetName,fromDate,toDate):
-    results = {}
+    return make_response({
+        street_name: street_news
+    }, 200)
 
-    street = {}
-    street['name'] = streetName
-    results[streetName] = getNewsArticles.collect_all(street, fromDate, toDate)
-
-    response = make_response(results,200)
-
-    return response
 
 if __name__ == '__main__':
     api.run()
