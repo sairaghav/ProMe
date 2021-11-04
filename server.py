@@ -14,11 +14,11 @@ from news import risk, news_articles
 api = Flask(__name__)
 
 
-@api.route('/directions/<fromSrc>/<toDst>', methods=['GET'])
-def directions(fromSrc, toDst):
+@api.route('/directions/<from_src>/<to_dst>', methods=['GET'])
+def directions(from_src, to_dst):
     result = []
 
-    streets = routing.fetch_instructions(fromSrc, toDst)
+    streets = routing.fetch_instructions(from_src, to_dst)
     # streets = significant_places.collect_on_route(streets)
 
     if 'name' in streets[0]:
@@ -32,11 +32,11 @@ def directions(fromSrc, toDst):
     return make_response(results, 200)
 
 
-@api.route('/directions/<modeOfTransport>/<fromSrc>/<toDst>', methods=['GET'])
-def directionsMode(fromSrc, toDst, modeOfTransport):
+@api.route('/directions/<mode_of_transport>/<from_src>/<to_dst>', methods=['GET'])
+def directions_with_mode(from_src, to_dst, mode_of_transport):
     result = []
 
-    streets = routing.fetch_instructions(fromSrc, toDst, modeOfTransport)
+    streets = routing.fetch_instructions(from_src, to_dst, mode_of_transport)
 
     if 'name' in streets[0]:
         # streets = significant_places.collect_on_route(streets)
@@ -52,7 +52,7 @@ def directionsMode(fromSrc, toDst, modeOfTransport):
 
 
 @api.route('/news/<street_name>/<from_date>/<to_date>', methods=['GET'])
-def newsStreet(street_name: str, from_date: str, to_date: str):
+def news_of_street(street_name: str, from_date: str, to_date: str):
     street_news = news_articles.fetch_from_all_sources(street_name, from_date, to_date)
 
     return make_response({

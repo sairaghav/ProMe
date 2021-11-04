@@ -1,7 +1,9 @@
-import csv, datetime, requests
-from urllib.parse import quote as url_encode
-from typing import NamedTuple
+import csv
+import datetime
 import os.path as path
+
+from news import news_articles
+from news.parsers import News
 
 streets = [
     "Viale Monza",
@@ -28,31 +30,17 @@ streets = [
     "Via Monte Napoleone"
 ]
 
-baseUrl = "http://localhost:5000/news"
+end_date = datetime.datetime.now().strftime("%Y-%m-%d")
+start_date = "2018-01-01"  # (datetime.datetime.now() - datetime.timedelta(days = 730)).strftime("%Y-%m-%d")
 
-endDate = datetime.datetime.now().strftime("%Y-%m-%d")
-startDate = "2018-01-01"  # (datetime.datetime.now() - datetime.timedelta(days = 730)).strftime("%Y-%m-%d")
-
-
-class NewsDataRow(NamedTuple):
-    date: str
-    time: str
-    source: str
-    street: str
-    tags: str
-    link: str
-
-
-csv_path = path.join(path.dirname(path.realpath(__file__)), "..", "datasets", f"NewsData_{startDate}_{endDate}.csv")
+csv_path = path.join(path.dirname(path.realpath(__file__)), "..", "datasets", f"NewsData_{start_date}_{end_date}.csv")
 with open(csv_path, 'w+', encoding='UTF8', newline='') as output_csv:
     writer = csv.writer(output_csv)
-    writer.writerow([field.capitalize() for field in NewsDataRow._fields])
+    writer.writerow([field.capitalize() for field in News._fields])
     for ind, street in enumerate(streets):
-        finalUrl = f"{baseUrl}/{url_encode(street)}/{url_encode(startDate)}/{url_encode(endDate)}"
         print(f"Processing: {street} ({ind + 1} / {len(streets)})", end="\r")
-        response = requests.get(finalUrl)
-        parsed_response = response.json()
-        writer.writerows([NewsDataRow(**row) for row in parsed_response[street]])
+        results = news_articles.fetch_from_all_sources(street, start_date, end_date)
+        writer.writerows(results)
         print(" " * 80, end="\r")
 print("OK, wrote CSV:")
 print(path.realpath(csv_path))

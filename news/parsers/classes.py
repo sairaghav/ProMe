@@ -11,12 +11,12 @@ class NewsQuery(NamedTuple):
 
 
 class News(NamedTuple):
-    source: str
-    link: str
-    tags: str
-    street: str
     date: str
     time: str
+    source: str
+    street: str
+    tags: str
+    link: str
 
 
 class AbstractNewsSource:
