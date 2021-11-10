@@ -9,7 +9,7 @@ con = sqlite3.connect(path+db_name, check_same_thread=False)
 cur = con.cursor()
 
 def init_tables():
-    cur.execute('CREATE TABLE IF NOT EXISTS street_list (last_update_time text, street text, risk_score text)')
+    cur.execute('CREATE TABLE IF NOT EXISTS street_list (last_update_time text, street text)')
     con.commit()
 
     cur.execute('CREATE TABLE IF NOT EXISTS street_news (date text, time text, source text, street text, tags text, link text)')
@@ -61,7 +61,7 @@ def update_street_risk_data(news_data: dict) -> None:
 def search_street_data(street: str) -> tuple:
     table_name = 'street_list'
     cur.execute('SELECT * FROM '+table_name+' WHERE street=:street', {"street": street})
-    return cur.fetchall()
+    return cur.fetchone()
 
 def search_street_risk_data(street: str) -> list[dict]:
     table_name = 'street_news'
@@ -84,7 +84,7 @@ def search_street_risk_data(street: str) -> list[dict]:
 
 def check_last_updated_time(street: str):
     if len(search_street_data(street)) > 0:
-        time_difference = datetime.datetime.now() - datetime.datetime.strptime(search_street_data(street)[0][0],"%Y-%m-%d %H:%M:%S")
+        time_difference = datetime.datetime.now() - datetime.datetime.strptime(search_street_data(street)[0],"%Y-%m-%d %H:%M:%S")
         return time_difference
 
     else: 
