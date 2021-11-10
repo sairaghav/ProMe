@@ -9,7 +9,7 @@ Description: Defines the routes for the API: https://developer.mapquest.com/docu
 '''
 from typing import NamedTuple
 from flask import Flask, request, make_response
-from map import routing, significant_places
+from directions import routing, significant_places
 from news import risk, news_articles
 
 api = Flask(__name__)
