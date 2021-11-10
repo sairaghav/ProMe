@@ -11,14 +11,16 @@ from typing import NamedTuple
 from flask import Flask, request, make_response
 from directions import routing, significant_places
 from news import risk, news_articles
+from db import db_operations
 
 api = Flask(__name__)
+import sqlite3
 
+db_operations.init_tables()
 
 class Response(NamedTuple):
     results: str
     errors: str
-
 
 @api.route('/api/directions', methods=['GET'])
 def directions() -> Response:
@@ -38,7 +40,7 @@ def directions() -> Response:
             if type(street) == dict:
                 response = Response(results=None, errors=street['info']['messages'])
             else:
-                result.append(risk.calculate_score(street._asdict()))
+                result.append(db_operations.get_risk_score(street))
                 response = Response(results=result, errors=None)
     
     return make_response(response._asdict(), 200)
@@ -54,10 +56,8 @@ def news_of_street() -> Response:
         response = Response(results=None, errors="Expected Format: /api/news?street=<street>&start=<yyyy-mm-dd>&end=<yyyy-mm-dd>")
 
     else:
-        result = []
-        for street_news in news_articles.fetch_from_all_sources(street_name, from_date, to_date):
-            result.append(street_news._asdict())
-            response = Response(results=result, errors=None)
+        result = db_operations.get_news_data(street_name, from_date, to_date)
+        response = Response(results=result, errors=None)
 
     return make_response(response._asdict(), 200)
 
