@@ -71,7 +71,7 @@ def fetch_from_source(street: str, start_date: str, end_date: str, source: Abstr
 # Returns news data for the last few days for a street on specified news URL
 def fetch_from_all_sources(street: str, start_date: str, end_date: str) -> List[News]:
     news = []
-    print('Querying news source')
+    print('Querying news source for '+street)
     for source in config.sources:
         news.extend(fetch_from_source(street, start_date, end_date, source))
     return news

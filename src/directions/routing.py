@@ -39,8 +39,6 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
     map_final_url = f"{config.mapBaseUrl}/directions/v2/route?key={config.mapApiKey}&from={from_source}&to={to_destination}&routeType={mode}&unit=k"
     response_data = requests.get(map_final_url).json()
 
-    print(response_data)
-
     results: List[Route] = []
     # https://developer.mapquest.com/documentation/open/directions-api/route/get/
 
