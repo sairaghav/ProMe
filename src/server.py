@@ -10,7 +10,7 @@ Description: Defines the routes for the API: https://developer.mapquest.com/docu
 from typing import NamedTuple
 from flask import Flask, request, make_response
 from directions import routing, significant_places
-from news import risk, news_articles
+from news import news_articles
 from db import db_operations
 
 api = Flask(__name__)
@@ -40,7 +40,7 @@ def directions() -> Response:
             if type(street) == dict:
                 response = Response(results=None, errors=street['info']['messages'])
             else:
-                result.append(db_operations.get_risk_score(street))
+                result.append(db_operations.get_risk_score(street._asdict()))
                 response = Response(results=result, errors=None)
     
     return make_response(response._asdict(), 200)

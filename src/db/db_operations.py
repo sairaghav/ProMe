@@ -61,7 +61,6 @@ def update_street_risk_data(news_data):
 
 def search_street_data(street):
     table_name = 'street_list'
-
     cur.execute('SELECT * FROM '+table_name+' WHERE street=:street', {"street": street})
     return cur.fetchall()
 
@@ -119,8 +118,10 @@ def get_news_data(street_name,
 
     return result
 
-def get_risk_score(street_name):
-    result = get_news_data(street_name)
+def get_risk_score(street):
+    result = get_news_data(street['name'])
+    
+    street['risk_metadata'] = result
+    street['risk_score'] = len(result)
 
-
-    return result
+    return street
