@@ -20,7 +20,7 @@ import config
 from typing import NamedTuple, List
 
 
-class Instruction(NamedTuple):  # TODO: Better name
+class Route(NamedTuple):  # TODO: Better name
     direction: str
     distance: int
     infra_score: int
@@ -32,7 +32,7 @@ class Instruction(NamedTuple):  # TODO: Better name
     risk_score: int
 
 
-def fetch_instructions(from_source, to_destination, mode) -> List[Instruction]:
+def fetch_route(from_source, to_destination, mode) -> List[Route]:
     from_source = urllib.parse.quote_plus(from_source)
     to_destination = urllib.parse.quote_plus(to_destination)
 
@@ -41,7 +41,7 @@ def fetch_instructions(from_source, to_destination, mode) -> List[Instruction]:
 
     print(response_data)
 
-    results: List[Instruction] = []
+    results: List[Route] = []
     # https://developer.mapquest.com/documentation/open/directions-api/route/get/
 
     if response_data['info']['messages']:
@@ -54,20 +54,20 @@ def fetch_instructions(from_source, to_destination, mode) -> List[Instruction]:
             if maneuver['streets']:
                 lat, lng = maneuver['startPoint']
                 name = "/".join(maneuver['streets'])
-                maneuver_street = Instruction(name=name, lat=lat, lng=lng, distance=maneuver['distance'],
+                maneuver_street = Route(name=name, lat=lat, lng=lng, distance=maneuver['distance'],
                                               direction=maneuver['directionName'], mode=maneuver['transportMode'],
                                               risk_score=0, infra_score=0, narrative=maneuver['narrative'])
                 results.append(maneuver_street)
 
     # Add the start point for the journey
-    start_street = Instruction(name=start_point["street"], distance=0, lng=start_point["latLng"]["lng"],
+    start_street = Route(name=start_point["street"], distance=0, lng=start_point["latLng"]["lng"],
                                lat=start_point["latLng"]["lat"], direction=results[0].direction, mode=results[0].mode,
                                risk_score=0, infra_score=0, narrative="Starting Point")
     results.insert(0, start_street)
 
     # Add the destination points for the journey
     for destination_point in destination_points:
-        destination_street = Instruction(name=destination_point["street"], distance=0,
+        destination_street = Route(name=destination_point["street"], distance=0,
                                          lng=destination_point["latLng"]["lng"], lat=destination_point["latLng"]["lat"],
                                          direction=results[-1].direction, mode=results[-1].mode, risk_score=0,
                                          infra_score=0, narrative="End Point")

@@ -31,7 +31,7 @@ def directions() -> Response:
 
     else:
         result = []
-        streets = routing.fetch_instructions(from_src, to_dst, mode)
+        streets = routing.fetch_route(from_src, to_dst, mode)
         # streets = significant_places.collect_on_route(streets))
 
         for street in streets:
