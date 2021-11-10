@@ -32,7 +32,7 @@ class Instruction(NamedTuple):  # TODO: Better name
     risk_score: int
 
 
-def fetch_instructions(from_source, to_destination, mode="fastest") -> List[Instruction]:
+def fetch_instructions(from_source, to_destination, mode) -> List[Instruction]:
     from_source = urllib.parse.quote_plus(from_source)
     to_destination = urllib.parse.quote_plus(to_destination)
 

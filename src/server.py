@@ -2,62 +2,64 @@
 Author: Sairaghav (https://github.com/sairaghav)
 
 Description: Defines the routes for the API: https://developer.mapquest.com/documentation/open/directions-api/route/get/
-    /directions/<fromSrc>/<toDst>: Returns the streets for the quickest drive time
-    /directions/pedestrian/<fromSrc>/<toDst>: Returns the streets for walking route; Avoids limited access roads; Ignores turn restrictions
-    /directions/shortest/<fromSrc>/<toDst>: Returns the streets for the shortest driving distance route
-    /directions/bicycle/<fromSrc>/<toDst>: Returns the streets on which bicycling is appropriate
+    /api/directions?from=<source>&to=<destination>: Returns the streets for the quickest drive time
+    /api/directions?from=<source>&to=<destination>&mode=pedestrian: Returns the streets for walking route; Avoids limited access roads; Ignores turn restrictions
+    /api/directions?from=<source>&to=<destination>&mode=shortest: Returns the streets for the shortest driving distance route
+    /api/directions?from=<source>&to=<destination>&mode=bicycle: Returns the streets on which bicycling is appropriate
 '''
-from flask import Flask, make_response
+from typing import NamedTuple
+from flask import Flask, request, make_response
 from map import routing, significant_places
 from news import risk, news_articles
 
 api = Flask(__name__)
 
 
-@api.route('/directions/<from_src>/<to_dst>', methods=['GET'])
-def directions(from_src, to_dst):
-    result = []
+class Response(NamedTuple):
+    results: str
+    errors: str
 
-    streets = routing.fetch_instructions(from_src, to_dst)
-    # streets = significant_places.collect_on_route(streets)
 
-    if 'name' in streets[0]:
-        for street in streets:
-            result.append(risk.calculate_score(street))
+@api.route('/api/directions', methods=['GET'])
+def directions() -> Response:
+    from_src = request.args.get('from', None)
+    to_dst = request.args.get('to', None)
+    mode = request.args.get('mode', "fastest")
+
+    if from_src is None or to_dst is None:
+        response = Response(results=None, errors="Expected Format: /api/directions?from=<source>&to=<destination>&mode=<null|pedestrian|shortest|bicycle>")
+
     else:
-        result.append(streets)
-
-    results = {'results': result}
-
-    return make_response(results, 200)
-
-
-@api.route('/directions/<mode_of_transport>/<from_src>/<to_dst>', methods=['GET'])
-def directions_with_mode(from_src, to_dst, mode_of_transport):
-    result = []
-
-    streets = routing.fetch_instructions(from_src, to_dst, mode_of_transport)
-
-    if 'name' in streets[0]:
-        # streets = significant_places.collect_on_route(streets)
+        result = []
+        streets = routing.fetch_instructions(from_src, to_dst, mode)
+        # streets = significant_places.collect_on_route(streets))
 
         for street in streets:
-            result.append(risk.calculate_score(street))
+            if type(street) == dict:
+                response = Response(results=None, errors=street['info']['messages'])
+            else:
+                result.append(risk.calculate_score(street._asdict()))
+                response = Response(results=result, errors=None)
+    
+    return make_response(response._asdict(), 200)
+
+
+@api.route('/api/news', methods=['GET'])
+def news_of_street() -> Response:
+    street_name = request.args.get('street', None)
+    from_date = request.args.get('start', None)
+    to_date = request.args.get('end', None)
+
+    if street_name is None or from_date is None or to_date is None:
+        response = Response(results=None, errors="Expected Format: /api/news?street=<street>&start=<yyyy-mm-dd>&end=<yyyy-mm-dd>")
+
     else:
-        result.append(streets)
+        result = []
+        for street_news in news_articles.fetch_from_all_sources(street_name, from_date, to_date):
+            result.append(street_news._asdict())
+            response = Response(results=result, errors=None)
 
-    return make_response({
-        "results": result
-    }, 200)
-
-
-@api.route('/news/<street_name>/<from_date>/<to_date>', methods=['GET'])
-def news_of_street(street_name: str, from_date: str, to_date: str):
-    street_news = news_articles.fetch_from_all_sources(street_name, from_date, to_date)
-
-    return make_response({
-        street_name: street_news
-    }, 200)
+    return make_response(response._asdict(), 200)
 
 
 if __name__ == '__main__':
