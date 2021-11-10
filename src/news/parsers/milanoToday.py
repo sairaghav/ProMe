@@ -28,7 +28,7 @@ class MilanoToday(AbstractNewsSource):
                         except TypeError:
                             break
                 tag_str = ",".join(set(tags))
-                news = News(MilanoToday.name, link, tag_str, "", "", "")
+                news = News(source=MilanoToday.name, link=MilanoToday._base_url+link, tags=tag_str, date="", time="", street="")
                 result.append(news)
         return result
 
