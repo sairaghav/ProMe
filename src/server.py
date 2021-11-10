@@ -9,13 +9,10 @@ Description: Defines the routes for the API: https://developer.mapquest.com/docu
 '''
 from typing import NamedTuple
 from flask import Flask, request, make_response
-from directions import routing, significant_places
-from news import news_articles
+from directions import routing
 from db import db_operations
 
 api = Flask(__name__)
-import sqlite3
-
 db_operations.init_tables()
 
 class Response(NamedTuple):
