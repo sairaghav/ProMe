@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath src server:api
+web: gunicorn ProMe.wsgi
