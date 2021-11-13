@@ -25,16 +25,18 @@ def add_to_db(street, from_date, to_date, queryset):
 
     return results
 
-
 def index(request):
     return HttpResponse("Hello! You're at the ProMeAPI index.")
 
 def get_news(request):
     street = request.GET.get('street',None)
-    from_date = datetime.datetime.strptime(request.GET.get('from',None), '%Y-%m-%d').astimezone(datetime.timezone.utc)
-    to_date = datetime.datetime.strptime(request.GET.get('to',None), '%Y-%m-%d').astimezone(datetime.timezone.utc)
+    from_date = request.GET.get('from',None)
+    to_date = request.GET.get('to',None)
 
     if street is not None and from_date is not None and to_date is not None:
+        from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)
+        to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)
+
         queryset = StreetRisk.objects.all()
         queryset = queryset.filter(street_name=street,date__range=[from_date,to_date])
 
@@ -51,12 +53,11 @@ def get_news(request):
 
     return JsonResponse(response._asdict())
 
-
-
 def get_directions(request):
     start = request.GET.get('start',None)
     end = request.GET.get('end',None)
     mode = request.GET.get('mode','fastest')
+    
     to_date = datetime.datetime.now(datetime.timezone.utc)
     from_date = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)
 
@@ -80,7 +81,6 @@ def get_directions(request):
                     route = route._replace(risk_metadata=[result._asdict() for result in results])
                     route = route._replace(risk_score=len(results))
 
-
                 else:
                     route = route._replace(risk_metadata=list(queryset.values()))
                     route = route._replace(risk_score=len(queryset))
@@ -93,3 +93,4 @@ def get_directions(request):
 
     else:
         response = Response(results=None, errors="Expected Format: /api/directions?from=<source>&to=<destination>&mode=<null|pedestrian|shortest|bicycle>")
+        return JsonResponse(response._asdict())
