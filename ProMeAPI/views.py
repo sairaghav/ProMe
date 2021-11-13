@@ -92,5 +92,5 @@ def get_directions(request):
         return JsonResponse(response._asdict())
 
     else:
-        response = Response(results=None, errors="Expected Format: /api/directions?from=<source>&to=<destination>&mode=<null|pedestrian|shortest|bicycle>")
+        response = Response(results=None, errors="Expected Format: /api/directions?start=<source>&end=<destination>&mode=<null|pedestrian|shortest|bicycle>")
         return JsonResponse(response._asdict())
