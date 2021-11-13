@@ -53,7 +53,7 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
             if maneuver['streets']:
                 lat = maneuver['startPoint']['lat']
                 lng = maneuver['startPoint']['lng']
-                name = ", ".join(maneuver['streets'])
+                name = " ".join(maneuver['streets'])
                 maneuver_street = Route(name=name, lat=lat, lng=lng, distance=maneuver['distance'],
                                               direction=maneuver['directionName'], mode=maneuver['transportMode'],
                                               risk_score=0, infra_score=0, narrative=maneuver['narrative'], risk_metadata=[])
