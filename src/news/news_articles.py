@@ -60,7 +60,7 @@ def fetch_from_source(street: str, start_date: str, end_date: str, source: Abstr
         query = query._replace(page=page)
         page_url = source.get_url(query)
         for partial_news in source.parse_news_list(fetch_soup(page_url)):
-            if not any(tag in config.trackingTags for tag in partial_news.tags):
+            if not any(tag in config.trackingTags for tag in partial_news.tags.split(",")):
                 continue  # No tag we want is included in the news, skip
             result = source.parse_news_page(fetch_soup(partial_news.link), partial_news)
             result = result._replace(source=source.name, street=street)
@@ -71,6 +71,7 @@ def fetch_from_source(street: str, start_date: str, end_date: str, source: Abstr
 # Returns news data for the last few days for a street on specified news URL
 def fetch_from_all_sources(street: str, start_date: str, end_date: str) -> List[News]:
     news = []
+    print('Querying news source for '+street)
     for source in config.sources:
         news.extend(fetch_from_source(street, start_date, end_date, source))
     return news
