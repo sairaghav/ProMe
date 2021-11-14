@@ -78,7 +78,7 @@ def get_news(request) -> JsonResponse:
                 street_list.save(update_fields=['news_till'])
 
             else:
-                add_to_db(street, queryset, from_date, to_date)
+                add_to_db(street, queryset, from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
         
         
         queryset = StreetRisk.objects.all()
