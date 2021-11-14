@@ -23,6 +23,8 @@ class MilanoToday(AbstractNewsSource):
         for article in soup.findAll('article', attrs={'data-channel': '/notizie/'}):
 
             for article_content_div in article.findAll('div', attrs={'class': 'c-story__content'}):
+                title = article_content_div.find('header').find('h1').contents[0]
+                print(title)
                 link = article_content_div.find('header').find('a')['href']
                 tags = []
                 for tag_list in article_content_div.findAll('ul'):
@@ -33,7 +35,7 @@ class MilanoToday(AbstractNewsSource):
                         except TypeError:
                             break
                 tag_str = ",".join(set(tags))
-                news = News(source=MilanoToday.name, link=MilanoToday._base_url+link, tags=tag_str, date="", street="")
+                news = News(source=MilanoToday.name, title=title, link=MilanoToday._base_url+link, tags=tag_str, date="", street="")
                 result.append(news)
         return result
 

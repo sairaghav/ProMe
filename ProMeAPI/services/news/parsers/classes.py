@@ -16,6 +16,7 @@ class News(NamedTuple):
     street: str
     tags: str
     link: str
+    title: str
 
 
 class AbstractNewsSource:

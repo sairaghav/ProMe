@@ -49,7 +49,11 @@ def streets(request):
             street_data = json.loads(response.text)['results']
 
             for data in street_data:
+                data['reference'] = {}
+                data['reference'][data['news']] = data['link']
                 data.pop('id')
+                data.pop('news')
+                data.pop('link')
             timeline_data = get_timeline_data(street_data)
             tag_data = get_tag_data(street_data)
             

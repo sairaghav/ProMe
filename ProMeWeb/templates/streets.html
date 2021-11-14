@@ -124,7 +124,13 @@
         <tbody>
             {% for item in street_data %}
             <tr>
-                {% for key,value in item.items %}<td>{{ value }}</td>{% endfor %}
+                {% for key,value in item.items %}
+                    {% if key == 'reference' %}
+                        <td>{% for title,link in value.items %}<a href='{{ link }}'>{{ title }}</a>{% endfor %}</td>
+                    {% else %}
+                        <td>{{ value }}</td>
+                    {% endif %}
+                {% endfor %}
             </tr>
             {% endfor %}
         </tbody>

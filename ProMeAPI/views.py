@@ -21,7 +21,7 @@ def add_to_db(street: str, queryset: QuerySet, from_date: str, to_date: str) -> 
     for result in results:
         if len(queryset.filter(date=result.date, link=result.link)) == 0:
             print('Adding to DB for '+street)
-            risk = StreetRisk(date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
+            risk = StreetRisk(news=result.title, date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
             risk.save()
 
     return results
