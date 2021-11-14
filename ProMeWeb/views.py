@@ -74,9 +74,11 @@ def streets(request):
             print('Error')
 
     else:
-        form = StreetRiskForm(initial={'news_from': (datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(days=30)).strftime("%Y-%m-%d"), 
+        form = StreetRiskForm(initial={'street': 'Lambrate',
+                        'news_from': (datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(days=30)).strftime("%Y-%m-%d"), 
                         'news_till': datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
-                    })
+                    }
+                )
         context = {
             'form': form
         }
