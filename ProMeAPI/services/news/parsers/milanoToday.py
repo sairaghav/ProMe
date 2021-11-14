@@ -24,7 +24,6 @@ class MilanoToday(AbstractNewsSource):
 
             for article_content_div in article.findAll('div', attrs={'class': 'c-story__content'}):
                 title = article_content_div.find('header').find('h1').contents[0]
-                print(title)
                 link = article_content_div.find('header').find('a')['href']
                 tags = []
                 for tag_list in article_content_div.findAll('ul'):
