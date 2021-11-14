@@ -4,8 +4,8 @@
 
 {% block content %}
 
-<div class="row mt-3 pt-3">
-    <div class="col-md-5">
+<div class="row mt-3 pt-3 justify-content-center">
+    <div class="col">
         <div class="border p-3 shadow">
             <h4>Search for street risk</h4>
             <hr>
@@ -17,18 +17,20 @@
 
         </div>
     </div>
-    <div class="col-md-4">
+</div>
+<div class="row mt-3 pt-3 justify-content-center">
+    {% if street %}
+        <h1 align="center">{{ street }}</h1>
+        {% if tag_data == None or timeline_data == None %}
+            <h5 align="Center">No data found.</h2>
+        {% endif %}
+    {% endif %}
+    <div class="col-md-4 justify-content-center">
         {% if street == None %}
         <p>Enter street name in search to get risk metrics</p>
         {% endif %}
-        {% if street %}
-        <h1 align="center">{{ street }}</h1>
-        {% if tag_data == None or timeline_data == None %}
-        <p>No data found.</p>
-        {% endif %}
-        {% endif %}
         {% if tag_data %}
-        <canvas id="tagChart" width="5" height="5"></canvas>
+        <canvas id="tagChart" width="100%" height="100%"></canvas>
         <script>
         const ctx2 = document.getElementById('tagChart').getContext('2d');
         const tagChart = new Chart(ctx2, {
@@ -67,8 +69,10 @@
         });
         </script>
         {% endif %}
+    </div>
+    <div class="col-md-4">
         {% if timeline_data %}
-        <canvas id="timeChart" width="200" height="100"></canvas>
+        <canvas id="timeChart" width="100%" height="100%"></canvas>
         <script>
         const ctx = document.getElementById('timeChart').getContext('2d');
         const timeChart = new Chart(ctx, {
@@ -109,5 +113,23 @@
         {% endif %}
     </div>
 </div>
+{% if street_data %}
+<div class="row">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                {% for key,value in street_data.0.items %}<th scope="col">{{ key.capitalize }}</th>{% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in street_data %}
+            <tr>
+                {% for key,value in item.items %}<td>{{ value }}</td>{% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 
 {% endblock %}

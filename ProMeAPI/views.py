@@ -5,7 +5,7 @@ from ProMeAPI.services.news import news_articles
 from ProMeAPI.services.directions import routing
 from ProMeAPI.services import config
 from ProMeAPI.services.news.parsers.classes import News
-from .models import StreetRisk
+from .models import StreetRisk, StreetList
 
 import datetime
 
@@ -21,7 +21,7 @@ def add_to_db(street: str, queryset: QuerySet, from_date: str, to_date: str) -> 
     for result in results:
         if len(queryset.filter(date=result.date, link=result.link)) == 0:
             print('Adding to DB for '+street)
-            risk = StreetRisk(date=result.date, source=result.source, street_name=result.street, tags=result.tags, link=result.link)
+            risk = StreetRisk(date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
             risk.save()
 
     return results
@@ -39,18 +39,18 @@ def get_news(request) -> JsonResponse:
         to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)
 
         queryset = StreetRisk.objects.all()
-        queryset = queryset.filter(street_name=street,date__range=[from_date,to_date])
+        queryset = queryset.filter(street=street,date__range=[from_date,to_date])
 
         if len(queryset) == 0:
             results = add_to_db(street, queryset, from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
 
             queryset = StreetRisk.objects.all()
-            queryset = queryset.filter(street_name=street,date__range=[from_date,to_date])
+            queryset = queryset.filter(street=street,date__range=[from_date,to_date])
 
         response = Response(results=list(queryset.values()), errors=None)
 
     else:
-        response = Response(results=None, errors="Expected Format: /api/news?street=<street_name>&from=<from_date_yyyy-mm-dd>&to=<to_date_yyyy-mm-dd>")
+        response = Response(results=None, errors="Expected Format: /api/news?street=<street>&from=<from_date_yyyy-mm-dd>&to=<to_date_yyyy-mm-dd>")
 
     return JsonResponse(response._asdict())
 
@@ -74,7 +74,7 @@ def get_directions(request) -> JsonResponse:
             else:
                 street = route.name
                 queryset = StreetRisk.objects.all()
-                queryset = queryset.filter(street_name=street,date__range=[from_date,to_date])
+                queryset = queryset.filter(street=street,date__range=[from_date,to_date])
             
                 if street not in street_visited and len(queryset) == 0:
                     results = add_to_db(street, queryset, from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
