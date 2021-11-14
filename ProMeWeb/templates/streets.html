@@ -6,8 +6,8 @@
 
 <div class="row mt-3 pt-3 justify-content-center">
     <div class="col">
-        <div class="border p-3 shadow">
-            <h4>Search for street risk</h4>
+        <div class="border p-3 shadow justify-content-center">
+            <h4>Search for a street name</h4>
             <hr>
             <form method="POST">
                 {% csrf_token %}
@@ -20,14 +20,14 @@
 </div>
 <div class="row mt-3 pt-3 justify-content-center">
     {% if street %}
-        <h1 align="center">{{ street }}</h1>
+        <h1 align="center">Risk Metrics for {{ street }}</h1>
         {% if tag_data == None or timeline_data == None %}
             <h5 align="Center">No data found.</h2>
         {% endif %}
     {% endif %}
     <div class="col-md-4 justify-content-center">
         {% if street == None %}
-        <p>Enter street name in search to get risk metrics</p>
+        <p>Enter street name in search field to get risk metrics</p>
         {% endif %}
         {% if tag_data %}
         <canvas id="tagChart" width="100%" height="100%"></canvas>

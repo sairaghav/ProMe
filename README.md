@@ -23,7 +23,7 @@ For each street, following values will be returned:
 - infra_score: Score calculated for infrastructure available along the street initialized to 0
 
 
-`https://prome-api.herokuapp.com/directions/pedestrian/<from>/<to>` will return the same values but mode of transport will only be considered as *WALKING*
+`https://pro-me.herokuapp.com/directions/pedestrian/<from>/<to>` will return the same values but mode of transport will only be considered as *WALKING*
 
 **Example usage:** 
 
@@ -33,7 +33,7 @@ For each street, following values will be returned:
 
 
 ### Get all news articles related to a particular street between a date range
-Calling `https://prome-api.herokuapp.com/news/<street name>/<start date>/<end date>` will return all news articles between the date range in the configured sources in config.py related to the specified street
+Calling `https://pro-me.herokuapp.com/news/<street name>/<start date>/<end date>` will return all news articles between the date range in the configured sources in config.py related to the specified street
 
 For each street, following values will be returned:
 - street: Name of street

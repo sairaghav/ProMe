@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.sites.shortcuts import get_current_site
 from .searchform import StreetRiskForm
 
+
 import requests, json, datetime
 
 import collections
@@ -39,7 +40,8 @@ def get_timeline_data(result):
 def streets(request):
     if request.method == 'POST':
         form = StreetRiskForm(request.POST,
-            initial={'news_from': (datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(days=30)).strftime("%Y-%m-%d"), 
+            initial={'street': 'Lambrate',
+                        'news_from': (datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(days=30)).strftime("%Y-%m-%d"), 
                         'news_till': datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
                     }
         )
