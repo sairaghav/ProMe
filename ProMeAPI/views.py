@@ -14,8 +14,13 @@ class Response(NamedTuple):
     results: str
     errors: str
 
-def add_to_db(street, from_date, to_date, queryset):
+def add_to_db(street, 
+                queryset, 
+                from_date=(datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime('%Y-%m-%d'), 
+                to_date=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
+            ):
     results = news_articles.fetch_from_all_sources(street, from_date, to_date)
+    print(results)
 
     for result in results:
         if len(queryset.filter(date=result.date, link=result.link)) == 0:
@@ -41,7 +46,7 @@ def get_news(request):
         queryset = queryset.filter(street_name=street,date__range=[from_date,to_date])
 
         if len(queryset) == 0:
-            results = add_to_db(street, from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'), queryset)
+            results = add_to_db(street, queryset, from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
 
             queryset = StreetRisk.objects.all()
             queryset = queryset.filter(street_name=street,date__range=[from_date,to_date])
@@ -76,7 +81,7 @@ def get_directions(request):
                 queryset = queryset.filter(street_name=street,date__range=[from_date,to_date])
             
                 if street not in street_visited and len(queryset) == 0:
-                    results = add_to_db(street, from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'), queryset)
+                    results = add_to_db(street, queryset, from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
                     street_visited.append(street)
                     route = route._replace(risk_metadata=[result._asdict() for result in results])
                     route = route._replace(risk_score=len(results))

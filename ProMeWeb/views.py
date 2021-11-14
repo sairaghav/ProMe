@@ -5,6 +5,7 @@ from .searchform import StreetRiskForm
 from ProMeAPI.models import StreetRisk
 
 import collections
+from ProMeAPI.views import add_to_db
 
 def get_tag_data(result):
     data = []
@@ -62,9 +63,15 @@ def index(request):
 
 
 def streets(request):
-    street_name = request.GET.get('street')
-    timeline_data = get_timeline_data(StreetRisk.objects.filter(street_name=street_name).values_list('date'))
-    tag_data = get_tag_data(StreetRisk.objects.filter(street_name=street_name).values_list('tags'))
+    street_name = request.GET.get('street',None)
+    
+    if street_name is not None:
+        street_data = StreetRisk.objects.filter(street_name=street_name)
+
+        if len(street_data) == 0:
+            add_to_db(street_name, street_data)
+        timeline_data = get_timeline_data(street_data.values_list('date'))
+        tag_data = get_tag_data(street_data.values_list('tags'))
 
     if request.method == 'POST':
         form = StreetRiskForm(request.POST)

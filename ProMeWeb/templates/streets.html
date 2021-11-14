@@ -18,6 +18,9 @@
         </div>
     </div>
     <div class="col-md-4">
+        {% if street == None %}
+        <p>Enter street name in search to get risk metrics</p>
+        {% endif %}
         {% if street %}
         <h1 align="center">{{ street }}</h1>
         {% if tag_data == None or timeline_data == None %}
