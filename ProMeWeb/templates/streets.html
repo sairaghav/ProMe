@@ -5,9 +5,9 @@
 {% block content %}
 
 <div class="row mt-3 pt-3">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="border p-3 shadow">
-            <h4>Search for street data</h4>
+            <h4>Search for street risk</h4>
             <hr>
             <form method="POST">
                 {% csrf_token %}
@@ -17,46 +17,93 @@
 
         </div>
     </div>
-
-    <div class="col-md-8">
-        <canvas id="myChart" width="400" height="200"></canvas>
-            <script>
-            const ctx = document.getElementById('myChart').getContext('2d');
-            const myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [{% for risk_score in risk_score %} '{{ risk_score.street_name }}', {% endfor %}],
-                    datasets: [{
-                        label: 'Risk Score',
-                        data: [{% for risk_score in risk_score %} {{ risk_score.count }}, {% endfor %}],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+    <div class="col-md-4">
+        {% if street %}
+        <h1 align="center">{{ street }}</h1>
+        {% if tag_data == None or timeline_data == None %}
+        <p>No data found.</p>
+        {% endif %}
+        {% endif %}
+        {% if tag_data %}
+        <canvas id="tagChart" width="5" height="5"></canvas>
+        <script>
+        const ctx2 = document.getElementById('tagChart').getContext('2d');
+        const tagChart = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: [{% for tag,count in tag_data.items %} '{{ tag }}', {% endfor %}],
+                datasets: [{
+                    label: 'Tag Score',
+                    data: [{% for tag,count in tag_data.items %} {{ count }}, {% endfor %}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            });
-            </script>
+            }
+        });
+        </script>
+        {% endif %}
+        {% if timeline_data %}
+        <canvas id="timeChart" width="200" height="100"></canvas>
+        <script>
+        const ctx = document.getElementById('timeChart').getContext('2d');
+        const timeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for date,count in timeline_data.items %} '{{ date }}', {% endfor %}],
+                datasets: [{
+                    label: 'Incidents Reported',
+                    data: [{% for date,count in timeline_data.items %} {{ count }}, {% endfor %}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        </script>
+        {% endif %}
     </div>
 </div>
 
