@@ -49,7 +49,6 @@ def get_news(request) -> JsonResponse:
         if len(queryset) == 0:
             street_list = StreetList(street=street,news_from=from_date,news_till=to_date)
             street_list.save()
-            queryset = StreetList.objects.all()
 
         available_from = datetime.datetime.strptime(queryset.filter(street=street).values('news_from')[0]['news_from'], '%Y-%m-%d').astimezone(datetime.timezone.utc)
         available_till = datetime.datetime.strptime(queryset.filter(street=street).values('news_till')[0]['news_till'], '%Y-%m-%d').astimezone(datetime.timezone.utc)
@@ -77,6 +76,9 @@ def get_news(request) -> JsonResponse:
                 add_to_db(street, queryset, available_till.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
                 street_list.news_till = to_date.strftime('%Y-%m-%d')
                 street_list.save(update_fields=['news_till'])
+
+            else:
+                add_to_db(street, queryset, from_date, to_date)
         
         
         queryset = StreetRisk.objects.all()
