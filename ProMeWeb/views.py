@@ -52,7 +52,7 @@ def get_timeline_data(result, source='News'):
 def streets(request):
     if request.method == 'POST':
         form = StreetRiskForm(request.POST,
-            initial={'street': 'Lambrate',
+            initial={'street': 'Via',
                         'news_from': (datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(days=30)).strftime("%Y-%m-%d"), 
                         'news_till': datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
                     }
@@ -100,7 +100,7 @@ def streets(request):
             print('Error')
 
     else:
-        form = StreetRiskForm(initial={'street': 'Lambrate',
+        form = StreetRiskForm(initial={'street': 'Via',
                         'news_from': (datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(days=30)).strftime("%Y-%m-%d"), 
                         'news_till': datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
                     }
