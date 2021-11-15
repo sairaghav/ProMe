@@ -72,7 +72,6 @@ def get_news_articles(street: str, street_list: QuerySet, requested_from: dateti
 def get_news_for_street(request) -> JsonResponse:
     street = request.GET.get('street', None)
     from_date, to_date = get_final_from_to_date(request)
-    print(from_date, to_date)
     first_time_processed = is_street_first_time(street)
 
     if street is not None:

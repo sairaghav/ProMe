@@ -76,6 +76,15 @@ def streets(request):
             tag_data = get_tag_data(street_data)
             user_reported_timeline_data = get_timeline_data(street_data, 'User')
             user_reported_tag_data = get_tag_data(street_data, 'User')
+
+            time_range = (datetime.datetime.strptime(to_date,"%Y-%m-%d")-datetime.datetime.strptime(from_date,"%Y-%m-%d")).days
+            risk_value = len(street_data)/time_range if time_range > 0 else len(street_data)
+            if risk_value <= 0.1:
+                risk_score = 'Low'
+            elif risk_value <= 0.25:
+                risk_score = 'Medium'
+            else:
+                risk_score = 'High'
             
             context = {
                 'timeline_data': timeline_data,
@@ -85,6 +94,7 @@ def streets(request):
                 'street_data': street_data,
                 'user_reported_timeline_data': user_reported_timeline_data,
                 'user_reported_tag_data': user_reported_tag_data,
+                'risk_score': risk_score
             }
         else:
             print('Error')
