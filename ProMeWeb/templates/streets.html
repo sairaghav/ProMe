@@ -8,7 +8,7 @@
     <div class="col">
         <div class="border p-3 shadow justify-content-center">
             <h4>Search for a street by name</h4>
-            <hr>
+            
             <form method="POST">
                 {% csrf_token %}
                 {{ form|crispy }}
@@ -26,12 +26,16 @@
         {% endif %}
     {% endif %}
 </div>
+<br>
+<br>
 <div class="row  justify-content-center">
+    {% if street == None %}
+    <p>Enter street name in search field to get risk metrics</p>
+    {% else %}
+    <h3 align="center">Overall metrics for {{ street }}</h3>
+    {% endif %}
+    {% if tag_data %}
     <div class="col-md-4">
-        {% if street == None %}
-        <p>Enter street name in search field to get risk metrics</p>
-        {% endif %}
-        {% if tag_data != None %}
         <canvas id="tagChart" width="100%" height="100%"></canvas>
         <script>
         const ctx2 = document.getElementById('tagChart').getContext('2d');
@@ -72,8 +76,8 @@
         </script>
         {% endif %}
     </div>
-    <div class="col-md-4 justify-content-center">
-        {% if timeline_data != None %}
+    {% if timeline_data %}
+    <div class="col-md-4">
         <canvas id="timeChart" width="100%" height="100%"></canvas>
         <script>
         const ctx = document.getElementById('timeChart').getContext('2d');
@@ -103,17 +107,24 @@
         });
         </script>
         {% endif %}
-        {% if user_reported_tag_data != None %}
+    </div>
+</div>
+<br>
+<br>
+<div class="row  justify-content-center">
+    {% if user_reported_tag_data %}
+    <h3 align="center">User reported incident metrics for {{ street }}</h3>
+    <div class="col-md-4">
         <canvas id="userReportedTagChart" width="100%" height="100%"></canvas>
         <script>
         const ctx3 = document.getElementById('userReportedTagChart').getContext('2d');
         const userReportedTagChart = new Chart(ctx3, {
             type: 'pie',
             data: {
-                labels: [{% for tag,count in tag_data.items %} '{{ tag }}', {% endfor %}],
+                labels: [{% for tag,count in user_reported_tag_data.items %} '{{ tag }}', {% endfor %}],
                 datasets: [{
                     label: 'Tag Score',
-                    data: [{% for tag,count in tag_data.items %} {{ count }}, {% endfor %}],
+                    data: [{% for tag,count in user_reported_tag_data.items %} {{ count }}, {% endfor %}],
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
@@ -144,18 +155,18 @@
         </script>
         {% endif %}
     </div>
-    <div class="col-md-4 justify-content-center">
-        {% if user_reported_timeline_data != None %}
+    {% if user_reported_timeline_data %}
+    <div class="col-md-4">
         <canvas id="userReportedTimeChart" width="100%" height="100%"></canvas>
         <script>
         const ctx4 = document.getElementById('userReportedTimeChart').getContext('2d');
         const userReportedTimeChart = new Chart(ctx4, {
             type: 'bar',
             data: {
-                labels: [{% for date,count in timeline_data.items %} '{{ date }}', {% endfor %}],
+                labels: [{% for date,count in user_reported_timeline_data.items %} '{{ date }}', {% endfor %}],
                 datasets: [{
                     label: 'No. of Incidents Reported',
-                    data: [{% for date,count in timeline_data.items %} {{ count }}, {% endfor %}],
+                    data: [{% for date,count in user_reported_timeline_data.items %} {{ count }}, {% endfor %}],
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)'
                     ],
@@ -177,7 +188,10 @@
         {% endif %}
     </div>
 </div>
+<br>
+<br>
 {% if street_data %}
+<h3 align="center">Summary of References for {{ street }}</h3>
 <div class="row">
     <table class="table table-striped table-responsive">
         <thead>

@@ -32,7 +32,6 @@ def get_timeline_data(result, source='News'):
     data = []
 
     for value in result:
-        print(value['source'])
         to_consider = True
         if source == 'User' and not value['source'].startswith('User'):
             to_consider = False
@@ -75,6 +74,8 @@ def streets(request):
             tag_data = get_tag_data(street_data)
             user_reported_timeline_data = get_timeline_data(street_data, 'User')
             user_reported_tag_data = get_tag_data(street_data, 'User')
+
+            print(user_reported_timeline_data, user_reported_tag_data)
             
             context = {
                 'timeline_data': timeline_data,
@@ -83,7 +84,7 @@ def streets(request):
                 'street': street,
                 'street_data': street_data,
                 'user_reported_timeline_data': user_reported_timeline_data,
-                'user_reported_timeline_data': user_reported_tag_data,
+                'user_reported_tag_data': user_reported_tag_data,
             }
         else:
             print('Error')
