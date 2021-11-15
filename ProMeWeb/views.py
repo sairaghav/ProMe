@@ -7,12 +7,18 @@ import requests, json, datetime
 
 import collections
 
-def get_tag_data(result):
+def get_tag_data(result, source='News'):
     data = []
 
     for value in result:
-        for tag in value['tags'].split(','):
-            data.append(tag)
+        to_consider = True
+        if source == 'User' and not value['source'].startswith('User'):
+            to_consider = False
+        else:
+            to_consider = True
+        if to_consider:
+            for tag in value['tags'].split(','):
+                data.append(tag)
 
     counter = collections.Counter(data)
 
@@ -22,11 +28,17 @@ def get_tag_data(result):
     else:
         return None
 
-def get_timeline_data(result):
+def get_timeline_data(result, source='News'):
     data = []
+
     for value in result:
-        date = datetime.datetime.strptime(value['date'].split('T')[0],"%Y-%m-%d").strftime('%B %Y')
-        data.append(date)
+        print(value['source'])
+        to_consider = True
+        if source == 'User' and not value['source'].startswith('User'):
+            to_consider = False
+        if to_consider:
+            date = datetime.datetime.strptime(value['date'].split('T')[0],"%Y-%m-%d").strftime('%B %Y')
+            data.append(date)
 
     counter = collections.Counter(data)
     
@@ -35,7 +47,6 @@ def get_timeline_data(result):
 
     else:
         return None
-
 
 def streets(request):
     if request.method == 'POST':
@@ -62,6 +73,8 @@ def streets(request):
                 data.pop('link')
             timeline_data = get_timeline_data(street_data)
             tag_data = get_tag_data(street_data)
+            user_reported_timeline_data = get_timeline_data(street_data, 'User')
+            user_reported_tag_data = get_tag_data(street_data, 'User')
             
             context = {
                 'timeline_data': timeline_data,
@@ -69,6 +82,8 @@ def streets(request):
                 'form': form,
                 'street': street,
                 'street_data': street_data,
+                'user_reported_timeline_data': user_reported_timeline_data,
+                'user_reported_timeline_data': user_reported_tag_data,
             }
         else:
             print('Error')

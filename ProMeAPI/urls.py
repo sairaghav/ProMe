@@ -9,6 +9,7 @@ router = routers.DefaultRouter()
 urlpatterns = [
     #path('', views.index, name='index'),
     path('', include(router.urls)),
-    path(r'news', views.get_news, name='news'),
-    path(r'directions', views.get_directions, name='directions')
+    path(r'news', views.get_news_for_street, name='news'),
+    path(r'directions', views.get_directions, name='directions'),
+    path(r'report', views.incident_report, name='report')
 ]
