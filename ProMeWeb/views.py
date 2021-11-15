@@ -80,11 +80,11 @@ def streets(request):
             time_range = (datetime.datetime.strptime(to_date,"%Y-%m-%d")-datetime.datetime.strptime(from_date,"%Y-%m-%d")).days
             risk_value = len(street_data)/time_range if time_range > 0 else len(street_data)
             if risk_value <= 0.1:
-                risk_score = 'Low'
+                risk_score = 'Safe'
             elif risk_value <= 0.25:
-                risk_score = 'Medium'
+                risk_score = 'Moderately Safe'
             else:
-                risk_score = 'High'
+                risk_score = 'Unsafe'
             
             context = {
                 'timeline_data': timeline_data,
