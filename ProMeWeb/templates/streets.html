@@ -31,10 +31,9 @@
 <div class="row  justify-content-center">
     {% if street == None %}
     <p>Enter street name in search field to get risk metrics</p>
-    {% else %}
-    <h3 align="center">Overall metrics for {{ street }}</h3>
     {% endif %}
     {% if tag_data %}
+    <h3 align="center">Overall metrics for {{ street }}</h3>
     <div class="col-md-4">
         <canvas id="tagChart" width="100%" height="100%"></canvas>
         <script>
@@ -192,8 +191,8 @@
 <br>
 {% if street_data %}
 <h3 align="center">Summary of References for {{ street }}</h3>
-<div class="row">
-    <table class="table table-striped table-responsive">
+<div class="row table-responsive">
+    <table class="table table-striped">
         <thead>
             <tr>
                 {% for key,value in street_data.0.items %}<th scope="col">{{ key.capitalize }}</th>{% endfor %}

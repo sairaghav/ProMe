@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
+from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from .searchform import StreetRiskForm
+from .reportform import StreetReportForm
 
 
 import requests, json, datetime
@@ -74,8 +76,6 @@ def streets(request):
             tag_data = get_tag_data(street_data)
             user_reported_timeline_data = get_timeline_data(street_data, 'User')
             user_reported_tag_data = get_tag_data(street_data, 'User')
-
-            print(user_reported_timeline_data, user_reported_tag_data)
             
             context = {
                 'timeline_data': timeline_data,
@@ -102,3 +102,32 @@ def streets(request):
     
 
     return render(request,'streets.html', context)
+
+def report(request):
+    if request.method == 'POST':
+        form = StreetReportForm(request.POST)
+        message = ''
+
+        if form.is_valid():
+            street = request.POST.get('street')
+            tags = request.POST.get('tags')
+            summary = request.POST.get('news')
+
+            response = requests.get('http://'+str(get_current_site(request))+'/api/report?street='+street+'&tags='+tags+'&summary='+summary)
+            messages.success(request, 'Incident reported successfully')
+
+        else:
+            message = 'There is some error in your report. Please check again.'
+
+        context = {
+            'message': message,
+            'form': form
+        }
+
+    else:
+        form = StreetReportForm()
+        context = {
+            'form': form
+        }
+
+    return render(request, 'report.html', context)

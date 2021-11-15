@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}ProMe{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="row mt-3 pt-3 justify-content-center">
+    <div class="col">
+        <div class="border p-3 shadow justify-content-center">
+            <h4>Report an incident for a street</h4>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <input type="submit" value="Submit" class="btn btn-success btn-block">
+            </form>
+        </div>
+    </div>
+</div>
+{% if messages %}
+<div class="row">
+    <ul class="messages">
+        {% for message in messages %}
+            <li  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% endblock %}

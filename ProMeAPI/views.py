@@ -32,8 +32,8 @@ def get_final_from_to_date(request):
     else:
         from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc).strftime('%Y-%m-%d')
 
-    # to_date is of %Y-%m-%d format, time is taken as midnight. Converting to UTC reduces date by 1. Hence adding 1 day
-    return from_date, (datetime.datetime.strptime(to_date, '%Y-%m-%d')+datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+    # to_date is of %Y-%m-%d format, time is taken as midnight. Converting to UTC reduces date by 1. Hence adding 2 days
+    return from_date, (datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=2)).strftime('%Y-%m-%d')
 
 def is_street_first_time(street: str):
     try:
@@ -72,6 +72,7 @@ def get_news_articles(street: str, street_list: QuerySet, requested_from: dateti
 def get_news_for_street(request) -> JsonResponse:
     street = request.GET.get('street', None)
     from_date, to_date = get_final_from_to_date(request)
+    print(from_date, to_date)
     first_time_processed = is_street_first_time(street)
 
     if street is not None:
