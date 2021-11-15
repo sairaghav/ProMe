@@ -20,29 +20,25 @@
 </div>
 <div class="row mt-3 pt-3 justify-content-center">
     {% if street %}
-        <h1 align="center">Summary for {{ street }}</h1>
-        {% if tag_data == None and timeline_data == None and user_reported_tag_data == None and user_reported_timeline_data == None %}
-            <h5 align="center">No data found.</h5>
-        {% else %}
-        <div class="col-6 col-md-4 center table-responsive">
-            <table class="table table-sm">
-                <tbody align="center">
-                    <tr>
-                        <td><b>Total results</b></td>
-                        <td>{{ street_data|length }}</td>
-                    </tr>
-                    <tr>
-                        <td><b>Risk Score</b></td>
-                        {% if risk_score == 'Low' %}<td class="bg-success" style="color: white;">{% endif %}
-                        {% if risk_score == 'Medium' %}<td class="bg-warning" style="color: white;">{% endif %}
-                        {% if risk_score == 'High' %}<td class="bg-danger" style="color: white;">{% endif %}    
-                            {{ risk_score }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
+    <h1 align="center">Summary for {{ street }}</h1>
+    <div class="col-6 col-md-4 center table-responsive">
+        <table class="table table-sm">
+            <tbody align="center">
+                <tr>
+                    <td><b>Total results</b></td>
+                    <td>{{ street_data|length }}</td>
+                </tr>
+                <tr>
+                    <td><b>Risk Score</b></td>
+                    {% if risk_score == 'Low' %}<td class="bg-success" style="color: white;">{% endif %}
+                    {% if risk_score == 'Medium' %}<td class="bg-warning" style="color: white;">{% endif %}
+                    {% if risk_score == 'High' %}<td class="bg-danger" style="color: white;">{% endif %}    
+                        {{ risk_score }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     {% endif %}
 </div>
 <br>
