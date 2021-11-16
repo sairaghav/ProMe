@@ -42,6 +42,7 @@ getMilanoToday(street,startDate,endDate): Scraps the search results for MilanoTo
             news['time']: Time of news article
 '''
 from django.db.models.query import QuerySet
+from pytz import timezone
 from .. import config
 import requests, datetime
 from bs4 import BeautifulSoup as BS
@@ -77,17 +78,15 @@ def get_final_from_to_date(from_date: str, to_date: str):
     # to_date is of %Y-%m-%d format, time is taken as midnight. Converting to UTC reduces date by 1. Hence adding 2 days
     return (datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=2)).strftime('%Y-%m-%d'), (datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=2)).strftime('%Y-%m-%d')
 
-def get_news_articles(street: str, from_date: datetime, to_date: datetime) -> QuerySet:
+def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
     street_list = add_to_street_db(street,{'street': street, 'news_from': from_date,'news_till': to_date})
 
     # Check already available data range
-    available_from = datetime.datetime.strptime(street_list.news_from, '%Y-%m-%d').astimezone(datetime.timezone.utc)
-    available_till = datetime.datetime.strptime(street_list.news_till, '%Y-%m-%d').astimezone(datetime.timezone.utc)
+    available_from = datetime.datetime.strptime(street_list.news_from, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
+    available_till = datetime.datetime.strptime(street_list.news_till, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
 
     requested_from = datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
     requested_till = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
-
-    print(requested_from, requested_till)
 
     # Check news articles for only the dates that were not analysed already
     if requested_from < available_from:
@@ -102,7 +101,7 @@ def get_news_articles(street: str, from_date: datetime, to_date: datetime) -> Qu
         if requested_till > available_till:
             add_to_risk_db(street, available_till.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
             add_to_street_db(street,{'street': street, 'news_from': available_from.strftime('%Y-%m-%d'),'news_till': requested_till.strftime('%Y-%m-%d')})
-        
+
     queryset = StreetRisk.objects.all()
     queryset = queryset.filter(street=street,date__range=[requested_from,requested_till])
 
@@ -121,11 +120,17 @@ def add_to_street_db(street: str, updatefields: dict) -> QuerySet:
     except StreetList.DoesNotExist:
         street_list = StreetList(street=updatefields['street'],news_from=updatefields['news_from'],news_till=updatefields['news_till'])
         street_list.save()
+
+        add_to_risk_db(street, updatefields['news_from'], updatefields['news_till'])
         
     return street_list
 
 def add_to_risk_db(street: str, from_date: str, to_date: str) -> list[News]:
     results = fetch_from_all_sources(street, from_date, to_date)
+
+    from_date = datetime.datetime.strptime(from_date,'%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
+    to_date = datetime.datetime.strptime(to_date,'%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
+    
     queryset = StreetRisk.objects.all()
     queryset = queryset.filter(street=street,date__range=[from_date,to_date])
 

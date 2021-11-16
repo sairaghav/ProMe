@@ -37,8 +37,8 @@ def get_directions(request) -> JsonResponse:
     end = request.GET.get('end',None)
     mode = request.GET.get('mode','pedestrian')
     
-    to_date = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
-    from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime("%Y-%m-%d")
+    to_date = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
+    from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime('%Y-%m-%d')
 
     if start is not None and end is not None:
         result = []
