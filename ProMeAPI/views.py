@@ -15,7 +15,10 @@ class Response(NamedTuple):
 
 def get_news_for_street(request) -> JsonResponse:
     street = request.GET.get('street', None)
-    from_date, to_date = news_articles.get_final_from_to_date(request)
+    from_date, to_date = news_articles.get_final_from_to_date(
+        request.GET.get('from',(datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime('%Y-%m-%d')),
+        request.GET.get('to',datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d'))
+        )
     
     if street is not None:
         queryset = news_articles.get_news_articles(street, from_date, to_date)

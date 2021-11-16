@@ -30,7 +30,7 @@ def get_tag_data(result, source='News'):
     else:
         return None
 
-def get_timeline_data(result, source='News'):
+def get_timeline_data(result, source='All'):
     data = []
 
     for value in result:

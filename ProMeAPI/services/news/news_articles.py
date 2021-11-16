@@ -41,7 +41,6 @@ getMilanoToday(street,startDate,endDate): Scraps the search results for MilanoTo
             news['date']: Date of news article
             news['time']: Time of news article
 '''
-
 from django.db.models.query import QuerySet
 from .. import config
 import requests, datetime
@@ -61,11 +60,8 @@ def add_user_reported_incidents(street: str, summary: str, tags: str) -> QuerySe
 
     return queryset
 
-def get_final_from_to_date(request) -> tuple(datetime,datetime):
-    # Convert all time data to UTC
-    from_date = request.GET.get('from',(datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime('%Y-%m-%d'))
-    to_date = request.GET.get('to',datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d'))
-    
+# Convert all time data to UTC
+def get_final_from_to_date(from_date: str, to_date: str):
     # Avoid future dates
     if datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc) <= datetime.datetime.now(datetime.timezone.utc):
         to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc).strftime('%Y-%m-%d')
@@ -116,10 +112,8 @@ def get_news_articles(street: str, from_date: datetime, to_date: datetime) -> Qu
 def add_to_street_db(street: str, updatefields: dict) -> QuerySet:
     try:
         street_list = StreetList.objects.get(street=street)
-        fields_to_update = []
 
         for field_name in updatefields.keys():
-            fields_to_update.append(field_name)
             setattr(street_list, field_name, updatefields[field_name])
             street_list.save(update_fields=[field_name])
 
