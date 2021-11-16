@@ -51,6 +51,13 @@ from .parsers.classes import *
 from ProMeAPI.services.news.parsers.classes import News
 from ...models import StreetRisk, StreetList
 
+def is_street_first_time(street: str) -> QuerySet:
+    try:
+        street_list = StreetList.objects.get(street=street)
+        return street_list
+
+    except StreetList.DoesNotExist:
+        return None
 
 def add_user_reported_incidents(street: str, summary: str, tags: str) -> QuerySet:
     risk = StreetRisk(news=summary, date=datetime.datetime.now(datetime.timezone.utc), source='User', street=street, tags=tags, link='')
@@ -79,7 +86,10 @@ def get_final_from_to_date(from_date: str, to_date: str):
     return (datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=2)).strftime('%Y-%m-%d'), (datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=2)).strftime('%Y-%m-%d')
 
 def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
-    street_list = add_to_street_db(street,{'street': street, 'news_from': from_date,'news_till': to_date})
+    street_list =  is_street_first_time(street)
+
+    if street_list is None:
+        street_list = add_to_street_db(street,{'street': street, 'news_from': from_date,'news_till': to_date})
 
     # Check already available data range
     available_from = datetime.datetime.strptime(street_list.news_from, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
@@ -90,16 +100,19 @@ def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
 
     # Check news articles for only the dates that were not analysed already
     if requested_from < available_from:
+        # requested_from to requested_till
         if requested_till > available_till:
             add_to_risk_db(street, requested_from.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
             add_to_street_db(street,{'street': street, 'news_from': requested_from.strftime('%Y-%m-%d'),'news_till': requested_till.strftime('%Y-%m-%d')})
+        # requested_from to available_till
         else:
             add_to_risk_db(street, requested_from.strftime('%Y-%m-%d'), available_till.strftime('%Y-%m-%d'))
             add_to_street_db(street,{'street': street, 'news_from': requested_from.strftime('%Y-%m-%d'),'news_till': available_till.strftime('%Y-%m-%d')})
 
     else:
+        # available_from to requested_till
         if requested_till > available_till:
-            add_to_risk_db(street, available_till.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
+            add_to_risk_db(street, available_from.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
             add_to_street_db(street,{'street': street, 'news_from': available_from.strftime('%Y-%m-%d'),'news_till': requested_till.strftime('%Y-%m-%d')})
 
     queryset = StreetRisk.objects.all()
@@ -130,7 +143,7 @@ def add_to_risk_db(street: str, from_date: str, to_date: str) -> list[News]:
 
     from_date = datetime.datetime.strptime(from_date,'%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
     to_date = datetime.datetime.strptime(to_date,'%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
-    
+
     queryset = StreetRisk.objects.all()
     queryset = queryset.filter(street=street,date__range=[from_date,to_date])
 
