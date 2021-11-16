@@ -103,10 +103,10 @@
                     label: 'No. of Incidents Reported',
                     data: [{% for date,count in timeline_data.items %} {{ count }}, {% endfor %}],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)'
+                        'rgba(54, 162, 235, 0.2)',
                     ],
                     borderColor: [
-                        'rgba(255, 99, 132, 1)'
+                        'rgba(54, 162, 235, 1)',
                     ],
                     borderWidth: 1
                 }]
@@ -182,10 +182,10 @@
                     label: 'No. of Incidents Reported',
                     data: [{% for date,count in user_reported_timeline_data.items %} {{ count }}, {% endfor %}],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)'
+                        'rgba(153, 102, 255, 0.2)',
                     ],
                     borderColor: [
-                        'rgba(255, 99, 132, 1)'
+                        'rgba(153, 102, 255, 1)',
                     ],
                     borderWidth: 1
                 }]
