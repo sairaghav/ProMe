@@ -68,22 +68,22 @@ def add_user_reported_incidents(street: str, summary: str, tags: str) -> QuerySe
 
     return queryset
 
-# Convert all time data to UTC
+# Convert all time values to UTC
 def get_final_from_to_date(from_date: str, to_date: str):
     # Avoid future dates
     if datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc) <= datetime.datetime.now(datetime.timezone.utc):
-        to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc).strftime('%Y-%m-%d')
+        to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)
     else:
-        to_date = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
+        to_date = datetime.datetime.now(datetime.timezone.utc)
     
-    # Avoid from date greater than to date
-    if datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc) < datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc):
-        from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime('%Y-%m-%d')
+    # Avoid from_date greater than to_date
+    if to_date < datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc):
+        from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days))
     else:
-        from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc).strftime('%Y-%m-%d')
+        from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)
 
-    # to_date is of %Y-%m-%d format, time is taken as midnight. Converting to UTC reduces date by 1. Hence adding 2 days
-    return (datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=2)).strftime('%Y-%m-%d'), (datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+    # Since from_date and to_date are of %Y-%m-%d format, time is taken as midnight. Converting to UTC reduces date by 1 day and hence adding 1 day
+    return (from_date+datetime.timedelta(days=1)).strftime('%Y-%m-%d'), (to_date+datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 
 def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
     street_list =  is_street_first_time(street)
@@ -131,10 +131,10 @@ def add_to_street_db(street: str, updatefields: dict) -> QuerySet:
 
     # Add street data if not already present
     except StreetList.DoesNotExist:
+        add_to_risk_db(street, updatefields['news_from'], updatefields['news_till'])
+        
         street_list = StreetList(street=updatefields['street'],news_from=updatefields['news_from'],news_till=updatefields['news_till'])
         street_list.save()
-
-        add_to_risk_db(street, updatefields['news_from'], updatefields['news_till'])
         
     return street_list
 
