@@ -61,7 +61,7 @@ def add_user_reported_incidents(street: str, summary: str, tags: str) -> QuerySe
 
     return queryset
 
-def get_final_from_to_date(request):
+def get_final_from_to_date(request) -> tuple(datetime,datetime):
     # Convert all time data to UTC
     from_date = request.GET.get('from',(datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime('%Y-%m-%d'))
     to_date = request.GET.get('to',datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d'))

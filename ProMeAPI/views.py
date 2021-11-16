@@ -37,8 +37,6 @@ def get_directions(request) -> JsonResponse:
     to_date = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
     from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)).strftime("%Y-%m-%d")
 
-    print(from_date,to_date)
-
     if start is not None and end is not None:
         result = []
 
@@ -55,8 +53,8 @@ def get_directions(request) -> JsonResponse:
                     queryset = news_articles.get_news_articles(street, from_date, to_date)
                     street_visited.append(street)
                 
-                route = route._replace(risk_metadata=[result for result in queryset.values()])
-                route = route._replace(risk_score=len(queryset))
+                route = route._replace(risk_metadata=[value for value in queryset.values()])
+                route = route._replace(risk_score=len(queryset)/config.fetch_news_for_interval_days)
 
                 result.append(route._asdict())
             
