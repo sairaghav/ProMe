@@ -139,10 +139,7 @@ def add_to_street_db(street: str, updatefields: dict) -> QuerySet:
 
 def add_to_risk_db(street: str, from_date: str, to_date: str) -> list[News]:
     results = fetch_from_all_sources(street, from_date, to_date)
-    print(from_date, to_date)
-
-    from_date = datetime.datetime.strptime(from_date,'%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
-    to_date = datetime.datetime.strptime(to_date,'%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
+    from_date, to_date = get_utc_from_to_date(from_date, to_date)
 
     queryset = StreetRisk.objects.all()
     queryset = queryset.filter(street=street,date__range=[from_date,to_date])
