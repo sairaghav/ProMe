@@ -69,7 +69,7 @@ def add_user_reported_incidents(street: str, summary: str, tags: str) -> QuerySe
     return queryset
 
 # Convert all time values to UTC
-def get_final_from_to_date(from_date: str, to_date: str):
+def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.datetime,datetime.datetime)]:
     # Avoid future dates
     if datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc) <= datetime.datetime.now(datetime.timezone.utc):
         to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)
@@ -83,7 +83,7 @@ def get_final_from_to_date(from_date: str, to_date: str):
         from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)
 
     # Since from_date and to_date are of %Y-%m-%d format, time is taken as midnight. Converting to UTC reduces date by 1 day and hence adding 1 day
-    return (from_date+datetime.timedelta(days=1)).strftime('%Y-%m-%d'), (to_date+datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+    return from_date+datetime.timedelta(days=1), to_date+datetime.timedelta(days=1)
 
 def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
     street_list =  is_street_first_time(street)
@@ -92,28 +92,27 @@ def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
         street_list = add_to_street_db(street,{'street': street, 'news_from': from_date,'news_till': to_date})
 
     # Check already available data range
-    available_from = datetime.datetime.strptime(street_list.news_from, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
-    available_till = datetime.datetime.strptime(street_list.news_till, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
 
-    requested_from = datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
-    requested_till = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
+    available_from, available_till = get_utc_from_to_date(street_list.news_from, street_list.news_till)
+    requested_from, requested_till = get_utc_from_to_date(from_date, to_date)
 
     # Check news articles for only the dates that were not analysed already
     if requested_from < available_from:
-        # requested_from to requested_till
+        # requested_from to requested_till = requested_from to available_from + available_till to requested_till + already available data
         if requested_till > available_till:
-            add_to_risk_db(street, requested_from.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
+            add_to_risk_db(street, requested_from.strftime('%Y-%m-%d'), available_from.strftime('%Y-%m-%d'))
+            add_to_risk_db(street, available_till.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
             add_to_street_db(street,{'street': street, 'news_from': requested_from.strftime('%Y-%m-%d'),'news_till': requested_till.strftime('%Y-%m-%d')})
-        # requested_from to available_till
+        # requested_from to available_till = requested_from to available_from + + already available data
         else:
-            add_to_risk_db(street, requested_from.strftime('%Y-%m-%d'), available_till.strftime('%Y-%m-%d'))
-            add_to_street_db(street,{'street': street, 'news_from': requested_from.strftime('%Y-%m-%d'),'news_till': available_till.strftime('%Y-%m-%d')})
+            add_to_risk_db(street, requested_from.strftime('%Y-%m-%d'), available_from.strftime('%Y-%m-%d'))
+            add_to_street_db(street,{'street': street, 'news_from': requested_from.strftime('%Y-%m-%d')})
 
     else:
-        # available_from to requested_till
+        # available_from to requested_till = available_till to requested_till + already available data
         if requested_till > available_till:
-            add_to_risk_db(street, available_from.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
-            add_to_street_db(street,{'street': street, 'news_from': available_from.strftime('%Y-%m-%d'),'news_till': requested_till.strftime('%Y-%m-%d')})
+            add_to_risk_db(street, available_till.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
+            add_to_street_db(street,{'street': street,'news_till': requested_till.strftime('%Y-%m-%d')})
 
     queryset = StreetRisk.objects.all()
     queryset = queryset.filter(street=street,date__range=[requested_from,requested_till])
@@ -140,6 +139,7 @@ def add_to_street_db(street: str, updatefields: dict) -> QuerySet:
 
 def add_to_risk_db(street: str, from_date: str, to_date: str) -> list[News]:
     results = fetch_from_all_sources(street, from_date, to_date)
+    print(from_date, to_date)
 
     from_date = datetime.datetime.strptime(from_date,'%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
     to_date = datetime.datetime.strptime(to_date,'%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
