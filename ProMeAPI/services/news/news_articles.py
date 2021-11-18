@@ -41,7 +41,6 @@ getMilanoToday(street,startDate,endDate): Scraps the search results for MilanoTo
             news['date']: Date of news article
             news['time']: Time of news article
 '''
-from django.db.models.query import QuerySet
 from pytz import timezone
 from .. import config
 import requests, datetime
@@ -51,7 +50,7 @@ from .parsers.classes import *
 from ProMeAPI.services.news.parsers.classes import News
 from ...models import StreetRisk, StreetList
 
-def is_street_first_time(street: str) -> List[QuerySet]:
+def is_street_first_time(street: str) -> List[StreetList]:
     try:
         street_list = StreetList.objects.get(street=street)
         return street_list
@@ -59,7 +58,7 @@ def is_street_first_time(street: str) -> List[QuerySet]:
     except StreetList.DoesNotExist:
         return None
 
-def add_user_reported_incidents(street: str, summary: str, tags: str) -> List[QuerySet]:
+def add_user_reported_incidents(street: str, summary: str, tags: str) -> List[StreetRisk]:
     risk = StreetRisk(news=summary, date=datetime.datetime.now(datetime.timezone.utc), source='User', street=street, tags=tags, link='')
     risk.save()
 
@@ -87,7 +86,7 @@ def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.dateti
     # Since from_date and to_date are of %Y-%m-%d format, time is taken as midnight. Converting to UTC reduces date by 1 day and hence adding 1 day
     return from_date+datetime.timedelta(days=1), to_date+datetime.timedelta(days=1)
 
-def get_news_articles(street: str, from_date: str, to_date: str) -> List[QuerySet]:
+def get_news_articles(street: str, from_date: str, to_date: str) -> List[StreetRisk]:
     street_list =  is_street_first_time(street)
 
     if street_list is None:
@@ -123,7 +122,7 @@ def get_news_articles(street: str, from_date: str, to_date: str) -> List[QuerySe
     return queryset
 
 
-def add_to_street_db(street: str, updatefields: dict) -> List[QuerySet]:
+def add_to_street_db(street: str, updatefields: dict) -> List[StreetList]:
     try:
         street_list = StreetList.objects.get(street=street)
 
