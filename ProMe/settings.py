@@ -80,15 +80,14 @@ WSGI_APPLICATION = 'ProMe.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['DATABASE_URL'].split('/')[-1],
-        'USER': os.environ['DATABASE_URL'].split('//')[1].split(':')[0],
-        'PASSWORD': os.environ['DATABASE_URL'].split('//')[1].split(':')[1].split('@')[0],
-        'HOST': os.environ['DATABASE_URL'].split('@')[1].split(':')[0],
-        'PORT': os.environ['DATABASE_URL'].split('@')[1].split(':')[1].split('/')[0],
+        'ENGINE': 'djongo',
+        'NAME': 'prome_db',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.environ['DATABASE_URL']
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
