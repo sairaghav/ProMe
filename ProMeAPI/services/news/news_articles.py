@@ -51,7 +51,7 @@ from .parsers.classes import *
 from ProMeAPI.services.news.parsers.classes import News
 from ...models import StreetRisk, StreetList
 
-def is_street_first_time(street: str) -> QuerySet:
+def is_street_first_time(street: str) -> List[QuerySet]:
     try:
         street_list = StreetList.objects.get(street=street)
         return street_list
@@ -59,7 +59,7 @@ def is_street_first_time(street: str) -> QuerySet:
     except StreetList.DoesNotExist:
         return None
 
-def add_user_reported_incidents(street: str, summary: str, tags: str) -> QuerySet:
+def add_user_reported_incidents(street: str, summary: str, tags: str) -> List[QuerySet]:
     risk = StreetRisk(news=summary, date=datetime.datetime.now(datetime.timezone.utc), source='User', street=street, tags=tags, link='')
     risk.save()
 
@@ -87,7 +87,7 @@ def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.dateti
     # Since from_date and to_date are of %Y-%m-%d format, time is taken as midnight. Converting to UTC reduces date by 1 day and hence adding 1 day
     return from_date+datetime.timedelta(days=1), to_date+datetime.timedelta(days=1)
 
-def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
+def get_news_articles(street: str, from_date: str, to_date: str) -> List[QuerySet]:
     street_list =  is_street_first_time(street)
 
     if street_list is None:
@@ -123,7 +123,7 @@ def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
     return queryset
 
 
-def add_to_street_db(street: str, updatefields: dict) -> QuerySet:
+def add_to_street_db(street: str, updatefields: dict) -> List[QuerySet]:
     try:
         street_list = StreetList.objects.get(street=street)
 
@@ -140,7 +140,7 @@ def add_to_street_db(street: str, updatefields: dict) -> QuerySet:
         
     return street_list
 
-def add_to_risk_db(street: str, from_date: str, to_date: str) -> list[News]:
+def add_to_risk_db(street: str, from_date: str, to_date: str) -> List[News]:
     results = fetch_from_all_sources(street, from_date, to_date)
     from_date, to_date = get_utc_from_to_date(from_date, to_date)
 
