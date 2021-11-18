@@ -1,6 +1,6 @@
 import os
 
-from .news.parsers import MilanoToday
+from ProMeAPI.services.news.parsers import MilanoToday
 
 trackingTags = ['furti', 'droga', 'arresti', 'incidenti', 'rapine', 'vandali', 'incidenti-stradali', 'aggressioni',
                 'indagini', 'morti']  # Will hold exhaustive collection of all tags to check
