@@ -84,7 +84,8 @@ DATABASES = {
         'NAME': 'prome_db',
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': os.environ['DATABASE_URL']
+            'host': os.environ['DATABASE_URL'],
+            'authMechanism': 'SCRAM-SHA-1'
         }
     }
 }
