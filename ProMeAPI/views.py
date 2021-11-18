@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 
 from ProMeAPI.services.news import news_articles
 from ProMeAPI.services.directions import routing
-from ProMeAPI.services import config
+from ProMe import config
 
 import datetime
 

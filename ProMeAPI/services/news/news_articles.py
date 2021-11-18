@@ -42,13 +42,13 @@ getMilanoToday(street,startDate,endDate): Scraps the search results for MilanoTo
             news['time']: Time of news article
 '''
 from pytz import timezone
-from .. import config
 import requests, datetime
 from bs4 import BeautifulSoup as BS
 from .parsers.classes import *
 
+from ProMe import config
 from ProMeAPI.services.news.parsers.classes import News
-from ...models import StreetRisk, StreetList
+from ProMeAPI.models import StreetRisk, StreetList
 
 def is_street_first_time(street: str) -> List[StreetList]:
     try:

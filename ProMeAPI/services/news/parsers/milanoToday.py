@@ -1,6 +1,6 @@
 from .classes import *
 import datetime, pytz
-from ... import config
+from ProMe import config
 
 
 class MilanoToday(AbstractNewsSource):
