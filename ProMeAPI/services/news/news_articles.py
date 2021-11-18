@@ -115,7 +115,8 @@ def get_news_articles(street: str, from_date: str, to_date: str) -> QuerySet:
             add_to_street_db(street,{'street': street,'news_till': requested_till.strftime('%Y-%m-%d')})
 
     queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street,date__range=[requested_from,requested_till])
+    queryset = queryset.filter(street=street)
+    queryset = queryset.filter(date__range=[requested_from,requested_till])
 
     return queryset
 
