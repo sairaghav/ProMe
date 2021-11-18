@@ -64,7 +64,9 @@ def add_user_reported_incidents(street: str, summary: str, tags: str) -> QuerySe
     risk.save()
 
     queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street,news=summary,tags=tags)
+    queryset = queryset.filter(street=street)
+    queryset = queryset.filter(news=summary)
+    queryset = queryset.filter(tags=tags)
 
     return queryset
 
@@ -143,10 +145,11 @@ def add_to_risk_db(street: str, from_date: str, to_date: str) -> list[News]:
     from_date, to_date = get_utc_from_to_date(from_date, to_date)
 
     queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street,date__range=[from_date,to_date])
+    queryset = queryset.filter(street=street)
+    queryset = queryset.filter(date__range=[from_date,to_date])
 
     for result in results:
-        if len(queryset.filter(date=result.date, link=result.link)) == 0:
+        if len(queryset.filter(date=result.date)) == 0 and len(queryset.filter(link=result.link)) == 0:
             print('Adding to DB for '+street)
             risk = StreetRisk(news=result.title, date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
             risk.save()
