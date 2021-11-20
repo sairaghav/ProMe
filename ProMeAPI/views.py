@@ -69,16 +69,20 @@ def get_directions(request) -> JsonResponse:
     return JsonResponse(response._asdict())
 
 def report_incident(request) -> JsonResponse:
-    street = request.GET.get('street', None)
-    news = request.GET.get('summary', None)
-    tags = request.GET.get('tags', None)
+    if request.method == 'POST':
+        street = request.POST.get('street', None)
+        news = request.POST.get('summary', None)
+        tags = request.POST.get('tags', None)
 
-    if street is not None and news is not None and tags is not None:
-        queryset = news_articles.add_user_reported_incidents(street, news, tags)
-        response = Response(results=list(queryset.values()), errors=None)
+        if street is not None and news is not None and tags is not None:
+            queryset = news_articles.add_user_reported_incidents(street, news, tags)
+            response = Response(results=list(queryset.values()), errors=None)
+
+        else:
+            response = Response(results=None, errors="Missing required parameters. Expected parameters: street, news, tags")
 
     else:
-        response = Response(results=None, errors="Expected Format: /api/report?street=<street_name>&summary=<report_summary>&tags=<tag1,tag2>")
+            response = Response(results=None, errors="Only POST method supported")
 
     return JsonResponse(response._asdict())
     
