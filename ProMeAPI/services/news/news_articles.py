@@ -58,14 +58,13 @@ def is_street_first_time(street: str) -> List[StreetList]:
     except StreetList.DoesNotExist:
         return None
 
-def add_user_reported_incidents(street: str, summary: str, tags: str) -> List[StreetRisk]:
-    risk = StreetRisk(news=summary, date=datetime.datetime.now(datetime.timezone.utc), source='User', street=street, tags=tags, link='')
+def add_user_reported_incidents(street: str, summary: str, tags: str, user='Test') -> List[StreetRisk]:
+    username = 'User '+user
+    risk = StreetRisk(news=summary, date=datetime.datetime.now(datetime.timezone.utc), source=username, street=street, tags=tags, link='')
     risk.save()
 
     queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street)
-    queryset = queryset.filter(news=summary)
-    queryset = queryset.filter(tags=tags)
+    queryset = queryset.filter(street=street, source=username)
 
     return queryset
 
@@ -116,8 +115,7 @@ def get_news_articles(street: str, from_date: str, to_date: str) -> List[StreetR
             add_to_street_db(street,{'street': street,'news_till': requested_till.strftime('%Y-%m-%d')})
 
     queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street)
-    queryset = queryset.filter(date__range=[requested_from,requested_till])
+    queryset = queryset.filter(street=street,date__range=[requested_from,requested_till])
 
     return queryset
 
