@@ -1,3 +1,4 @@
+from django.http import response
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
@@ -63,14 +64,21 @@ def signin(request):
             user = request.POST.get('username')
             password = request.POST.get('password')
 
-            data = {
+            post_data = {
                 'email': user,
                 'password': password
             }
+
             auth = authenticate(request, username=user, password=password)
 
             if auth is not None:
                 login(request, auth)
+
+                api_login_url = 'http://'+str(get_current_site(request))+'/api/auth/token/login'
+                response = requests.post(api_login_url, data=post_data)
+                token = json.loads(response.text)['auth_token']
+                request.session['Authorization'] = 'Token '+token
+                
                 return redirect('/streets')
             else:
                 messages.error(request, 'Username or password is incorrect')
@@ -99,9 +107,12 @@ def streets(request):
         if form.is_valid():
             street = request.POST.get('street')
             from_date = request.POST.get('news_from') 
-            to_date = request.POST.get('news_till') 
-            
-            response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street+'&from='+from_date+'&to='+to_date)
+            to_date = request.POST.get('news_till')
+
+            headers = {
+                'Authorization': request.session.get('Authorization')
+            }
+            response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
             street_data = json.loads(response.text)['results']
 
             for data in street_data:
@@ -162,7 +173,20 @@ def report(request):
             tags = request.POST.get('tags')
             summary = request.POST.get('news')
 
-            response = requests.get('http://'+str(get_current_site(request))+'/api/report?street='+street+'&tags='+tags+'&summary='+summary)
+            post_data = {
+                'street': street,
+                'tags': tags,
+                'summary': summary
+            }
+
+            headers = {
+                'Authorization': request.session.get('Authorization')
+            }
+
+            print(post_data)
+            
+            response = requests.post('http://'+str(get_current_site(request))+'/api/report', data=post_data, headers=headers)
+            print(response.text)
             messages.success(request, 'Incident reported successfully')
 
         else:
