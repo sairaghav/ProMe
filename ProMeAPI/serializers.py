@@ -1,8 +1,9 @@
-from .models import StreetRisk
+from .models import User
 from rest_framework import serializers
+from djoser.serializers import UserCreateSerializer, UserSerializer
 
-class StreetRiskSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name="streetrisk-detail")
-    class Meta:
-        model = StreetRisk
-        fields = ('__all__')
+
+class UserCreateSerializer(UserCreateSerializer):
+    class Meta(UserCreateSerializer.Meta):
+        model = User
+        fields = ('username','password','first_name','last_name','email','phone')

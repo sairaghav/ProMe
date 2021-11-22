@@ -38,6 +38,7 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
     to_destination = urllib.parse.quote_plus(to_destination)
 
     map_final_url = f"{config.mapBaseUrl}/directions/v2/route?key={config.mapApiKey}&from={from_source}&to={to_destination}&routeType={mode}&unit=k"
+    print(map_final_url)
     response_data = requests.get(map_final_url).json()
 
     results: List[Route] = []

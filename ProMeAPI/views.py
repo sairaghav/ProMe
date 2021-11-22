@@ -1,5 +1,9 @@
 
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from ProMeAPI.services.news import news_articles
 from ProMeAPI.services.directions import routing
@@ -13,6 +17,8 @@ class Response(NamedTuple):
     results: str
     errors: str
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_news_for_street(request) -> JsonResponse:
     street = request.GET.get('street', None)
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(
@@ -32,6 +38,8 @@ def get_news_for_street(request) -> JsonResponse:
 def index(request) -> HttpResponse:
     return HttpResponse("Hello! You're at the ProMeAPI index.")
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_directions(request) -> JsonResponse:
     start = request.GET.get('start',None)
     end = request.GET.get('end',None)
@@ -68,21 +76,19 @@ def get_directions(request) -> JsonResponse:
     
     return JsonResponse(response._asdict())
 
-def report_incident(request) -> JsonResponse:
-    if request.method == 'POST':
-        street = request.POST.get('street', None)
-        news = request.POST.get('summary', None)
-        tags = request.POST.get('tags', None)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def report_incident(request, *args, **kwargs) -> JsonResponse:
+    street = request.POST.get('street', None)
+    news = request.POST.get('summary', None)
+    tags = request.POST.get('tags', None)
 
-        if street is not None and news is not None and tags is not None:
-            queryset = news_articles.add_user_reported_incidents(street, news, tags)
-            response = Response(results=list(queryset.values()), errors=None)
-
-        else:
-            response = Response(results=None, errors="Missing required parameters. Expected parameters: street, news, tags")
+    if street is not None and news is not None and tags is not None:
+        queryset = news_articles.add_user_reported_incidents(street, news, tags)
+        response = Response(results=list(queryset.values()), errors=None)
 
     else:
-            response = Response(results=None, errors="Only POST method supported")
+        response = Response(results=None, errors="Missing required parameters. Expected parameters: street, news, tags")
 
     return JsonResponse(response._asdict())
     

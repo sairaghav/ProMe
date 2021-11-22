@@ -1,7 +1,19 @@
 from .classes import *
 import datetime, pytz
-from ProMe import config
 
+month_number_map = {"gennaio":"01",
+                    "febbraio":"02",
+                    "marzo":"03",
+                    "aprile":"04",
+                    "maggio":"05",
+                    "giugno":"06",
+                    "luglio":"07",
+                    "agosto":"08",
+                    "settembre":"09",
+                    "ottobre":"10",
+                    "novembre":"11",
+                    "dicembre":"12"
+                }
 
 class MilanoToday(AbstractNewsSource):
     _base_url = "https://www.milanotoday.it"
@@ -11,7 +23,7 @@ class MilanoToday(AbstractNewsSource):
     def parse_news_page(soup: BeautifulSoup, partial_news: News) -> News:
         timestamp = soup.find('span', attrs={'data-timestamp': True}).contents[0]
         
-        date = timestamp.split(' ')[0]+'-'+config.month_number_map[timestamp.split(' ')[1].lower()]+'-'+timestamp.split(' ')[2]+' '+timestamp.split(' ')[3]
+        date = timestamp.split(' ')[0]+'-'+month_number_map[timestamp.split(' ')[1].lower()]+'-'+timestamp.split(' ')[2]+' '+timestamp.split(' ')[3]
         date = datetime.datetime.strptime(date,'%d-%m-%Y %H:%M')
         date = pytz.timezone('Europe/Rome').localize(date).astimezone(pytz.timezone('UTC'))
 
