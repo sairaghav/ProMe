@@ -1,15 +1,21 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
+
+from .loginform import UserLoginForm
 from .searchform import StreetRiskForm
 from .reportform import StreetReportForm
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
+
 
 
 import requests, json, datetime
 
 import collections
 
-def get_tag_data(result, source='News'):
+def get_tag_data(result, source='All'):
     data = []
 
     for value in result:
@@ -49,6 +55,38 @@ def get_timeline_data(result, source='All'):
     else:
         return None
 
+def signin(request):
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+
+        if form.is_valid():
+            user = request.POST.get('username')
+            password = request.POST.get('password')
+
+            data = {
+                'email': user,
+                'password': password
+            }
+            auth = authenticate(request, username=user, password=password)
+
+            if auth is not None:
+                login(request, auth)
+                return redirect('/streets')
+            else:
+                messages.error(request, 'Username or password is incorrect')
+
+
+    else:
+        form = UserLoginForm()
+
+    context = {
+        'form': form
+    }
+
+
+    return render(request,'login.html', context)
+
+@login_required
 def streets(request):
     if request.method == 'POST':
         form = StreetRiskForm(request.POST,
@@ -113,6 +151,7 @@ def streets(request):
 
     return render(request,'streets.html', context)
 
+@login_required
 def report(request):
     if request.method == 'POST':
         form = StreetReportForm(request.POST)
