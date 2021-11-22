@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'ProMe.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'prome_db',
+        'NAME': os.environ['DATABASE_URL'].split('/')[-1],
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
             'host': os.environ['DATABASE_URL'],

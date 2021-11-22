@@ -31,6 +31,7 @@ class Route(NamedTuple):  # TODO: Better name
     narrative: str
     risk_score: int
     risk_metadata: list
+    mapUrl: str 
 
 
 def fetch_route(from_source, to_destination, mode) -> List[Route]:
@@ -57,13 +58,13 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
                 name = " ".join(maneuver['streets'])
                 maneuver_street = Route(name=name, lat=lat, lng=lng, distance=maneuver['distance'],
                                               direction=maneuver['directionName'], mode=maneuver['transportMode'],
-                                              risk_score=0, infra_score=0, narrative=maneuver['narrative'], risk_metadata=[])
+                                              risk_score=0, infra_score=0, narrative=maneuver['narrative'], risk_metadata=[], mapUrl=maneuver['mapUrl'])
                 results.append(maneuver_street)
 
     # Add the start point for the journey
     start_street = Route(name=start_point["street"], distance=0, lng=start_point["latLng"]["lng"],
                                lat=start_point["latLng"]["lat"], direction=results[0].direction, mode=results[0].mode,
-                               risk_score=0, infra_score=0, narrative="Starting Point", risk_metadata=[])
+                               risk_score=0, infra_score=0, narrative="Starting Point", risk_metadata=[], mapUrl='')
     results.insert(0, start_street)
 
     # Add the destination points for the journey
@@ -71,7 +72,7 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
         destination_street = Route(name=destination_point["street"], distance=0,
                                          lng=destination_point["latLng"]["lng"], lat=destination_point["latLng"]["lat"],
                                          direction=results[-1].direction, mode=results[-1].mode, risk_score=0,
-                                         infra_score=0, narrative="End Point", risk_metadata=[])
+                                         infra_score=0, narrative="End Point", risk_metadata=[], mapUrl='')
         results.append(destination_street)
 
     return results
