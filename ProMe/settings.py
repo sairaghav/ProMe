@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-^$ox$t8si82)e)&8a^et-3x-x&ih9rhx9&no4lwz*xl4&ouqv#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["pro-me.herokuapp.com","localhost"]
 
@@ -59,7 +59,7 @@ AUTH_USER_MODEL = 'ProMeAPI.User'
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'USER_CREATE_PASSWORD_RETYPE': True,
+    #'USER_CREATE_PASSWORD_RETYPE': True,
     'SERIALIZERS': {
         'user_create': 'ProMeAPI.serializers.UserCreateSerializer',
         'user': 'ProMeAPI.serializers.UserCreateSerializer'

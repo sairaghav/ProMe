@@ -1,16 +1,15 @@
-from django.http import response
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
+from django.http import HttpResponse
 
 from .loginform import UserLoginForm
+from .registerform import UserRegisterForm
 from .searchform import StreetRiskForm
 from .reportform import StreetReportForm
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
-
-
 
 import requests, json, datetime
 
@@ -56,43 +55,103 @@ def get_timeline_data(result, source='All'):
     else:
         return None
 
+def index(request):
+    if 'Authorization' in request.session.keys():
+        return redirect('/streets')
+    else:
+
+        return redirect('/login')
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+
+        if form.is_valid():
+            user = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            phone = request.POST.get('phone')
+
+            post_data = {
+                'username': user,
+                'email': email,
+                'password': password,
+                'first_name': first_name,
+                'last_name': last_name,
+                'phone': phone
+            }
+
+            api_register_url = 'http://'+str(get_current_site(request))+'/api/auth/users/'
+            response = requests.post(api_register_url, data=post_data)
+
+            if response.status_code == 201:
+                return redirect('/login')
+            else:
+                messages.error(request, response.text)
+        else:
+            messages.error(request, 'Enter all details')
+
+
+    else:
+        form = UserRegisterForm()
+
+    context = {
+        'form': form,
+        'loggedin': False
+    }
+
+
+    return render(request,'register.html', context)
+    
 def signin(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
 
-        if form.is_valid():
-            user = request.POST.get('username')
-            password = request.POST.get('password')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
 
-            post_data = {
-                'email': user,
-                'password': password
-            }
+        post_data = {
+            'email': email,
+            'password': password
+        }
 
-            auth = authenticate(request, username=user, password=password)
+        auth = authenticate(request, username=email, password=password)
+        
+        if auth is not None:
+            login(request, auth)
 
-            if auth is not None:
-                login(request, auth)
-
-                api_login_url = 'http://'+str(get_current_site(request))+'/api/auth/token/login'
-                response = requests.post(api_login_url, data=post_data)
-                token = json.loads(response.text)['auth_token']
-                request.session['Authorization'] = 'Token '+token
-                
-                return redirect('/streets')
-            else:
-                messages.error(request, 'Username or password is incorrect')
-
+            api_login_url = 'http://'+str(get_current_site(request))+'/api/auth/token/login'
+            response = requests.post(api_login_url, data=post_data)
+            token = json.loads(response.text)['auth_token']
+            request.session['Authorization'] = 'Token '+token
+            
+            return redirect('/streets')
+        else:
+            messages.error(request, 'Email or password is incorrect')
 
     else:
         form = UserLoginForm()
 
     context = {
-        'form': form
+        'form': form,
+        'loggedin': False
     }
 
 
     return render(request,'login.html', context)
+
+@login_required
+def logout(request):
+    if request.method == 'GET':
+        headers = {
+            'Authorization': request.session.get('Authorization')
+        }
+        api_logout_url = 'http://'+str(get_current_site(request))+'/api/auth/token/logout'
+        response = requests.post(api_logout_url, headers=headers)
+        request.session.flush()
+    return redirect('/login')
 
 @login_required
 def streets(request):
@@ -155,7 +214,8 @@ def streets(request):
                     }
                 )
         context = {
-            'form': form
+            'form': form,
+            'loggedin': True
         }
 
     
@@ -183,10 +243,8 @@ def report(request):
                 'Authorization': request.session.get('Authorization')
             }
 
-            print(post_data)
-            
             response = requests.post('http://'+str(get_current_site(request))+'/api/report', data=post_data, headers=headers)
-            print(response.text)
+
             messages.success(request, 'Incident reported successfully')
 
         else:
@@ -194,13 +252,15 @@ def report(request):
 
         context = {
             'message': message,
-            'form': form
+            'form': form,
+            'loggedin': True
         }
 
     else:
         form = StreetReportForm()
         context = {
-            'form': form
+            'form': form,
+            'loggedin': True
         }
 
     return render(request, 'report.html', context)
