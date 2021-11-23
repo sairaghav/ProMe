@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}ProMe{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="row mt-3 pt-3 mx-auto w-90 justify-content-center">
+    <div class="col">
+        <div class="border p-3 shadow justify-content-center">
+            <h4>Search for safest route</h4>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <input type="submit" value="Submit" class="mt-3 btn btn-success btn-block">
+            </form>
+        </div>
+    </div>
+</div>
+{% if route_data %}
+<div class="row mt-3 pt-3">
+    <table class="table table-responsive">
+        <tbody style="text-align: center;"">
+            {% for item in route_data %}
+            <tr>
+                <td>{{ item.narrative }} for {{ item.distance }} kilometers</td>
+                {% if item.risk_score == 'Safe' %}<td class="bg-success" style="color: white;">{% endif %}
+                {% if item.risk_score == 'Moderately Safe' %}<td class="bg-warning" style="color: white;">{% endif %}
+                {% if item.risk_score == 'Unsafe' %}<td class="bg-danger" style="color: white;">{% endif %}    
+                    {{ item.risk_score }}
+                </td>
+            </tr>
+            {% if item.mapUrl %}
+            <tr>
+                <td><img width="30%" src="{{ item.mapUrl }}"></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if error %}
+<p>{{ error.0 }}</p>
+{% endif %}
+{% endblock %}

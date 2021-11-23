@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from .loginform import UserLoginForm
 from .registerform import UserRegisterForm
 from .searchform import StreetRiskForm
+from .routeform import StreetRouteForm
 from .reportform import StreetReportForm
 
 from django.contrib.auth.decorators import login_required
@@ -222,6 +223,62 @@ def streets(request):
 
     return render(request,'streets.html', context)
 
+@login_required
+def route(request):
+    if request.method == 'POST':
+        form = StreetRouteForm(request.POST, initial={
+            'source': 'Via',
+            'destination': 'Via'
+        })
+
+        if form.is_valid():
+            headers = {
+                'Authorization': request.session.get('Authorization')
+            }
+
+            start = request.POST.get('source')
+            end = request.POST.get('destination') 
+            mode = request.POST.get('mode')
+
+            #print(start, end, mode)
+
+            response = requests.get('http://'+str(get_current_site(request))+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)
+            response_data = json.loads(response.text)
+
+            if response_data['results'] is not None:
+                for street in response_data['results']:
+                    if street['risk_score'] <= 0.1:
+                        street['risk_score'] = 'Safe'
+                    elif street['risk_score'] <= 0.25:
+                        street['risk_score'] = 'Moderately Safe'
+                    else:
+                        street['risk_score'] = 'Unsafe'
+                    
+                context = {
+                    'form': form,
+                    'loggedin': True,
+                    'route_data': response_data['results']
+                }
+
+            else:
+                context = {
+                    'form': form,
+                    'loggedin': True,
+                    'error': response_data['errors']
+                }
+
+    else:
+        form = StreetRouteForm(initial={
+            'source': 'Via',
+            'destination': 'Via'
+        })
+
+        context = {
+            'form': form,
+            'loggedin': True
+        }
+    return render(request,'route.html', context)
+    
 @login_required
 def report(request):
     if request.method == 'POST':
