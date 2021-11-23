@@ -11,7 +11,7 @@ class StreetReportForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['tags'].widget = forms.CheckboxSelectMultiple(choices=tag_list)
+        self.fields['tags'].widget = forms.RadioSelect(choices=tag_list)
     class Meta:
         model = StreetRisk
-        fields = ['street', 'news','tags']
+        fields = ['street', 'news', 'tags']
