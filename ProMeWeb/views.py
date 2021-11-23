@@ -202,7 +202,8 @@ def streets(request):
                 'street_data': street_data,
                 'user_reported_timeline_data': user_reported_timeline_data,
                 'user_reported_tag_data': user_reported_tag_data,
-                'risk_score': risk_score
+                'risk_score': risk_score,
+                'loggedin': True
             }
         else:
             print('Error')
