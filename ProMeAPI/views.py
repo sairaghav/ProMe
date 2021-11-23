@@ -77,17 +77,18 @@ def get_directions(request) -> JsonResponse:
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def report_incident(request, *args, **kwargs) -> JsonResponse:
+def report_incident(request) -> JsonResponse:
     street = request.POST.get('street', None)
     news = request.POST.get('summary', None)
     tags = request.POST.get('tags', None)
+    user = request.POST.get('user', None)
 
-    if street is not None and news is not None and tags is not None:
-        queryset = news_articles.add_user_reported_incidents(street, news, tags)
+    if street is not None and news is not None and tags is not None and user is not None:
+        queryset = news_articles.add_user_reported_incidents(street, news, tags, user)
         response = Response(results=list(queryset.values()), errors=None)
 
     else:
-        response = Response(results=None, errors="Missing required parameters. Expected parameters: street, news, tags")
+        response = Response(results=None, errors="Missing required parameters. Expected POST parameters: street, summary, tags, user")
 
     return JsonResponse(response._asdict())
     

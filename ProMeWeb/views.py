@@ -234,17 +234,22 @@ def report(request):
             tags = request.POST.get('tags')
             summary = request.POST.get('news')
 
-            post_data = {
-                'street': street,
-                'tags': tags,
-                'summary': summary
-            }
-
             headers = {
                 'Authorization': request.session.get('Authorization')
             }
 
-            response = requests.post('http://'+str(get_current_site(request))+'/api/report', data=post_data, headers=headers)
+            response = requests.get('http://'+str(get_current_site(request))+'/api/auth/users/me', headers=headers)
+            user = json.loads(response.text)['username']
+
+
+            post_data = {
+                'street': street,
+                'tags': tags,
+                'summary': summary,
+                'user': user
+            }
+
+            requests.post('http://'+str(get_current_site(request))+'/api/report', data=post_data, headers=headers)
 
             messages.success(request, 'Incident reported successfully')
 
