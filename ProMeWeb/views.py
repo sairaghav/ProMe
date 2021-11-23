@@ -139,7 +139,6 @@ def signin(request):
         'loggedin': False
     }
 
-
     return render(request,'login.html', context)
 
 @login_required
