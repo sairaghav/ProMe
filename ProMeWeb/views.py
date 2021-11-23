@@ -12,7 +12,7 @@ from .reportform import StreetReportForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
-import requests, json, datetime
+import requests, datetime
 
 import collections
 
@@ -57,11 +57,7 @@ def get_timeline_data(result, source='All'):
         return None
 
 def index(request):
-    if 'Authorization' in request.session.keys():
-        return redirect('/streets')
-    else:
-
-        return redirect('/login')
+    return render(request,'index.html')
 
 def register(request):
     if request.method == 'POST':
@@ -125,7 +121,7 @@ def signin(request):
 
             api_login_url = 'http://'+str(get_current_site(request))+'/api/auth/token/login'
             response = requests.post(api_login_url, data=post_data)
-            token = json.loads(response.text)['auth_token']
+            token = response.json()['auth_token']
             request.session['Authorization'] = 'Token '+token
             
             return redirect('/streets')
@@ -172,7 +168,7 @@ def streets(request):
                 'Authorization': request.session.get('Authorization')
             }
             response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
-            street_data = json.loads(response.text)['results']
+            street_data = response.json()['results']
 
             for data in street_data:
                 data['reference'] = {}
@@ -228,7 +224,8 @@ def route(request):
     if request.method == 'POST':
         form = StreetRouteForm(request.POST, initial={
             'source': 'Via',
-            'destination': 'Via'
+            'destination': 'Via',
+            'mode': 'pedestrian'
         })
 
         if form.is_valid():
@@ -243,7 +240,7 @@ def route(request):
             #print(start, end, mode)
 
             response = requests.get('http://'+str(get_current_site(request))+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)
-            response_data = json.loads(response.text)
+            response_data = response.json()
 
             if response_data['results'] is not None:
                 for street in response_data['results']:
@@ -270,7 +267,8 @@ def route(request):
     else:
         form = StreetRouteForm(initial={
             'source': 'Via',
-            'destination': 'Via'
+            'destination': 'Via',
+            'mode': 'pedestrian'
         })
 
         context = {
@@ -295,7 +293,7 @@ def report(request):
             }
 
             response = requests.get('http://'+str(get_current_site(request))+'/api/auth/users/me', headers=headers)
-            user = json.loads(response.text)['username']
+            user = response.json()['username']
 
 
             post_data = {
