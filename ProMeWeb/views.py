@@ -14,50 +14,6 @@ from django.contrib.auth import authenticate, login
 
 import requests, datetime
 
-from ProMe import config
-
-import collections
-
-def get_tag_data(result, source='All'):
-    data = []
-
-    for value in result:
-        to_consider = True
-        if source == 'User' and not value['source'].startswith('User'):
-            to_consider = False
-        else:
-            to_consider = True
-        if to_consider:
-            for tag in value['tags'].split(','):
-                data.append(tag)
-
-    counter = collections.Counter(data)
-
-    if len(dict(counter).keys()) > 0:
-        return dict(counter)
-
-    else:
-        return None
-
-def get_timeline_data(result, source='All'):
-    data = []
-
-    for value in result:
-        to_consider = True
-        if source == 'User' and not value['source'].startswith('User'):
-            to_consider = False
-        if to_consider:
-            date = datetime.datetime.strptime(value['date'].split('T')[0],"%Y-%m-%d").strftime('%B %Y')
-            data.append(date)
-
-    counter = collections.Counter(data)
-    
-    if len(dict(counter).keys()) > 0:
-        return dict(counter)
-
-    else:
-        return None
-
 def index(request):
     return render(request,'index.html')
 
@@ -181,10 +137,11 @@ def streets(request):
             data.pop('id')
             data.pop('news')
             data.pop('link')
-        timeline_data = get_timeline_data(street_data)
-        tag_data = get_tag_data(street_data)
-        user_reported_timeline_data = get_timeline_data(street_data, 'User')
-        user_reported_tag_data = get_tag_data(street_data, 'User')
+            
+        timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street, headers=headers)).json()['results']
+        tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street, headers=headers)).json()['results']
+        user_reported_timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&source=User', headers=headers)).json()['results']
+        user_reported_tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&source=User', headers=headers)).json()['results']
 
         time_range = (datetime.datetime.strptime(to_date,'%Y-%m-%d') - datetime.datetime.strptime(from_date,'%Y-%m-%d')).days
         risk_value = len(street_data)/time_range
