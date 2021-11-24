@@ -1,6 +1,6 @@
 from django import forms
 from ProMeAPI.models import StreetRisk
-from ProMe.config import trackingTags
+from ProMeAPI.services.config import trackingTags
 
 tag_list = []
 

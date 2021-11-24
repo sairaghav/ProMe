@@ -16,7 +16,7 @@ getStreets(from, to, modeOfTransport): Returns the following fields for all the 
 
 import requests
 import urllib.parse
-from ProMe import config
+from ProMeAPI.services import config
 from typing import NamedTuple, List
 
 

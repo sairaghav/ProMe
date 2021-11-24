@@ -45,7 +45,7 @@ import requests, datetime
 from bs4 import BeautifulSoup as BS
 from .parsers.classes import *
 
-from ProMe import config
+from ProMeAPI.services import config
 from ProMeAPI.services.news.parsers.classes import News
 from ProMeAPI.models import StreetRisk, StreetList
 
@@ -95,7 +95,7 @@ def add_user_reported_incidents(street: str, summary: str, tags: str, user='Test
 
 # Convert all time values to UTC
 def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.datetime,datetime.datetime)]:
-    from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days+1)).strftime('%Y-%m-%d') if from_date is None else from_date
+    from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days+2)).strftime('%Y-%m-%d') if from_date is None else from_date
     to_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1)).strftime('%Y-%m-%d') if to_date is None else to_date
     # Avoid future dates
     if datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc) <= datetime.datetime.now(datetime.timezone.utc):

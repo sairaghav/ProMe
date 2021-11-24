@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from ProMeAPI.services.news import news_articles
 from ProMeAPI.services.directions import routing
-from ProMe import config
 
 import collections
 

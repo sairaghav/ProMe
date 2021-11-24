@@ -1,5 +1,5 @@
 import requests
-from ProMe import config
+from ProMeAPI.services import config
 from collections import defaultdict
 
 
