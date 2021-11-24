@@ -27,9 +27,9 @@
                     <td>{{ all_streets }}</td>
                 </tr>
                 <tr>
-                    <td><b>Moderately safe streets</b></td>
+                    <td class="bg-warning" style="color: white;"><b>Moderately safe streets</b></td>
                     {% if moderate_streets.0|length > 0 %}
-                        <td class="bg-warning" style="color: white;">
+                        <td >
                             <table>
                                 {% for street in moderate_streets.0 %}
                                     <tr>
@@ -39,13 +39,13 @@
                             </table>
                         </td>
                     {% else %}
-                        <td class="bg-warning" style="color: white;">None</td>
+                        <td>None</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td><b>Unsafe streets</b></td>
+                    <td class="bg-danger" style="color: white;"><b>Unsafe streets</b></td>
                     {% if unsafe_streets.0|length > 0 %}
-                        <td class="bg-danger" style="color: white;">
+                        <td>
                             <table>
                                 {% for street in unsafe_streets.0 %}
                                     <tr>
@@ -55,7 +55,7 @@
                             </table>
                         </td>
                     {% else %}
-                        <td class="bg-danger" style="color: white;">None</td>
+                        <td>None</td>
                     {% endif %}
                 </tr>
             </tbody>
@@ -77,10 +77,10 @@
                 <tr>
                     <td>{{ forloop.counter }}. {{ item.narrative }} for {{ item.distance }} kilometers by {{ item.mode }}</td>
                     <td class="col-6"><img width="50%" src="{{ item.mapUrl }}"></td>
-                    {% if item.risk_value == 'Safe' %}<td class="bg-success" style="color: white;">{% endif %}
-                    {% if item.risk_value == 'Moderately Safe' %}<td class="bg-warning" style="color: white;">{% endif %}
-                    {% if item.risk_value == 'Unsafe' %}<td class="bg-danger" style="color: white;">{% endif %}    
-                        {{ item.risk_value }}
+                    {% if item.risk_score == 'Safe' %}<td class="bg-success" style="color: white;">{% endif %}
+                    {% if item.risk_score == 'Moderately Safe' %}<td class="bg-warning" style="color: white;">{% endif %}
+                    {% if item.risk_score == 'Unsafe' %}<td class="bg-danger" style="color: white;">{% endif %}    
+                        {{ item.risk_score }}
                     </td>
                     <td>
                         <form action="/streets" method="POST">

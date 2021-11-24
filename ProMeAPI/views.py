@@ -127,21 +127,13 @@ def get_directions(request) -> JsonResponse:
         result = []
 
         routes = routing.fetch_route(start, end, mode)
-        street_visited = []
         for route in routes:
             if type(route) == dict:
                 response = Response(results=None, errors=route['info']['messages'])
                 break
             else:
                 street = route.name
-            
-                if street not in street_visited:
-                    queryset = news_articles.get_news_articles(street, from_date, to_date)
-                    street_visited.append(street)
-                
-                route = route._replace(risk_metadata=[value for value in queryset.values()])
-                route = route._replace(risk_score=len(queryset)/config.fetch_news_for_interval_days)
-
+                route = route._replace(risk_score=news_articles.get_risk_score(street, from_date, to_date))
                 result.append(route._asdict())
             
             response = Response(results=result, errors=None)

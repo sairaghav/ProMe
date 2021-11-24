@@ -140,6 +140,8 @@ def streets(request):
             user_reported_timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&source=User', headers=headers)).json()['results']
             user_reported_tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&source=User', headers=headers)).json()['results']
             risk_score = (requests.get('http://'+str(get_current_site(request))+'/api/getriskscore?street='+street, headers=headers)).json()['results']
+            top_time = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&limit=3', headers=headers)).json()['results']
+            top_tags = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&limit=3', headers=headers)).json()['results']
             
             context['timeline_data'] = timeline_data
             context['tag_data'] = tag_data
@@ -148,6 +150,8 @@ def streets(request):
             context['user_reported_timeline_data'] = user_reported_timeline_data
             context['user_reported_tag_data'] = user_reported_tag_data
             context['risk_score'] = risk_score
+            context['top_time'] = top_time
+            context['top_tags'] = top_tags
 
     else:
         form = StreetRiskForm(initial={'street': 'Via'})
@@ -188,10 +192,10 @@ def route(request):
                 for street in response['results']:
                     if street['name'] not in all_streets: all_streets.append(street['name'])
                     
-                    street['risk_value'] = (requests.get('http://'+str(get_current_site(request))+'/api/getriskscore?street='+street['name'], headers=headers)).json()['results']
+                    #street['risk_value'] = (requests.get('http://'+str(get_current_site(request))+'/api/getriskscore?street='+street['name'], headers=headers)).json()['results']
                 
-                    if street['risk_value'] == 'Moderately Safe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
-                    if street['risk_value'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
+                    if street['risk_score'] == 'Moderately Safe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
+                    if street['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
 
                     
                 context['route_data'] = response['results'],

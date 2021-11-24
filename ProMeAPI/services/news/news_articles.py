@@ -49,7 +49,7 @@ from ProMe import config
 from ProMeAPI.services.news.parsers.classes import News
 from ProMeAPI.models import StreetRisk, StreetList
 
-def get_risk_score(street: str, from_date: str, to_date: str, format: str) -> str:
+def get_risk_score(street: str, from_date: str, to_date: str, format='text') -> str:
     try:
         street_list = StreetList.objects.get(street=street)
         if street_list.news_from == from_date and street_list.news_till == to_date:

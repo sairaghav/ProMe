@@ -36,6 +36,34 @@
                         {{ risk_score }}
                     </td>
                 </tr>
+                {% if top_tags.keys|length > 0 %}
+                <tr>
+                    <td><b>Top Risky Activities</b></td>
+                    <td>
+                        <table>
+                            {% for tag, count in top_tags.items %}
+                            <tr>
+                                <td>{{ tag }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
+                {% if top_time.keys|length > 0 %}
+                <tr>
+                    <td><b>Top Risky Periods</b></td>
+                    <td>
+                        <table>
+                            {% for time, count in top_time.items %}
+                            <tr>
+                                <td>{{ time }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
@@ -205,7 +233,7 @@
 <br>
 <br>
 {% if street_data %}
-<h3 align="center">Summary of References for {{ street }}</h3>
+<h3 align="center">References for {{ street }}</h3>
 <div class="row table-responsive">
     <table class="table table-striped">
         <thead>
