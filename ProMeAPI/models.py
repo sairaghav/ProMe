@@ -3,8 +3,9 @@ from django.contrib.auth.models import AbstractUser
 
 class StreetList(models.Model):
     street = models.CharField('Street Name', max_length=200)
-    news_from = models.CharField('News From (yyyy-mm-dd)', max_length=200)
-    news_till = models.CharField('News Till (yyyy-mm-dd)', max_length=200)
+    news_from = models.CharField('News From', max_length=10)
+    news_till = models.CharField('News Till', max_length=10)
+    risk_score = models.FloatField('Risk Score')
     
 class StreetRisk(models.Model):
     street = models.CharField('Street Name', max_length=200)

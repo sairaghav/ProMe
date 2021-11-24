@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
-from django.http import HttpResponse
 
 from .loginform import UserLoginForm
 from .registerform import UserRegisterForm
@@ -12,7 +10,7 @@ from .reportform import StreetReportForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
-import requests, datetime
+import requests
 
 def index(request):
     return render(request,'index.html')
@@ -101,7 +99,7 @@ def logout(request):
             'Authorization': request.session.get('Authorization')
         }
         api_logout_url = 'http://'+str(get_current_site(request))+'/api/auth/token/logout'
-        response = requests.post(api_logout_url, headers=headers)
+        requests.post(api_logout_url, headers=headers)
         request.session.flush()
     
     return redirect('/login')
@@ -125,10 +123,8 @@ def streets(request):
             }
             if from_date is None or to_date is None:
                 response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street, headers=headers)
-                time_range = 14
             else:
                 response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
-                time_range = (datetime.datetime.strptime(to_date,'%Y-%m-%d') - datetime.datetime.strptime(from_date,'%Y-%m-%d')).days
             
             street_data = response.json()['results']
 
@@ -143,14 +139,7 @@ def streets(request):
             tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street, headers=headers)).json()['results']
             user_reported_timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&source=User', headers=headers)).json()['results']
             user_reported_tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&source=User', headers=headers)).json()['results']
-            
-            risk_value = len(street_data)/time_range
-            if risk_value <= 0.1:
-                risk_score = 'Safe'
-            elif risk_value <= 0.25:
-                risk_score = 'Moderately Safe'
-            else:
-                risk_score = 'Unsafe'
+            risk_score = (requests.get('http://'+str(get_current_site(request))+'/api/getriskscore?street='+street, headers=headers)).json()['results']
             
             context['timeline_data'] = timeline_data
             context['tag_data'] = tag_data
@@ -198,11 +187,9 @@ def route(request):
             if response['results'] is not None:
                 for street in response['results']:
                     if street['name'] not in all_streets: all_streets.append(street['name'])
-            
-                    if street['risk_score'] <= 0.1: street['risk_value'] = 'Safe'
-                    elif street['risk_score'] <= 0.25: street['risk_value'] = 'Moderately Safe'
-                    else: street['risk_value'] = 'Unsafe'
                     
+                    street['risk_value'] = (requests.get('http://'+str(get_current_site(request))+'/api/getriskscore?street='+street['name'], headers=headers)).json()['results']
+                
                     if street['risk_value'] == 'Moderately Safe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
                     if street['risk_value'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
 

@@ -16,6 +16,16 @@ class Response(NamedTuple):
     results: str
     errors: str
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_risk(request):
+    street = request.GET.get('street', None)
+    format = request.GET.get('format', 'text')
+    from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
+
+    response = Response(results=news_articles.get_risk_score(street, from_date, to_date, format), errors=None)
+
+    return JsonResponse(response._asdict())
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
