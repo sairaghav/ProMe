@@ -41,7 +41,6 @@ getMilanoToday(street,startDate,endDate): Scraps the search results for MilanoTo
             news['date']: Date of news article
             news['time']: Time of news article
 '''
-from pytz import timezone
 import requests, datetime
 from bs4 import BeautifulSoup as BS
 from .parsers.classes import *

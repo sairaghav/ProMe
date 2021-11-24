@@ -28,7 +28,7 @@
                 </tr>
                 <tr>
                     <td><b>Moderately safe streets</b></td>
-                    {% if moderate_streets|length > 0 %}
+                    {% if moderate_streets.0|length > 0 %}
                         <td class="bg-warning" style="color: white;">
                             <table>
                                 {% for street in moderate_streets.0 %}
@@ -39,12 +39,12 @@
                             </table>
                         </td>
                     {% else %}
-                        <td>None</td>
+                        <td class="bg-danger" style="color: white;">None</td>
                     {% endif %}
                 </tr>
                 <tr>
                     <td><b>Unsafe streets</b></td>
-                    {% if unsafe_streets|length > 0 %}
+                    {% if unsafe_streets.0|length > 0 %}
                         <td class="bg-danger" style="color: white;">
                             <table>
                                 {% for street in unsafe_streets.0 %}
@@ -55,7 +55,7 @@
                             </table>
                         </td>
                     {% else %}
-                        <td>None</td>
+                        <td class="bg-danger" style="color: white;">None</td>
                     {% endif %}
                 </tr>
             </tbody>
