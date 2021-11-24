@@ -96,16 +96,13 @@ def add_user_reported_incidents(street: str, summary: str, tags: str, user='Test
 # Convert all time values to UTC
 def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.datetime,datetime.datetime)]:
     # Convert input dates from string to datetime and assign default values if None
-    from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days)) if from_date is None else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
+    from_date = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days) if from_date is None else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
     to_date = datetime.datetime.now(datetime.timezone.utc) if to_date is None else datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
 
-    # Avoid future dates
-    if to_date > datetime.datetime.now(datetime.timezone.utc):
+    # Avoid future dates and from_date greater than to_date
+    if to_date > datetime.datetime.now(datetime.timezone.utc) or from_date < to_date:
         to_date = datetime.datetime.now(datetime.timezone.utc)
-
-    # Avoid from_date greater than to_date
-    if to_date < from_date:
-        from_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days))
+        from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days)
 
     return from_date, to_date
 
@@ -146,6 +143,7 @@ def get_news_articles(street: str, from_date: str, to_date: str) -> List[StreetR
     queryset = queryset.filter(street=street)
     queryset = queryset.filter(date__range=[requested_from,requested_till])
 
+    # Add risk score for street to DB
     add_to_street_db(street,{'risk_score': len(queryset)/time_range})
 
     return queryset
