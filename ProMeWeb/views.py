@@ -18,6 +18,10 @@ def index(request):
     return render(request,'index.html')
 
 def register(request):
+    context = {
+        'loggedin': False
+    }
+
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
 
@@ -44,23 +48,20 @@ def register(request):
             if response.status_code == 201:
                 return redirect('/login')
             else:
-                messages.error(request, response.text)
-        else:
-            messages.error(request, 'Enter all details')
-
+                context['message'] = response.text
 
     else:
         form = UserRegisterForm()
 
-    context = {
-        'form': form,
-        'loggedin': False
-    }
-
+    context['form'] = form
 
     return render(request,'register.html', context)
     
 def signin(request):
+    context = {
+        'loggedin': False
+    }
+
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
 
@@ -84,15 +85,12 @@ def signin(request):
             
             return redirect('/streets')
         else:
-            messages.error(request, 'Email or password is incorrect')
+            context['message'] = 'Email or password is incorrect'
 
     else:
         form = UserLoginForm()
 
-    context = {
-        'form': form,
-        'loggedin': False
-    }
+    context['form'] = form
 
     return render(request,'login.html', context)
 
@@ -105,82 +103,76 @@ def logout(request):
         api_logout_url = 'http://'+str(get_current_site(request))+'/api/auth/token/logout'
         response = requests.post(api_logout_url, headers=headers)
         request.session.flush()
+    
     return redirect('/login')
 
 @login_required
 def streets(request):
     street = request.POST.get('street', None)
-    from_date = request.POST.get('news_from', (datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(days=30)).strftime("%Y-%m-%d")) 
-    to_date = request.POST.get('news_till', datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"))
-        
+    from_date = None if request.POST.get('news_from') == '' else request.POST.get('news_from')
+    to_date = None if request.POST.get('news_till') == '' else request.POST.get('news_till')
+
     context = {
         'loggedin': True
     }
 
     if request.method == 'POST' and street is not None:
-        form = StreetRiskForm(request.POST,
-            initial={'street': 'Via',
-                        'news_from': from_date, 
-                        'news_till': to_date
-                    }
-        )
+        form = StreetRiskForm(request.POST, initial={'street': 'Via'})
 
-        headers = {
-            'Authorization': request.session.get('Authorization')
-        }
-        response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
-        street_data = response.json()['results']
-
-        for data in street_data:
-            data['reference'] = {}
-            data['reference'][data['news']] = data['link']
-            data.pop('id')
-            data.pop('news')
-            data.pop('link')
+        if form.is_valid():
+            headers = {
+                'Authorization': request.session.get('Authorization')
+            }
+            if from_date is None or to_date is None:
+                response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street, headers=headers)
+                time_range = 14
+            else:
+                response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
+                time_range = (datetime.datetime.strptime(to_date,'%Y-%m-%d') - datetime.datetime.strptime(from_date,'%Y-%m-%d')).days
             
-        timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street, headers=headers)).json()['results']
-        tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street, headers=headers)).json()['results']
-        user_reported_timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&source=User', headers=headers)).json()['results']
-        user_reported_tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&source=User', headers=headers)).json()['results']
+            street_data = response.json()['results']
 
-        time_range = (datetime.datetime.strptime(to_date,'%Y-%m-%d') - datetime.datetime.strptime(from_date,'%Y-%m-%d')).days
-        risk_value = len(street_data)/time_range
-        if risk_value <= 0.1:
-            risk_score = 'Safe'
-        elif risk_value <= 0.25:
-            risk_score = 'Moderately Safe'
-        else:
-            risk_score = 'Unsafe'
-        
-        context = {
-            'timeline_data': timeline_data,
-            'tag_data': tag_data,
-            'form': form,
-            'street': street,
-            'street_data': street_data,
-            'user_reported_timeline_data': user_reported_timeline_data,
-            'user_reported_tag_data': user_reported_tag_data,
-            'risk_score': risk_score,
-            'loggedin': True
-        }
+            for data in street_data:
+                data['reference'] = {}
+                data['reference'][data['news']] = data['link']
+                data.pop('id')
+                data.pop('news')
+                data.pop('link')
+
+            timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street, headers=headers)).json()['results']
+            tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street, headers=headers)).json()['results']
+            user_reported_timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&source=User', headers=headers)).json()['results']
+            user_reported_tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&source=User', headers=headers)).json()['results']
+            
+            risk_value = len(street_data)/time_range
+            if risk_value <= 0.1:
+                risk_score = 'Safe'
+            elif risk_value <= 0.25:
+                risk_score = 'Moderately Safe'
+            else:
+                risk_score = 'Unsafe'
+            
+            context['timeline_data'] = timeline_data
+            context['tag_data'] = tag_data
+            context['street'] = street
+            context['street_data'] = street_data
+            context['user_reported_timeline_data'] = user_reported_timeline_data
+            context['user_reported_tag_data'] = user_reported_tag_data
+            context['risk_score'] = risk_score
 
     else:
-        form = StreetRiskForm(initial={'street': 'Via',
-                        'news_from': from_date, 
-                        'news_till': to_date
-                    }
-                )
-        context = {
-            'form': form,
-            'loggedin': True
-        }
+        form = StreetRiskForm(initial={'street': 'Via'})
 
+    context['form'] = form
     
-
     return render(request,'streets.html', context)
 
 @login_required
 def route(request):
+    context = {
+        'loggedin': True
+    }
+
     if request.method == 'POST':
         form = StreetRouteForm(request.POST, initial={
             'source': 'Via',
@@ -197,42 +189,31 @@ def route(request):
             end = request.POST.get('destination') 
             mode = request.POST.get('mode')
 
-            response = requests.get('http://'+str(get_current_site(request))+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)
-            response_data = response.json()
+            response = (requests.get('http://'+str(get_current_site(request))+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)).json()
             
             all_streets= []
             moderate_streets = []
             unsafe_streets = []
             
-            if response_data['results'] is not None:
-                for street in response_data['results']:
-                    if street['risk_score'] <= 0.1:
-                        street['risk_score'] = 'Safe'
-                        all_streets.append(street['name'])
-                    elif street['risk_score'] <= 0.25:
-                        street['risk_score'] = 'Moderately Safe'
-                        moderate_streets.append(street['name'])
-                        all_streets.append(street['name'])
-                    else:
-                        street['risk_score'] = 'Unsafe'
-                        unsafe_streets.append(street['name'])
-                        all_streets.append(street['name'])
+            if response['results'] is not None:
+                for street in response['results']:
+                    if street['name'] not in all_streets: all_streets.append(street['name'])
+            
+                    if street['risk_score'] <= 0.1: street['risk_value'] = 'Safe'
+                    elif street['risk_score'] <= 0.25: street['risk_value'] = 'Moderately Safe'
+                    else: street['risk_value'] = 'Unsafe'
                     
-                context = {
-                    'form': form,
-                    'loggedin': True,
-                    'route_data': response_data['results'],
-                    'moderate_streets': ', '.join(set(moderate_streets)),
-                    'unsafe_streets': ', '.join(set(unsafe_streets)),
-                    'all_streets': ', '.join(set(all_streets))
-                }
+                    if street['risk_value'] == 'Moderately Safe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
+                    if street['risk_value'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
 
+                    
+                context['route_data'] = response['results'],
+                context['moderate_streets'] = moderate_streets,
+                context['unsafe_streets'] = unsafe_streets,
+                context['all_streets'] = ' -> '.join(all_streets)
+        
             else:
-                context = {
-                    'form': form,
-                    'loggedin': True,
-                    'error': response_data['errors']
-                }
+                context['message'] = response['errors']
 
     else:
         form = StreetRouteForm(initial={
@@ -241,14 +222,16 @@ def route(request):
             'mode': 'pedestrian'
         })
 
-        context = {
-            'form': form,
-            'loggedin': True
-        }
+    context['form'] = form
+
     return render(request,'route.html', context)
     
 @login_required
 def report(request):
+    context = {
+        'loggedin': True
+    }
+
     if request.method == 'POST':
         form = StreetReportForm(request.POST)
         message = ''
@@ -275,22 +258,15 @@ def report(request):
 
             requests.post('http://'+str(get_current_site(request))+'/api/report', data=post_data, headers=headers)
 
-            messages.success(request, 'Incident reported successfully')
+            context['message'] = 'Incident reported successfully'
 
         else:
-            message = 'There is some error in your report. Please check again.'
+            context['message'] = 'There is some error in your report. Please check again.'
 
-        context = {
-            'message': message,
-            'form': form,
-            'loggedin': True
-        }
 
     else:
         form = StreetReportForm()
-        context = {
-            'form': form,
-            'loggedin': True
-        }
+    
+    context['form'] = form
 
     return render(request, 'report.html', context)

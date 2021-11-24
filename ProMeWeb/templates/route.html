@@ -7,7 +7,7 @@
 <div class="row mt-5 pt-5 mx-auto w-90 justify-content-center">
     <div class="col">
         <div class="border p-3 shadow justify-content-center">
-            <h4>Search for safest route</h4>
+            <h4>Search for safety metrics along a route</h4>
             <form method="POST">
                 {% csrf_token %}
                 {{ form|crispy }}
@@ -17,65 +17,92 @@
     </div>
 </div>
 {% if route_data %}
-<h1 class="mt-3 pt-3" align="center">Route Summary</h1>
-    <div class="row mt-3 pt-3 justify-content-center">
-    <div class="col-6 col-md-4 center table-responsive">
-        <table class="table">
-            <tbody align="center">
+    <div class="row mt-5 pt-5 mx-auto w-90 justify-content-center shadow">
+    <div class="col col-6 p-3 justify-content-center">
+        <h1 align="center">Route Information</h1>
+        <table class="table table-hover">
+            <tbody>
                 <tr>
                     <td><b>Streets Traversed</b></td>
                     <td>{{ all_streets }}</td>
                 </tr>
                 <tr>
                     <td><b>Moderately safe streets</b></td>
-                    {% if moderate_streets|length > 0 %}<td class="bg-warning" style="color: white;">{{ moderate_streets }}</td>
-                    {% else %}<td class="bg-warning" style="color: white;">None</td>{% endif %}
+                    {% if moderate_streets|length > 0 %}
+                        <td class="bg-warning" style="color: white;">
+                            <table>
+                                {% for street in moderate_streets.0 %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}. {{ street }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    {% else %}
+                        <td>None</td>
+                    {% endif %}
                 </tr>
                 <tr>
                     <td><b>Unsafe streets</b></td>
-                    {% if unsafe_streets|length > 0 %}<td class="bg-danger" style="color: white;">{{ unsafe_streets }}</td>
-                    {% else %}<td class="bg-danger" style="color: white;">None</td>{% endif %}
+                    {% if unsafe_streets|length > 0 %}
+                        <td class="bg-danger" style="color: white;">
+                            <table>
+                                {% for street in unsafe_streets.0 %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}. {{ street }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    {% else %}
+                        <td>None</td>
+                    {% endif %}
                 </tr>
             </tbody>
         </table>
     </div>
-    <table class="table table-responsive">
-        <thead style="text-align: center;">
-            <tr>
-                <th scope="col">Description</th>
-                <th scope="col">Safety Score</th>
-            </tr>
-        </thead>
-        <tbody style="text-align: center;">
-            {% for item in route_data %}
-            <tr>
-                <!--<td></td>-->
-                <td>{{ forloop.counter }}. {{ item.narrative }} for {{ item.distance }} kilometers</td>
-                {% if item.risk_score == 'Safe' %}<td class="bg-success" style="color: white;">{% endif %}
-                {% if item.risk_score == 'Moderately Safe' %}<td class="bg-warning" style="color: white;">{% endif %}
-                {% if item.risk_score == 'Unsafe' %}<td class="bg-danger" style="color: white;">{% endif %}    
-                    {{ item.risk_score }}
-                </td>
-                <td>
-                    <form action="/streets" method="POST">
-                        {% csrf_token %}
-                        <label for="street"></label>
-                        <button type="submit" name="street" value="{{ item.name }}" class="btn btn-link">Get Detailed Safety Info</button>
-                    </form>
-                </td>
-            </tr>
-            {% if item.mapUrl %}
-            <tr>
-                <td><img width="50%" src="{{ item.mapUrl }}"></td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
+    </div>
+    <div class="row mt-5 pt-5 mx-auto w-90 justify-content-center shadow">
+        <h1 align="center">Directions</h1>
+        <table class="table table-hover">
+            <thead style="text-align: center;">
+                <tr>
+                    <th scope="col">Directions</th>
+                    <th scope="col">Map</th>
+                    <th scope="col">Safety Score</th>
+                </tr>
+            </thead>
+            <tbody style="text-align: center;">
+                {% for item in route_data.0 %}
+                <tr>
+                    <td>{{ forloop.counter }}. {{ item.narrative }} for {{ item.distance }} kilometers by {{ item.mode }}</td>
+                    <td class="col-6"><img width="50%" src="{{ item.mapUrl }}"></td>
+                    {% if item.risk_value == 'Safe' %}<td class="bg-success" style="color: white;">{% endif %}
+                    {% if item.risk_value == 'Moderately Safe' %}<td class="bg-warning" style="color: white;">{% endif %}
+                    {% if item.risk_value == 'Unsafe' %}<td class="bg-danger" style="color: white;">{% endif %}    
+                        {{ item.risk_value }}
+                    </td>
+                    <td>
+                        <form action="/streets" method="POST">
+                            {% csrf_token %}
+                            <label for="street"></label>
+                            <button type="submit" name="street" value="{{ item.name }}" class="btn btn-link">Get Detailed Safety Info</button>
+                        </form>
+                    </td>
+                </tr>
+                {% if item.mapUrl %}
+                <tr>
+                    
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endif %}
 
-{% if error %}
-<p>{{ error.0 }}</p>
+{% if message %}
+<p>{{ message }}</p>
 {% endif %}
 {% endblock %}
