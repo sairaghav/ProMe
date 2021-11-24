@@ -91,7 +91,7 @@ def get_timeline_data(request):
 def get_news_for_street(request) -> JsonResponse:
     street = request.GET.get('street', None)
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
-    
+
     if street is not None:
         queryset = news_articles.get_news_articles(street, from_date, to_date)
         response = Response(results=list(queryset.values()), errors=None)
@@ -111,8 +111,7 @@ def get_directions(request) -> JsonResponse:
     end = request.GET.get('end',None)
     mode = request.GET.get('mode','pedestrian')
     
-    to_date = None
-    from_date = None
+    from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(None, None)]
 
     if start is not None and end is not None:
         result = []
