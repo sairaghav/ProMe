@@ -101,7 +101,7 @@ def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.dateti
     if datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc) <= datetime.datetime.now(datetime.timezone.utc):
         to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)
     else:
-        to_date = datetime.datetime.now(datetime.timezone.utc)
+        to_date = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1)
     
     # Avoid from_date greater than to_date
     if to_date < datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc):
