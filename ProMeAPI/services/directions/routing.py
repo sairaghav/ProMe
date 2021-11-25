@@ -1,19 +1,3 @@
-'''
-Author: Sairaghav (https://github.com/sairaghav)
-
-Description: Returns the streets between source and destination
-
-getStreets(from, to, modeOfTransport): Returns the following fields for all the streets between a source and destination
-    name: Name of street
-    distance: Distance to travel in km
-    lng: Longitude of starting point
-    lat: Latitude of starting point
-    direction: Direction to travel along
-    mode: Mode of transport (AUTO, WALK, BICYCLE)
-    risk_score: Score calculated for risk initialized to 0
-    infra_score: Score calculated for infrastructure available initialized to 0
-'''
-
 import requests
 import urllib.parse
 from ProMeAPI.services import config

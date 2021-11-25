@@ -91,7 +91,7 @@ def signin(request):
             token = response.json()['auth_token']
             request.session['Authorization'] = 'Token '+token
             
-            return redirect('/streets')
+            return redirect('/')
         else:
             context['message'] = 'Email or password is incorrect'
 

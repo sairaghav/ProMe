@@ -20,7 +20,10 @@ def get_risk(request):
     format = request.GET.get('format', 'text')
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
 
-    response = Response(results=news_articles.get_risk_data(street, from_date, to_date, format), errors=None)
+    if street is not None:
+        response = Response(results=news_articles.get_risk_data(street, from_date, to_date, format), errors=None)
+    else:
+        response = Response(results=None, errors="Expected Format: /api/getriskscore?street=<street_name>&format=<null|text>")
 
     return JsonResponse(response._asdict())
 
@@ -41,7 +44,7 @@ def get_metadata(request):
             response = Response(results=result, errors=None)
     
     else:
-        response = Response(results=None, errors="Expected Format: /api/getmetadata?street=<street_name>&type=<tags|timeline>&source=<optional_User>&from=<optional_from_date_yyyy-mm-dd>&to=<optional_to_date_yyyy-mm-dd>&limit=<optional_num_results>")
+        response = Response(results=None, errors="Expected Format: /api/getmetadata?street=<street_name>&type=<tags|timeline>&source=<null|user>&from=<null|from_date_yyyy-mm-dd>&to=<null|to_date_yyyy-mm-dd>&limit=<null|num_results>")
 
     return JsonResponse(response._asdict())
 
@@ -82,15 +85,13 @@ def get_directions(request) -> JsonResponse:
                 response = Response(results=None, errors=route['info']['messages'])
                 break
             else:
-                street = route.name
-                print(street)
-                route = route._replace(risk_score=news_articles.get_risk_data(street, from_date, to_date))
+                route = route._replace(risk_score=news_articles.get_risk_data(route.name, from_date, to_date))
                 result.append(route._asdict())
             
             response = Response(results=result, errors=None)
 
     else:
-        response = Response(results=None, errors="Expected Format: /api/directions?start=<source>&end=<destination>&mode=<null|pedestrian|shortest|bicycle>")
+        response = Response(results=None, errors="Expected Format: /api/directions?start=<source>&end=<destination>&mode=<null|pedestrian|fastest|bicycle>")
     
     return JsonResponse(response._asdict())
 
@@ -107,7 +108,7 @@ def report_incident(request) -> JsonResponse:
         response = Response(results=list(queryset.values()), errors=None)
 
     else:
-        response = Response(results=None, errors="Missing required parameters. Expected POST parameters: street, summary, tags, user")
+        response = Response(results=None, errors="Missing required parameters for /api/report. Expected POST parameters: street, summary, tags, user")
 
     return JsonResponse(response._asdict())
     

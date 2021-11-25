@@ -18,52 +18,52 @@
 </div>
 {% if route_data %}
     <div class="row mt-3 pt-3 mx-auto w-90 justify-content-center shadow">
-        <h1 align="center">Route Information</h1>
+        <h3 align="center">Route Information</h3>
         <div class="col col-6 justify-content-center">
             <table class="table table-hover">
                 <tbody>
                     <tr>
-                        <td><b>Streets Along the Route</b></td>
+                        <td><b>Source -> Destination</b></td>
                         <td>{{ all_streets }}</td>
                     </tr>
                     <tr>
                         <td><b>Moderately safe streets</b></td>
-                        {% if moderate_streets.0|length > 0 %}
-                            <td class="bg-warning" style="color: white;">
-                                <table>
-                                    {% for street in moderate_streets.0 %}
-                                        <tr>
-                                            <td>{{ street }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </td>
-                        {% else %}
-                            <td class="bg-warning" style="color: white;">None</td>
-                        {% endif %}
+                        <td class="bg-warning" style="color: white;"><b>
+                            {% if moderate_streets.0|length > 0 %}
+                            <table>
+                                {% for street in moderate_streets.0 %}
+                                    <tr>
+                                        <td>{{ street }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            {% else %}
+                                None
+                            {% endif %}
+                        </b></td>
                     </tr>
                     <tr>
                         <td><b>Unsafe streets</b></td>
-                        {% if unsafe_streets.0|length > 0 %}
-                            <td class="bg-danger" style="color: white;">
-                                <table>
-                                    {% for street in unsafe_streets.0 %}
-                                        <tr>
-                                            <td>{{ street }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </td>
-                        {% else %}
-                            <td class="bg-danger" style="color: white;">None</td>
-                        {% endif %}
+                        <td class="bg-danger" style="color: white;"><b>
+                            {% if unsafe_streets.0|length > 0 %}
+                            <table>
+                                {% for street in unsafe_streets.0 %}
+                                    <tr>
+                                        <td>{{ street }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            {% else %}
+                                None
+                            {% endif %}
+                        </b></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="row mt-3 pt-3 mx-auto w-90 justify-content-center shadow">
-        <h1 align="center">Directions</h1>
+    <div class="row mt-3 pt-3 mx-auto justify-content-center">
+        <h3 align="center">Directions</h3>
         <table class="table table-hover">
             <thead style="text-align: center;">
                 <tr>
@@ -81,12 +81,11 @@
                     {% if item.risk_score == 'Moderately Safe' %}<td class="bg-warning" style="color: white;">{% endif %}
                     {% if item.risk_score == 'Unsafe' %}<td class="bg-danger" style="color: white;">{% endif %}    
                         {{ item.risk_score }}
-                    </td>
-                    <td>
+
                         <form action="/streets" method="POST">
                             {% csrf_token %}
                             <label for="street"></label>
-                            <button type="submit" name="street" value="{{ item.name }}" class="btn btn-link">Get Detailed Safety Info</button>
+                            <button type="submit" name="street" value="{{ item.name }}" class="btn btn-link" style="color: white;">Get Detailed Safety Info</button>
                         </form>
                     </td>
                 </tr>
