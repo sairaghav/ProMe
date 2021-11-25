@@ -7,8 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from ProMeAPI.services.news import news_articles
 from ProMeAPI.services.directions import routing
 
-import collections
-
 from typing import NamedTuple
 
 class Response(NamedTuple):
@@ -47,7 +45,6 @@ def get_metadata(request):
 
     return JsonResponse(response._asdict())
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_news_for_street(request) -> JsonResponse:
@@ -64,7 +61,8 @@ def get_news_for_street(request) -> JsonResponse:
     return JsonResponse(response._asdict())
 
 def index(request) -> HttpResponse:
-    return HttpResponse("Hello! You're at the ProMeAPI index.")
+    response = Response(results="Welcome to the ProMe API index page!", errors=None)
+    return JsonResponse(response._asdict())
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

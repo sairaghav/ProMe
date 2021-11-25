@@ -1,57 +1,36 @@
 # ProMe
 
-API Prototype for ProMe app
+Email: prome.jmoss@gmail.com
+
+Prototype for ProMe app
 - Uses `https://developer.mapquest.com/` for maps
-- Other values provided in [config file](config.py)
+- Uses MongoDB Atlas as database
+- Other values provided in [config file](ProMeAPI/services/config.py)
 
-**Start with server.py**
+```
+git clone https://github.com/sairaghav/ProMe
+cd ProMe
+python -m virtualenv venv
+venv\Scripts\activate (for Windows)
+source venv/bin/activate (for Linux)
+pip install -r requirements.txt
 
-## Description
+python manage.py runserver
+```
 
-### Get route from source to destination with risk score for each street
-Calling `https://prome-api.herokuapp.com/directions/<from>/<to>` returns the route from the source (from) to destination (to), as a list of streets
+## Endpoints
 
-For each street, following values will be returned:
-- name: Name of street
-- distance: Distance to travel in km
-- lng: Longitude of starting point
-- lat: Latitude of starting point
-- direction: Direction to travel along
-- mode: Mode of transport (AUTO, WALKING, BICYCLE)
-- risk_score: Score calculated for risk based on news articles for the street
-- risk_metadata: All news articles and the tags that were associate with them based on new sources
-- infra_score: Score calculated for infrastructure available along the street initialized to 0
+**Unauthenticated APIs**
 
+- `POST /api/auth/users/`: Create new user for accessing the authenticated APIs. Requires `username`, `phone`, `email`, `password` parameters. `first_name` and `last_name` are optional parameters
 
-`https://pro-me.herokuapp.com/directions/pedestrian/<from>/<to>` will return the same values but mode of transport will only be considered as *WALKING*
-
-**Example usage:** 
-
-- To get risk score for a route: http://prome-api.herokuapp.com/directions/Via%20Risorgimento%20237/Piazza%20Leonardo%20da%20Vinci,%20Milan
-
-![sample route](examples/images/sample-route.png)
+- `POST /api/auth/token/login/`: Get access token for accessing the authenticated APIs. Requires `username` and `password` parameters
 
 
-### Get all news articles related to a particular street between a date range
-Calling `https://pro-me.herokuapp.com/news/<street name>/<start date>/<end date>` will return all news articles between the date range in the configured sources in config.py related to the specified street
+**Authenticated APIs**
 
-For each street, following values will be returned:
-- street: Name of street
-- source: Source of news
-- tags: Associated tags
-- link: Link for news article
-- date: Date of news article
-- time: Time of news article
+*Requires `Authorization: Token <token>` header value*
 
-**Example usage:** 
+- `GET /api/directions?start=<source_street>&end=<destination_street>&mode=<mode_of_transport>`: Get route from source to destination with the mode of transport. `mode` parameter is optional and is *pedestrian* by default. Other possible values are *fastest* and *bicycle*
 
-- To get all news for Viale Monza between two dates: http://prome-api.herokuapp.com/news/viale monza/2020-06-20/2021-10-27
-
-![sample news](examples/images/sample-news.png)
-
-## TODO
-- Generated tagged dataset from news data
-- Improve news article detection and scoring
-- User Authentication and DB
-- Add infrastructure-related data to street data
-- Add more news sources
+- `GET /api/news?street=<street_name>&from=<yyyy-mm-dd>&to=<yyyy-mm-dd>`: Get all news articles for the specified street in `street` between the time period specified in `from` and `to`. `from` and `to` are optional parameters and if not given, the dates are 30 days from current date. The default time difference is specified in the [config file](ProMeAPI/services/config.py)
