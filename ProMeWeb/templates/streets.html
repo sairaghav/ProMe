@@ -20,8 +20,8 @@
         {% endif %}
     </div>
 </div>
+{% if street %}
 <div class="row mt-3 pt-3 mx-auto w-90 shadow justify-content-center">
-    {% if street %}
     <h1 align="center">Summary for {{ street }}</h1>
     <div class="col-6 col-md-4 center">
         <table class="table table-sm">
@@ -69,13 +69,12 @@
             </tbody>
         </table>
     </div>
-    {% endif %}
 </div>
-<br>
-<br>
+{% endif %}
+{% if street %}
 <div class="row mt-3 pt-3 mx-auto w-90 shadow justify-content-center">
-    {% if tag_data %}
     <h3 align="center">Overall Metrics for {{ street }}</h3>
+    {% if tag_data %}
     <div class="col-md-4">
         <canvas id="tagChart" width="100%" height="100%"></canvas>
         <script>
@@ -115,8 +114,8 @@
             }
         });
         </script>
-        {% endif %}
     </div>
+    {% endif %}
     {% if timeline_data %}
     <div class="col-md-4">
         <canvas id="timeChart" width="100%" height="100%"></canvas>
@@ -147,13 +146,12 @@
             }
         });
         </script>
-        {% endif %}
     </div>
+    {% endif %}
 </div>
-<br>
-<br>
-<div class="row  justify-content-center">
-    {% if user_reported_tag_data %}
+{% endif %}
+{% if user_reported_tag_data %}
+<div class="row justify-content-center">
     <h3 align="center">User-reported Incident Metrics for {{ street }}</h3>
     <div class="col-md-4">
         <canvas id="userReportedTagChart" width="100%" height="100%"></canvas>
@@ -194,8 +192,8 @@
             }
         });
         </script>
-        {% endif %}
     </div>
+    {% endif %}
     {% if user_reported_timeline_data %}
     <div class="col-md-4">
         <canvas id="userReportedTimeChart" width="100%" height="100%"></canvas>
@@ -226,13 +224,11 @@
             }
         });
         </script>
-        {% endif %}
     </div>
+    {% endif %}
 </div>
-<br>
-<br>
 {% if street_data %}
-<div class="col col-md-4 mt-3 pt-3 mx-auto justify-content-center table-responsive">
+<div class="col col-md-10 mt-3 pt-3 mx-auto shadow justify-content-center table-responsive">
     <h3 align="center">References for {{ street }}</h3>
     <table class="table table-striped">
         <thead>
