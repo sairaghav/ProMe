@@ -82,7 +82,7 @@ def get_directions(request) -> JsonResponse:
         routes = routing.fetch_route(start, end, mode)
         for route in routes:
             if type(route) == dict:
-                response = Response(results=None, errors=route['info']['messages'])
+                response = Response(results=None, errors=route['info']['messages'][0])
                 break
             else:
                 route = route._replace(risk_score=news_articles.get_risk_data(route.name, from_date, to_date))
