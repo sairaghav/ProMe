@@ -66,7 +66,7 @@ def get_risk_score(street: str, from_date: str, to_date: str, format='text') -> 
 
     if format == 'text':
         if risk_score <= 0.05: risk_score = 'Safe'
-        elif risk_score <= 0.25: risk_score = 'Moderately Safe'
+        elif risk_score <= 0.2: risk_score = 'Moderately Safe'
         else: risk_score = 'Unsafe'
 
         return risk_score
@@ -74,13 +74,14 @@ def get_risk_score(street: str, from_date: str, to_date: str, format='text') -> 
     else:
         return str(risk_score)
 
-def is_street_first_time(street: str) -> List[StreetList]:
+def is_street_first_time(street: str, from_date: str, to_date: str) -> List[StreetList]:
     try:
         street_list = StreetList.objects.get(street=street)
-        return street_list
 
     except StreetList.DoesNotExist:
-        return None
+        street_list = add_to_street_db(street,{'street': street, 'news_from': from_date,'news_till': to_date, 'risk_score': 0.0})
+
+    return street_list
 
 def add_user_reported_incidents(street: str, summary: str, tags: str, user='Test') -> List[StreetRisk]:
     username = 'User '+user
@@ -107,10 +108,7 @@ def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.dateti
     return from_date, to_date
 
 def get_news_articles(street: str, from_date: str, to_date: str) -> List[StreetRisk]:
-    street_list =  is_street_first_time(street)
-
-    if street_list is None:
-        street_list = add_to_street_db(street,{'street': street, 'news_from': from_date,'news_till': to_date, 'risk_score': 0.0})
+    street_list =  is_street_first_time(street, from_date, to_date)
 
     # Check already available data range
     available_from, available_till = get_utc_from_to_date(street_list.news_from, street_list.news_till)
@@ -165,6 +163,7 @@ def add_to_street_db(street: str, updatefields: dict) -> List[StreetList]:
         street_list.save()
         
     return street_list
+
 
 def add_to_risk_db(street: str, from_date: str, to_date: str) -> List[News]:
     results = fetch_from_all_sources(street, from_date, to_date)

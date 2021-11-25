@@ -40,7 +40,8 @@ def register(request):
                 'phone': phone
             }
 
-            api_register_url = 'http://'+str(get_current_site(request))+'/api/auth/users/'
+            base_url = 'http://'+str(get_current_site(request))
+            api_register_url = base_url+'/api/auth/users/'
             response = requests.post(api_register_url, data=post_data)
 
             if response.status_code == 201:
@@ -76,7 +77,8 @@ def signin(request):
         if auth is not None:
             login(request, auth)
 
-            api_login_url = 'http://'+str(get_current_site(request))+'/api/auth/token/login'
+            base_url = 'http://'+str(get_current_site(request))
+            api_login_url = base_url+'/api/auth/token/login'
             response = requests.post(api_login_url, data=post_data)
             token = response.json()['auth_token']
             request.session['Authorization'] = 'Token '+token
@@ -98,7 +100,9 @@ def logout(request):
         headers = {
             'Authorization': request.session.get('Authorization')
         }
-        api_logout_url = 'http://'+str(get_current_site(request))+'/api/auth/token/logout'
+
+        base_url = 'http://'+str(get_current_site(request))
+        api_logout_url = base_url+'/api/auth/token/logout'
         requests.post(api_logout_url, headers=headers)
         request.session.flush()
     
@@ -121,25 +125,27 @@ def streets(request):
             headers = {
                 'Authorization': request.session.get('Authorization')
             }
-            if from_date is None or to_date is None:
-                response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street, headers=headers)
 
-                timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street, headers=headers)).json()['results']
-                tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street, headers=headers)).json()['results']
-                user_reported_timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&source=User', headers=headers)).json()['results']
-                user_reported_tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&source=User', headers=headers)).json()['results']
-                risk_score = (requests.get('http://'+str(get_current_site(request))+'/api/getriskscore?street='+street, headers=headers)).json()['results']
-                top_time = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&limit=3', headers=headers)).json()['results']
-                top_tags = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&limit=3', headers=headers)).json()['results']
+            base_url = 'http://'+str(get_current_site(request))
+
+            if from_date is None or to_date is None:
+                response = requests.get(base_url+'/api/news?street='+street, headers=headers)
+                timeline_data = (requests.get(base_url+'/api/gettimeline?street='+street, headers=headers)).json()['results']
+                tag_data = (requests.get(base_url+'/api/gettags?street='+street, headers=headers)).json()['results']
+                user_reported_timeline_data = (requests.get(base_url+'/api/gettimeline?street='+street+'&source=User', headers=headers)).json()['results']
+                user_reported_tag_data = (requests.get(base_url+'/api/gettags?street='+street+'&source=User', headers=headers)).json()['results']
+                risk_score = (requests.get(base_url+'/api/getriskscore?street='+street, headers=headers)).json()['results']
+                top_time = (requests.get(base_url+'/api/gettimeline?street='+street+'&limit=3', headers=headers)).json()['results']
+                top_tags = (requests.get(base_url+'/api/gettags?street='+street+'&limit=3', headers=headers)).json()['results']
             else:
-                response = requests.get('http://'+str(get_current_site(request))+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
-                timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                user_reported_timeline_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                user_reported_tag_data = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                risk_score = (requests.get('http://'+str(get_current_site(request))+'/api/getriskscore?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                top_time = (requests.get('http://'+str(get_current_site(request))+'/api/gettimeline?street='+street+'&from='+from_date+'&to='+to_date+'&limit=3', headers=headers)).json()['results']
-                top_tags = (requests.get('http://'+str(get_current_site(request))+'/api/gettags?street='+street+'&from='+from_date+'&to='+to_date+'&limit=3', headers=headers)).json()['results']
+                response = requests.get(base_url+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
+                timeline_data = (requests.get(base_url+'/api/gettimeline?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
+                tag_data = (requests.get(base_url+'/api/gettags?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
+                user_reported_timeline_data = (requests.get(base_url+'/api/gettimeline?street='+street+'&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
+                user_reported_tag_data = (requests.get(base_url+'/api/gettags?street='+street+'&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
+                risk_score = (requests.get(base_url+'/api/getriskscore?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
+                top_time = (requests.get(base_url+'/api/gettimeline?street='+street+'&from='+from_date+'&to='+to_date+'&limit=3', headers=headers)).json()['results']
+                top_tags = (requests.get(base_url+'/api/gettags?street='+street+'&from='+from_date+'&to='+to_date+'&limit=3', headers=headers)).json()['results']
             
             street_data = response.json()['results']
 
@@ -149,8 +155,7 @@ def streets(request):
                 data.pop('id')
                 data.pop('news')
                 data.pop('link')
-
-            
+                data.pop('street')
             
             context['timeline_data'] = timeline_data
             context['tag_data'] = tag_data
@@ -191,7 +196,8 @@ def route(request):
             end = request.POST.get('destination') 
             mode = request.POST.get('mode')
 
-            response = (requests.get('http://'+str(get_current_site(request))+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)).json()
+            base_url = 'http://'+str(get_current_site(request))
+            response = (requests.get(base_url+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)).json()
             
             all_streets= []
             moderate_streets = []
@@ -200,9 +206,6 @@ def route(request):
             if response['results'] is not None:
                 for street in response['results']:
                     if street['name'] not in all_streets: all_streets.append(street['name'])
-                    
-                    #street['risk_value'] = (requests.get('http://'+str(get_current_site(request))+'/api/getriskscore?street='+street['name'], headers=headers)).json()['results']
-                
                     if street['risk_score'] == 'Moderately Safe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
                     if street['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
 
@@ -245,7 +248,8 @@ def report(request):
                 'Authorization': request.session.get('Authorization')
             }
 
-            response = requests.get('http://'+str(get_current_site(request))+'/api/auth/users/me', headers=headers)
+            base_url = 'http://'+str(get_current_site(request))
+            response = requests.get(base_url+'/api/auth/users/me', headers=headers)
             user = response.json()['username']
 
 
@@ -256,7 +260,7 @@ def report(request):
                 'user': user
             }
 
-            requests.post('http://'+str(get_current_site(request))+'/api/report', data=post_data, headers=headers)
+            requests.post(base_url+'/api/report', data=post_data, headers=headers)
 
             context['message'] = 'Incident reported successfully'
 
