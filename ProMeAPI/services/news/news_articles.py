@@ -159,7 +159,7 @@ def add_to_street_db(street: str, updatefields: dict) -> List[StreetList]:
     except StreetList.DoesNotExist:
         add_to_risk_db(street, updatefields['news_from'], updatefields['news_till'])
         
-        street_list = StreetList(street=updatefields['street'],news_from=updatefields['news_from'],news_till=updatefields['news_till'])
+        street_list = StreetList(street=updatefields['street'], news_from=updatefields['news_from'], news_till=updatefields['news_till'], risk_score=updatefields['risk_score'])
         street_list.save()
         
     return street_list
