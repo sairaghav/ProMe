@@ -13,7 +13,15 @@ from django.contrib.auth import authenticate, login
 import requests
 
 def index(request):
-    return render(request,'index.html')
+    context = {
+        'loggedin': False
+    }
+    if 'Authorization' in request.session.keys():
+        context = {
+        'loggedin': True
+    }
+
+    return render(request,'index.html', context)
 
 def register(request):
     context = {
