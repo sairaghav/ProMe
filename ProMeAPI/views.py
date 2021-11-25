@@ -22,78 +22,31 @@ def get_risk(request):
     format = request.GET.get('format', 'text')
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
 
-    response = Response(results=news_articles.get_risk_score(street, from_date, to_date, format), errors=None)
+    response = Response(results=news_articles.get_risk_data(street, from_date, to_date, format), errors=None)
 
     return JsonResponse(response._asdict())
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_tag_data(request):
+def get_metadata(request):
     street = request.GET.get('street', None)
+    type = request.GET.get('type', None)
     source = request.GET.get('source', 'All')
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
     limit = int(request.GET.get('limit', 0))
-    
-    data = []
 
-    if street is not None:
-        queryset = news_articles.get_news_articles(street, from_date, to_date)
-        result = list(queryset.values())
-
-        for value in result:
-            to_consider = True
-            if source == 'User' and not value['source'].startswith('User'):
-                to_consider = False
-            else:
-                to_consider = True
-            if to_consider:
-                for tag in value['tags'].split(','):
-                    data.append(tag)
-
-        counter = collections.Counter(data)
-        if limit > 0:
-            counter = counter.most_common(limit)
-
-        response = Response(results=dict(counter), errors=None)
+    if street is not None and type is not None:
+        result = news_articles.get_detailed_metadata(street, from_date, to_date, type, source, limit)
+        if 'errors' in result.keys():
+            response = Response(results=None, errors=result['errors'])
+        else:
+            response = Response(results=result, errors=None)
     
     else:
-        response = Response(results=None, errors="Expected Format: /api/gettags?street=<street_name>&source=<optional_User>&from=<optional_from_date_yyyy-mm-dd>&to=<optional_to_date_yyyy-mm-dd>&limit=<optional_num_results>")
+        response = Response(results=None, errors="Expected Format: /api/getmetadata?street=<street_name>&type=<tags|timeline>&source=<optional_User>&from=<optional_from_date_yyyy-mm-dd>&to=<optional_to_date_yyyy-mm-dd>&limit=<optional_num_results>")
 
     return JsonResponse(response._asdict())
 
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_timeline_data(request):
-    street = request.GET.get('street', None)
-    source = request.GET.get('source', 'All')
-    from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
-    limit = int(request.GET.get('limit', 0))
-    
-    data = []
-
-    if street is not None:
-        queryset = news_articles.get_news_articles(street, from_date, to_date)
-        result = list(queryset.values())
-
-        for value in result:
-            to_consider = True
-            if source == 'User' and not value['source'].startswith('User'):
-                to_consider = False
-            if to_consider:
-                date = value['date'].strftime('%B %Y')
-                data.append(date)
-
-        counter = collections.Counter(data)
-        if limit > 0:
-            counter = counter.most_common(limit)
-        
-        response = Response(results=dict(counter), errors=None)
-
-    else:
-        response = Response(results=None, errors="Expected Format: /api/gettimeline?street=<street_name>&&source=<optional_User>&from=<optional_from_date_yyyy-mm-dd>&to=<optional_to_date_yyyy-mm-dd>&limit=<optional_num_results>")
-
-    return JsonResponse(response._asdict())
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -132,7 +85,8 @@ def get_directions(request) -> JsonResponse:
                 break
             else:
                 street = route.name
-                route = route._replace(risk_score=news_articles.get_risk_score(street, from_date, to_date))
+                print(street)
+                route = route._replace(risk_score=news_articles.get_risk_data(street, from_date, to_date))
                 result.append(route._asdict())
             
             response = Response(results=result, errors=None)

@@ -16,7 +16,7 @@
             </form>
         </div>
         {% if street == None %}
-        <p>Enter street name in search field to get risk metrics</p>
+        <p>Enter street name in search field to get safety metrics</p>
         {% endif %}
     </div>
 </div>
@@ -31,7 +31,7 @@
                     <td>{{ street_data|length }}</td>
                 </tr>
                 <tr>
-                    <td><b>Risk Score</b></td>
+                    <td><b>Safety Score</b></td>
                     {% if risk_score == 'Safe' %}<td class="bg-success" style="color: white;">{% endif %}
                     {% if risk_score == 'Moderately Safe' %}<td class="bg-warning" style="color: white;">{% endif %}
                     {% if risk_score == 'Unsafe' %}<td class="bg-danger" style="color: white;">{% endif %}    

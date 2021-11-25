@@ -41,7 +41,7 @@ getMilanoToday(street,startDate,endDate): Scraps the search results for MilanoTo
             news['date']: Date of news article
             news['time']: Time of news article
 '''
-import requests, datetime
+import requests, datetime, collections
 from bs4 import BeautifulSoup as BS
 from .parsers.classes import *
 
@@ -49,7 +49,35 @@ from ProMeAPI.services import config
 from ProMeAPI.services.news.parsers.classes import News
 from ProMeAPI.models import StreetRisk, StreetList
 
-def get_risk_score(street: str, from_date: str, to_date: str, format='text') -> str:
+def get_detailed_metadata(street: str, from_date: str, to_date:str, type: str, source: str, limit: int) -> dict:
+    queryset = get_news_articles(street, from_date, to_date)
+    result = list(queryset.values())
+
+    data = []
+
+    for value in result:
+        to_consider = True
+        if source.lower() == 'user' and not value['source'].lower().startswith('user'):
+            to_consider = False
+        else:
+            to_consider = True
+        if to_consider:
+            if type.lower() == 'tags':
+                for tag in value['tags'].split(','):
+                    data.append(tag)
+            elif type.lower() == 'timeline':
+                date = value['date'].strftime('%B %Y')
+                data.append(date)
+            else:
+                return {"errors": "Expected values for 'type' is either 'tags' or 'timeline'"}
+
+    counter = collections.Counter(data)
+    if limit > 0:
+        counter = counter.most_common(limit)
+
+    return dict(counter)
+
+def get_risk_data(street: str, from_date: str, to_date: str, format='text') -> str:
     try:
         street_list = StreetList.objects.get(street=street)
         if street_list.news_from == from_date and street_list.news_till == to_date:
@@ -83,7 +111,7 @@ def is_street_first_time(street: str, from_date: str, to_date: str) -> List[Stre
 
     return street_list
 
-def add_user_reported_incidents(street: str, summary: str, tags: str, user='Test') -> List[StreetRisk]:
+def add_user_reported_incidents(street: str, summary: str, tags: str, user) -> List[StreetRisk]:
     username = 'User '+user
     risk = StreetRisk(news=summary, date=datetime.datetime.now(datetime.timezone.utc), source=username, street=street, tags=tags, link='')
     risk.save()

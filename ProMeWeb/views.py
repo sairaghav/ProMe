@@ -130,22 +130,22 @@ def streets(request):
 
             if from_date is None or to_date is None:
                 response = requests.get(base_url+'/api/news?street='+street, headers=headers)
-                timeline_data = (requests.get(base_url+'/api/gettimeline?street='+street, headers=headers)).json()['results']
-                tag_data = (requests.get(base_url+'/api/gettags?street='+street, headers=headers)).json()['results']
-                user_reported_timeline_data = (requests.get(base_url+'/api/gettimeline?street='+street+'&source=User', headers=headers)).json()['results']
-                user_reported_tag_data = (requests.get(base_url+'/api/gettags?street='+street+'&source=User', headers=headers)).json()['results']
+                timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=timeline', headers=headers)).json()['results']
+                tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=tags', headers=headers)).json()['results']
+                user_reported_timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&source=User&type=timeline', headers=headers)).json()['results']
+                user_reported_tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&source=User&type=tags', headers=headers)).json()['results']
                 risk_score = (requests.get(base_url+'/api/getriskscore?street='+street, headers=headers)).json()['results']
-                top_time = (requests.get(base_url+'/api/gettimeline?street='+street+'&limit=3', headers=headers)).json()['results']
-                top_tags = (requests.get(base_url+'/api/gettags?street='+street+'&limit=3', headers=headers)).json()['results']
+                top_time = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=timeline&limit=3', headers=headers)).json()['results']
+                top_tags = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=tags&limit=3', headers=headers)).json()['results']
             else:
                 response = requests.get(base_url+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
-                timeline_data = (requests.get(base_url+'/api/gettimeline?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                tag_data = (requests.get(base_url+'/api/gettags?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                user_reported_timeline_data = (requests.get(base_url+'/api/gettimeline?street='+street+'&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                user_reported_tag_data = (requests.get(base_url+'/api/gettags?street='+street+'&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
+                timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&from='+from_date+'&to='+to_date+'&type=timeline', headers=headers)).json()['results']
+                tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&from='+from_date+'&to='+to_date+'&type=tags', headers=headers)).json()['results']
+                user_reported_timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=timeline&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
+                user_reported_tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=tags&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
                 risk_score = (requests.get(base_url+'/api/getriskscore?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                top_time = (requests.get(base_url+'/api/gettimeline?street='+street+'&from='+from_date+'&to='+to_date+'&limit=3', headers=headers)).json()['results']
-                top_tags = (requests.get(base_url+'/api/gettags?street='+street+'&from='+from_date+'&to='+to_date+'&limit=3', headers=headers)).json()['results']
+                top_time = (requests.get(base_url+'/api/getmetadata?street='+street+'&from='+from_date+'&to='+to_date+'&type=timeline&limit=3', headers=headers)).json()['results']
+                top_tags = (requests.get(base_url+'/api/getmetadata?street='+street+'&from='+from_date+'&to='+to_date+'&type=tags&limit=3', headers=headers)).json()['results']
             
             street_data = response.json()['results']
 

@@ -60,18 +60,19 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
                                               risk_score=0, infra_score=0, narrative=maneuver['narrative'][:-1], risk_metadata=[], mapUrl=maneuver['mapUrl'])
                 results.append(maneuver_street)
 
+    '''
     # Add the start point for the journey
     start_street = Route(name=start_point["street"], distance=0, lng=start_point["latLng"]["lng"],
                                lat=start_point["latLng"]["lat"], direction=results[0].direction, mode=results[0].mode,
-                               risk_score=0, infra_score=0, narrative="Start from starting Point", risk_metadata=[], mapUrl='')
+                               risk_score=0, infra_score=0, narrative="Start from starting point", risk_metadata=[], mapUrl='')
     results.insert(0, start_street)
-
+    
     # Add the destination points for the journey
     for destination_point in destination_points:
         destination_street = Route(name=destination_point["street"], distance=0,
                                          lng=destination_point["latLng"]["lng"], lat=destination_point["latLng"]["lat"],
                                          direction=results[-1].direction, mode=results[-1].mode, risk_score=0,
-                                         infra_score=0, narrative="Reach end Point", risk_metadata=[], mapUrl='')
+                                         infra_score=0, narrative="Reach end point", risk_metadata=[], mapUrl='')
         results.append(destination_street)
-
+    '''
     return results
