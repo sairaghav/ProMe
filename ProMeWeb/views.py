@@ -122,6 +122,15 @@ def streets(request):
     from_date = None if request.POST.get('news_from') == '' else request.POST.get('news_from')
     to_date = None if request.POST.get('news_till') == '' else request.POST.get('news_till')
 
+    if from_date is None and to_date is None:
+        time_url = ''
+    elif from_date is None:
+        time_url = '&to='+to_date
+    elif to_date is None:
+        time_url = '&from='+from_date
+    else:
+        time_url = '&from='+from_date+'&to='+to_date
+
     context = {
         'loggedin': True
     }
@@ -136,26 +145,18 @@ def streets(request):
 
             base_url = 'http://'+str(get_current_site(request))
 
-            if from_date is None or to_date is None:
-                response = requests.get(base_url+'/api/news?street='+street, headers=headers)
-                timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=timeline', headers=headers)).json()['results']
-                tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=tags', headers=headers)).json()['results']
-                user_reported_timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&source=User&type=timeline', headers=headers)).json()['results']
-                user_reported_tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&source=User&type=tags', headers=headers)).json()['results']
-                risk_score = (requests.get(base_url+'/api/getriskscore?street='+street, headers=headers)).json()['results']
-                top_time = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=timeline&limit=3', headers=headers)).json()['results']
-                top_tags = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=tags&limit=3', headers=headers)).json()['results']
-            else:
-                response = requests.get(base_url+'/api/news?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)
-                timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&from='+from_date+'&to='+to_date+'&type=timeline', headers=headers)).json()['results']
-                tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&from='+from_date+'&to='+to_date+'&type=tags', headers=headers)).json()['results']
-                user_reported_timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=timeline&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                user_reported_tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+'&type=tags&source=User&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                risk_score = (requests.get(base_url+'/api/getriskscore?street='+street+'&from='+from_date+'&to='+to_date, headers=headers)).json()['results']
-                top_time = (requests.get(base_url+'/api/getmetadata?street='+street+'&from='+from_date+'&to='+to_date+'&type=timeline&limit=3', headers=headers)).json()['results']
-                top_tags = (requests.get(base_url+'/api/getmetadata?street='+street+'&from='+from_date+'&to='+to_date+'&type=tags&limit=3', headers=headers)).json()['results']
+            response = requests.get(base_url+'/api/news?street='+street+''+time_url, headers=headers)
+            timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+''+time_url+'&type=timeline', headers=headers)).json()['results']
+            tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+''+time_url+'&type=tags', headers=headers)).json()['results']
+            risk_score = (requests.get(base_url+'/api/getriskscore?street='+street+''+time_url, headers=headers)).json()['results']
+            top_time = (requests.get(base_url+'/api/getmetadata?street='+street+''+time_url+'&type=timeline&limit=3', headers=headers)).json()['results']['all']
+            top_tags = (requests.get(base_url+'/api/getmetadata?street='+street+''+time_url+'&type=tags&limit=3', headers=headers)).json()['results']['all']
             
             street_data = response.json()['results']
+            all_timeline_data = timeline_data['all']
+            all_tag_data = tag_data['all']
+            user_reported_timeline_data = timeline_data['user']
+            user_reported_tag_data = tag_data['user']
 
             for data in street_data:
                 data['reference'] = {}
@@ -165,8 +166,8 @@ def streets(request):
                 data.pop('link')
                 data.pop('street')
             
-            context['timeline_data'] = timeline_data
-            context['tag_data'] = tag_data
+            context['timeline_data'] = all_timeline_data
+            context['tag_data'] = all_tag_data
             context['street'] = street
             context['street_data'] = street_data
             context['user_reported_timeline_data'] = user_reported_timeline_data

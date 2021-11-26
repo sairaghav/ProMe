@@ -6,33 +6,39 @@ from ProMeAPI.services import config
 from ProMeAPI.services.news.parsers.classes import News
 from ProMeAPI.models import StreetRisk, StreetList
 
-def get_detailed_metadata(street: str, from_date: str, to_date:str, type: str, source: str, limit: int) -> dict:
+def get_detailed_metadata(street: str, from_date: str, to_date:str, type: str, limit: int) -> dict:
     queryset = get_news_articles(street, from_date, to_date)
     result = list(queryset.values())
 
-    data = []
+    all_data = []
+    user_data = []
+    results = {}
 
     for value in result:
-        to_consider = True
-        if source.lower() == 'user' and not value['source'].lower().startswith('user'):
-            to_consider = False
+        if type.lower() == 'tags':
+            for tag in value['tags'].split(','):
+                all_data.append(tag)
+                if value['source'].lower().startswith('user'):
+                    user_data.append(tag)
+        elif type.lower() == 'timeline':
+            date = value['date'].strftime('%B %Y')
+            all_data.append(date)
+            if value['source'].lower().startswith('user'):
+                user_data.append(date)
         else:
-            to_consider = True
-        if to_consider:
-            if type.lower() == 'tags':
-                for tag in value['tags'].split(','):
-                    data.append(tag)
-            elif type.lower() == 'timeline':
-                date = value['date'].strftime('%B %Y')
-                data.append(date)
-            else:
-                return {"errors": "Expected values for 'type' is either 'tags' or 'timeline'"}
+            return {"errors": "Expected values for 'type' is either 'tags' or 'timeline'"}
 
-    counter = collections.Counter(data)
+    all_counter = collections.Counter(all_data)
+    user_counter = collections.Counter(user_data)
+    
     if limit > 0:
-        counter = counter.most_common(limit)
+        all_counter = all_counter.most_common(limit)
+        user_counter = user_counter.most_common(limit)
 
-    return dict(counter)
+    results['all'] = dict(all_counter)
+    results['user'] = dict(user_counter)
+
+    return results
 
 def get_risk_data(street: str, from_date: str, to_date: str, format='text') -> str:
     try:
@@ -82,11 +88,10 @@ def add_user_reported_incidents(street: str, summary: str, tags: str, user) -> L
 # Convert all time values to UTC
 def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.datetime,datetime.datetime)]:
     # Convert input dates from string to datetime and assign default values if None
-    from_date = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=config.fetch_news_for_interval_days) if from_date is None else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
-    to_date = datetime.datetime.now(datetime.timezone.utc) if to_date is None else datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
-
+    to_date = datetime.datetime.now(datetime.timezone.utc) if to_date is None else datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(hours=1)
+    from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days) if from_date is None else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(hours=1)
     # Avoid future dates and from_date greater than to_date
-    if to_date > datetime.datetime.now(datetime.timezone.utc) or from_date < to_date:
+    if to_date > datetime.datetime.now(datetime.timezone.utc) or from_date > to_date:
         to_date = datetime.datetime.now(datetime.timezone.utc)
         from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days)
 
