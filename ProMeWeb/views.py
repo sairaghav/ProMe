@@ -156,8 +156,8 @@ def streets(request):
             all_tag_data = response['all_tags']
             user_reported_timeline_data = response['user_timeline']
             user_reported_tag_data = response['user_tags']
-            top_time = response['user_top_timeline_3']
-            top_tags = response['user_top_tag_3']
+            top_time = response['all_top_timeline_3']
+            top_tags = response['all_top_tag_3']
 
             for data in street_data:
                 data['reference'] = {}
