@@ -152,8 +152,9 @@
 </div>
 {% endif %}
 {% if user_reported_tag_data %}
-<div class="row justify-content-center">
+<div class="row mt-3 pt-3 mx-auto w-90 shadow justify-content-center">
     <h3 align="center">User-reported Incident Metrics for {{ street }}</h3>
+    {% if user_reported_tag_data %}
     <div class="col-md-4">
         <canvas id="userReportedTagChart" width="100%" height="100%"></canvas>
         <script>
@@ -228,6 +229,7 @@
     </div>
     {% endif %}
 </div>
+{% endif %}
 {% if street_data %}
 <div class="col col-md-10 mt-3 pt-3 mx-auto shadow justify-content-center table-responsive">
     <h3 align="center">References for {{ street }}</h3>

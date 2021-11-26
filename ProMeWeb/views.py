@@ -218,6 +218,10 @@ def route(request):
                     if street['risk_score'] == 'Moderately Safe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
                     if street['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
 
+                    tag_data = (requests.get(base_url+'/api/getmetadata?type=tags&limit=3&street='+street['name'], headers=headers)).json()['results']['all']
+                    if len(tag_data.keys()) > 0:
+                        street['tag_data'] = ', '.join(tag_data.keys())
+
                     
                 context['route_data'] = response['results'],
                 context['moderate_streets'] = moderate_streets,

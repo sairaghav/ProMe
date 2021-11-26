@@ -34,7 +34,6 @@ def get_metadata(request):
     type = request.GET.get('type', None)
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
     limit = int(request.GET.get('limit', 0))
-    print(from_date, to_date)
 
     if street is not None and type is not None:
         result = news_articles.get_detailed_metadata(street, from_date, to_date, type, limit)
@@ -53,8 +52,7 @@ def get_metadata(request):
 def get_news_for_street(request) -> JsonResponse:
     street = request.GET.get('street', None)
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
-    print('backend')
-    print(from_date, to_date)
+
     if street is not None:
         queryset = news_articles.get_news_articles(street, from_date, to_date)
         response = Response(results=list(queryset.values()), errors=None)
