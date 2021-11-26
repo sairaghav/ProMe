@@ -16,10 +16,14 @@ def index(request):
     context = {
         'loggedin': False
     }
+
     if 'Authorization' in request.session.keys():
-        context = {
-        'loggedin': True
-    }
+        headers = {'Authorization': request.session['Authorization']}
+        api_user_url = 'http://'+str(get_current_site(request))+'/api/auth/users/' 
+        response = requests.get(api_user_url, headers=headers)
+        
+        if not response.status_code == 401:
+            context['loggedin'] = True
 
     return render(request,'index.html', context)
 
@@ -144,19 +148,16 @@ def streets(request):
             }
 
             base_url = 'http://'+str(get_current_site(request))
-
-            response = requests.get(base_url+'/api/news?street='+street+''+time_url, headers=headers)
-            timeline_data = (requests.get(base_url+'/api/getmetadata?street='+street+''+time_url+'&type=timeline', headers=headers)).json()['results']
-            tag_data = (requests.get(base_url+'/api/getmetadata?street='+street+''+time_url+'&type=tags', headers=headers)).json()['results']
-            risk_score = (requests.get(base_url+'/api/getriskscore?street='+street+''+time_url, headers=headers)).json()['results']
-            top_time = (requests.get(base_url+'/api/getmetadata?street='+street+''+time_url+'&type=timeline&limit=3', headers=headers)).json()['results']['all']
-            top_tags = (requests.get(base_url+'/api/getmetadata?street='+street+''+time_url+'&type=tags&limit=3', headers=headers)).json()['results']['all']
+            response = (requests.get(base_url+'/api/getriskdata?street='+street+''+time_url, headers=headers)).json()['results']
             
-            street_data = response.json()['results']
-            all_timeline_data = timeline_data['all']
-            all_tag_data = tag_data['all']
-            user_reported_timeline_data = timeline_data['user']
-            user_reported_tag_data = tag_data['user']
+            street_data = response['risk_metadata']
+            risk_score = response['risk_score']
+            all_timeline_data = response['all_timeline']
+            all_tag_data = response['all_tags']
+            user_reported_timeline_data = response['user_timeline']
+            user_reported_tag_data = response['user_tags']
+            top_time = response['user_top_timeline_3']
+            top_tags = response['user_top_tag_3']
 
             for data in street_data:
                 data['reference'] = {}
@@ -209,21 +210,24 @@ def route(request):
             response = (requests.get(base_url+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)).json()
             
             all_streets= []
+            slight_streets = []
             moderate_streets = []
             unsafe_streets = []
             
             if response['results'] is not None:
                 for street in response['results']:
                     if street['name'] not in all_streets: all_streets.append(street['name'])
+                    if street['risk_score'] == 'Slightly Unsafe' and street['name'] not in slight_streets: slight_streets.append(street['name'])
                     if street['risk_score'] == 'Moderately Unsafe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
                     if street['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
 
-                    tag_data = (requests.get(base_url+'/api/getmetadata?type=tags&limit=3&street='+street['name'], headers=headers)).json()['results']['all']
+                    tag_data = (requests.get(base_url+'/api/getriskdata?street='+street['name'], headers=headers)).json()['results']['all_tags']
                     if len(tag_data.keys()) > 0:
                         street['tag_data'] = ', '.join(tag_data.keys())
 
                     
                 context['route_data'] = response['results'],
+                context['slight_streets'] = slight_streets,
                 context['moderate_streets'] = moderate_streets,
                 context['unsafe_streets'] = unsafe_streets,
                 context['all_streets'] = ' -> '.join(all_streets)

@@ -15,50 +15,15 @@ class Response(NamedTuple):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_risk(request):
-    street = request.GET.get('street', None)
-    format = request.GET.get('format', 'text')
-    from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
-
-    if street is not None:
-        response = Response(results=news_articles.get_risk_data(street, from_date, to_date, format), errors=None)
-    else:
-        response = Response(results=None, errors="Expected Format: /api/getriskscore?street=<street_name>&format=<null|text>")
-
-    return JsonResponse(response._asdict())
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_metadata(request):
-    street = request.GET.get('street', None)
-    type = request.GET.get('type', None)
-    from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
-    limit = int(request.GET.get('limit', 0))
-
-    if street is not None and type is not None:
-        result = news_articles.get_detailed_metadata(street, from_date, to_date, type, limit)
-        if 'errors' in result.keys():
-            response = Response(results=None, errors=result['errors'])
-        else:
-            response = Response(results=result, errors=None)
-    
-    else:
-        response = Response(results=None, errors="Expected Format: /api/getmetadata?street=<street_name>&type=<tags|timeline>&from=<null|from_date_yyyy-mm-dd>&to=<null|to_date_yyyy-mm-dd>&limit=<null|num_results>")
-
-    return JsonResponse(response._asdict())
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_news_for_street(request) -> JsonResponse:
+def get_risk_data(request) -> JsonResponse:
     street = request.GET.get('street', None)
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
 
     if street is not None:
-        queryset = news_articles.get_news_articles(street, from_date, to_date)
-        response = Response(results=list(queryset.values()), errors=None)
+        response = Response(results=news_articles.get_risk(street, from_date, to_date), errors=None)
 
     else:
-        response = Response(results=None, errors="Expected Format: /api/news?street=<street>&from=<from_date_yyyy-mm-dd>&to=<to_date_yyyy-mm-dd>")
+        response = Response(results=None, errors="Expected Format: /api/getriskdata?street=<street>&from=<from_date_yyyy-mm-dd>&to=<to_date_yyyy-mm-dd>")
 
     return JsonResponse(response._asdict())
 
@@ -84,7 +49,7 @@ def get_directions(request) -> JsonResponse:
                 response = Response(results=None, errors=route['info']['messages'][0])
                 break
             else:
-                route = route._replace(risk_score=news_articles.get_risk_data(route.name, from_date, to_date))
+                route = route._replace(risk_score=news_articles.get_risk(route.name, from_date, to_date)['risk_score'])
                 result.append(route._asdict())
             
             response = Response(results=result, errors=None)
