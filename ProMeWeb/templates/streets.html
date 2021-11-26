@@ -34,7 +34,7 @@
                 <tr>
                     <td><b>Safety Score</b></td>
                     {% if risk_score == 'Safe' %}<td class="bg-success" style="color: white;">{% endif %}
-                    {% if risk_score == 'Moderately Safe' %}<td class="bg-warning" style="color: white;">{% endif %}
+                    {% if risk_score == 'Moderately Unsafe' %}<td class="bg-warning" style="color: white;">{% endif %}
                     {% if risk_score == 'Unsafe' %}<td class="bg-danger" style="color: white;">{% endif %}    
                         {{ risk_score }}
                     </td>

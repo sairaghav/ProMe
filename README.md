@@ -39,4 +39,4 @@ python manage.py runserver
 
 - `GET /api/getmetadata?street=<street_name>&type=<tags|timeline>&from=<null|from_date_yyyy-mm-dd>&to=<null|to_date_yyyy-mm-dd>&limit=<null|num_results>`: Returns a dict of tags or time period with the count of reported events depending on the `type` specified. `from`, `to` and `limit` are optional parameters
 
-- `/api/getriskscore?street=<street_name>&format=<null|text>`: Returns the risk score of a particular street. Returns the risk score in text as one of `Safe`, `Moderately Safe` and `Unsafe` depending on the risk score if `format` is provided as *text*
+- `/api/getriskscore?street=<street_name>&format=<null|text>`: Returns the risk score of a particular street. Returns the risk score in text as one of `Safe`, `Moderately Unsafe` and `Unsafe` depending on the risk score if `format` is provided as *text*

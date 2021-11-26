@@ -57,7 +57,7 @@ def get_risk_data(street: str, from_date: str, to_date: str, format='text') -> s
 
     if format == 'text':
         if risk_score <= 0.05: risk_score = 'Safe'
-        elif risk_score <= 0.2: risk_score = 'Moderately Safe'
+        elif risk_score <= 0.2: risk_score = 'Moderately Unsafe'
         else: risk_score = 'Unsafe'
 
         return risk_score

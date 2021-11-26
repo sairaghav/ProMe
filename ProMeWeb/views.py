@@ -215,7 +215,7 @@ def route(request):
             if response['results'] is not None:
                 for street in response['results']:
                     if street['name'] not in all_streets: all_streets.append(street['name'])
-                    if street['risk_score'] == 'Moderately Safe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
+                    if street['risk_score'] == 'Moderately Unsafe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
                     if street['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
 
                     tag_data = (requests.get(base_url+'/api/getmetadata?type=tags&limit=3&street='+street['name'], headers=headers)).json()['results']['all']
