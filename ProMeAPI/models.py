@@ -16,7 +16,7 @@ class StreetRisk(models.Model):
     link = models.CharField('Reference Link', max_length=500)
 
 class User(AbstractUser):
-    id = models.CharField(max_length=255, unique=True)
+    #id = models.CharField(max_length=255, unique=True)
     email = models.EmailField('Email', max_length=255, unique=True, primary_key=True)
     phone = models.CharField(max_length=255, unique=True)
     REQUIRED_FIELDS = ['username', 'phone', 'first_name', 'last_name']
