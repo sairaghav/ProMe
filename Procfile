@@ -1,1 +1,1 @@
-web: gunicorn ProMe.asgi -k uvicorn.workers.UvicornWorker
+web: gunicorn ProMe.wsgi
