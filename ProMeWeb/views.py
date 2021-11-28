@@ -129,24 +129,11 @@ def logout(request):
 
 @login_required
 def streets(request):
-    street = request.POST.get('street', None)
-    from_date = None if request.POST.get('news_from') == '' else request.POST.get('news_from')
-    to_date = None if request.POST.get('news_till') == '' else request.POST.get('news_till')
-
-    if from_date is None and to_date is None:
-        time_url = ''
-    elif from_date is None:
-        time_url = '&to='+to_date
-    elif to_date is None:
-        time_url = '&from='+from_date
-    else:
-        time_url = '&from='+from_date+'&to='+to_date
-
     context = {
         'loggedin': True
     }
 
-    if request.method == 'POST' and street is not None:
+    if request.method == 'POST':
         form = StreetRiskForm(request.POST, initial={'street': 'Via'})
 
         if form.is_valid():
@@ -154,18 +141,23 @@ def streets(request):
                 'Authorization': request.session.get('Authorization')
             }
 
+            street = request.POST.get('street', None)
+            from_date = None if request.POST.get('news_from') == '' else request.POST.get('news_from')
+            to_date = None if request.POST.get('news_till') == '' else request.POST.get('news_till')
+
+            if from_date is None and to_date is None:
+                time_url = ''
+            elif from_date is None:
+                time_url = '&to='+to_date
+            elif to_date is None:
+                time_url = '&from='+from_date
+            else:
+                time_url = '&from='+from_date+'&to='+to_date
+
             base_url = 'http://'+str(get_current_site(request))
             response = (requests.get(base_url+'/api/getriskdata?street='+street+''+time_url, headers=headers)).json()['results']
             
             street_data = response['risk_metadata']
-            risk_score = response['risk_score']
-            all_timeline_data = response['all_timeline']
-            all_tag_data = response['all_tags']
-            user_reported_timeline_data = response['user_timeline']
-            user_reported_tag_data = response['user_tags']
-            top_time = response['all_top_timeline']
-            top_tags = response['all_top_tag']
-
             for data in street_data:
                 data['reference'] = {}
                 data['reference'][data['news']] = data['link']
@@ -174,15 +166,15 @@ def streets(request):
                 data.pop('link')
                 data.pop('street')
             
-            context['timeline_data'] = all_timeline_data
-            context['tag_data'] = all_tag_data
             context['street'] = street
             context['street_data'] = street_data
-            context['user_reported_timeline_data'] = user_reported_timeline_data
-            context['user_reported_tag_data'] = user_reported_tag_data
-            context['risk_score'] = risk_score
-            context['top_time'] = top_time
-            context['top_tags'] = top_tags
+            context['timeline_data'] = response['all_timeline']
+            context['tag_data'] = response['all_tags']
+            context['user_reported_timeline_data'] = response['user_timeline']
+            context['user_reported_tag_data'] = response['user_tags']
+            context['risk_score'] = response['risk_score']
+            context['top_time'] = response['all_top_timeline']
+            context['top_tags'] = response['all_top_tag']
 
     else:
         form = StreetRiskForm(initial={'street': 'Via'})
@@ -219,7 +211,6 @@ async def route(request):
             response = (requests.get(base_url+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)).json()
             
             all_streets= []
-            #slight_streets = []
             moderate_streets = []
             unsafe_streets = []
             
@@ -233,7 +224,6 @@ async def route(request):
                         if street['name'] == data['street']:
                             street['risk_data'] = data
 
-                    #if street['risk_score'] == 'Slightly Unsafe' and street['name'] not in slight_streets: slight_streets.append(street['name'])
                     if street['risk_data']['risk_score'] == 'Moderately Unsafe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
                     if street['risk_data']['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
                 
@@ -242,12 +232,11 @@ async def route(request):
                         street['tag_data'] = ', '.join(tag_data.keys())
                         
                     context['route_data'] = response['results'],
-                    #context['slight_streets'] = slight_streets,
                     context['moderate_streets'] = moderate_streets,
                     context['unsafe_streets'] = unsafe_streets,
                     context['all_streets'] = ' -> '.join(all_streets)
             else:
-                context['message'] = response['errors']
+                context['message'] = response['errors'][0]
 
     else:
         form = StreetRouteForm(initial={
@@ -268,7 +257,6 @@ def report(request):
 
     if request.method == 'POST':
         form = StreetReportForm(request.POST)
-        message = ''
 
         if form.is_valid():
             street = request.POST.get('street')

@@ -64,8 +64,6 @@ def get_top_tags(results: RiskData, limit=3) -> RiskData:
             if metadata['source'].lower().startswith('user'):
                 user_tags.append(tag)
 
-    
-
     return results._replace(
         all_tags=dict(collections.Counter(all_tags)),
         user_tags=dict(collections.Counter(user_tags)),
