@@ -49,7 +49,7 @@ def get_directions(request) -> JsonResponse:
                 response = Response(results=None, errors=route['info']['messages'])
                 break
             else:
-                route = route._replace(risk_data=news_articles.get_risk(route.name, from_date, to_date))
+                #route = route._replace(risk_data=news_articles.get_risk(route.name, from_date, to_date))
                 result.append(route._asdict())
             
                 response = Response(results=result, errors=None)

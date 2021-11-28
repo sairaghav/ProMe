@@ -10,7 +10,14 @@ from .reportform import StreetReportForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
-import requests
+import requests, asyncio, httpx
+from asgiref.sync import async_to_sync, sync_to_async
+
+async def make_async_api_call(url: str, headers: dict) -> dict:
+    async with httpx.AsyncClient(timeout=httpx.Timeout(25.0, connect=5.0)) as client:
+        response = await client.get(url, headers=headers)
+
+    return response.json()['results']
 
 def index(request):
     context = {
@@ -184,8 +191,10 @@ def streets(request):
     
     return render(request,'streets.html', context)
 
+@sync_to_async
 @login_required
-def route(request):
+@async_to_sync
+async def route(request):
     context = {
         'loggedin': True
     }
@@ -217,23 +226,28 @@ def route(request):
             if response['results'] is not None:
                 for street in response['results']:
                     if street['name'] not in all_streets: all_streets.append(street['name'])
-                    #if street['risk_score'] == 'Slightly Unsafe' and street['name'] not in slight_streets: slight_streets.append(street['name'])
-                    if street['risk_data']['risk_score'] == 'Moderately Unsafe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
-                    if street['risk_data']['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
+            else:
+                context['message'] = response['errors']
 
-                    tag_data = street['risk_data']['all_tags']
-                    if len(tag_data.keys()) > 0:
-                        street['tag_data'] = ', '.join(tag_data.keys())
+            risk_data = await asyncio.gather(*[make_async_api_call('http://'+str(get_current_site(request))+'/api/getriskdata?street='+street, headers) for street in all_streets])
+            for street in response['results']:
+                for data in risk_data:
+                    if street['name'] == data['street']:
+                        street['risk_data'] = data
+
+                #if street['risk_score'] == 'Slightly Unsafe' and street['name'] not in slight_streets: slight_streets.append(street['name'])
+                if street['risk_data']['risk_score'] == 'Moderately Unsafe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
+                if street['risk_data']['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
+            
+                tag_data = street['risk_data']['all_tags']
+                if len(tag_data.keys()) > 0:
+                    street['tag_data'] = ', '.join(tag_data.keys())
                     
                 context['route_data'] = response['results'],
                 #context['slight_streets'] = slight_streets,
                 context['moderate_streets'] = moderate_streets,
                 context['unsafe_streets'] = unsafe_streets,
                 context['all_streets'] = ' -> '.join(all_streets)
-        
-            else:
-                context['message'] = response['errors']
-
     else:
         form = StreetRouteForm(initial={
             'source': 'Via',

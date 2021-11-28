@@ -7,6 +7,7 @@ from ProMeAPI.services.news.parsers.classes import News
 from ProMeAPI.models import StreetRisk, StreetList
 
 class RiskData(NamedTuple):
+    street: str
     risk_score: str
     risk_metadata: list
     all_tags: dict
@@ -127,7 +128,8 @@ def update_risk_db(street: str, available_from: datetime.datetime, available_til
     elif risk_score <= 0.2: risk_score = 'Moderately Unsafe'
     else: risk_score = 'Unsafe'
 
-    return RiskData(risk_metadata=list(queryset.values()),
+    return RiskData(street=street,
+                    risk_metadata=list(queryset.values()),
                     risk_score=risk_score,
                     all_tags={},
                     all_timeline={},
