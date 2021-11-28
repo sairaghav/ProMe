@@ -14,7 +14,7 @@ import requests, asyncio, httpx
 from asgiref.sync import async_to_sync, sync_to_async
 
 async def make_async_api_call(url: str, headers: dict) -> dict:
-    async with httpx.AsyncClient(timeout=httpx.Timeout(25.0, connect=5.0)) as client:
+    async with httpx.AsyncClient(timeout=httpx.Timeout(25.0, connect=1.0)) as client:
         response = await client.get(url, headers=headers)
 
     return response.json()['results']
