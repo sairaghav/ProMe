@@ -46,13 +46,13 @@ def get_directions(request) -> JsonResponse:
         routes = routing.fetch_route(start, end, mode)
         for route in routes:
             if type(route) == dict:
-                response = Response(results=None, errors=route['info']['messages'][0])
+                response = Response(results=None, errors=route['info']['messages'])
                 break
             else:
-                route = route._replace(risk_score=news_articles.get_risk(route.name, from_date, to_date)['risk_score'])
+                route = route._replace(risk_data=news_articles.get_risk(route.name, from_date, to_date))
                 result.append(route._asdict())
             
-            response = Response(results=result, errors=None)
+                response = Response(results=result, errors=None)
 
     else:
         response = Response(results=None, errors="Expected Format: /api/directions?start=<source>&end=<destination>&mode=<null|pedestrian|fastest|bicycle>")

@@ -156,8 +156,8 @@ def streets(request):
             all_tag_data = response['all_tags']
             user_reported_timeline_data = response['user_timeline']
             user_reported_tag_data = response['user_tags']
-            top_time = response['all_top_timeline_3']
-            top_tags = response['all_top_tag_3']
+            top_time = response['all_top_timeline']
+            top_tags = response['all_top_tag']
 
             for data in street_data:
                 data['reference'] = {}
@@ -210,24 +210,23 @@ def route(request):
             response = (requests.get(base_url+'/api/directions?start='+start+'&end='+end+'&mode='+mode, headers=headers)).json()
             
             all_streets= []
-            slight_streets = []
+            #slight_streets = []
             moderate_streets = []
             unsafe_streets = []
             
             if response['results'] is not None:
                 for street in response['results']:
                     if street['name'] not in all_streets: all_streets.append(street['name'])
-                    if street['risk_score'] == 'Slightly Unsafe' and street['name'] not in slight_streets: slight_streets.append(street['name'])
-                    if street['risk_score'] == 'Moderately Unsafe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
-                    if street['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
+                    #if street['risk_score'] == 'Slightly Unsafe' and street['name'] not in slight_streets: slight_streets.append(street['name'])
+                    if street['risk_data']['risk_score'] == 'Moderately Unsafe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
+                    if street['risk_data']['risk_score'] == 'Unsafe' and street['name'] not in unsafe_streets: unsafe_streets.append(street['name'])
 
-                    tag_data = (requests.get(base_url+'/api/getriskdata?street='+street['name'], headers=headers)).json()['results']['all_tags']
+                    tag_data = street['risk_data']['all_tags']
                     if len(tag_data.keys()) > 0:
                         street['tag_data'] = ', '.join(tag_data.keys())
-
                     
                 context['route_data'] = response['results'],
-                context['slight_streets'] = slight_streets,
+                #context['slight_streets'] = slight_streets,
                 context['moderate_streets'] = moderate_streets,
                 context['unsafe_streets'] = unsafe_streets,
                 context['all_streets'] = ' -> '.join(all_streets)

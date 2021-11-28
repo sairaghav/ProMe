@@ -3,6 +3,8 @@ import urllib.parse
 from ProMeAPI.services import config
 from typing import NamedTuple, List
 
+from ProMeAPI.services.news.news_articles import RiskData
+
 
 class Route(NamedTuple):
     direction: str
@@ -13,10 +15,8 @@ class Route(NamedTuple):
     mode: str
     name: str
     narrative: str
-    risk_score: int
-    risk_metadata: list
-    mapUrl: str 
-
+    mapUrl: str
+    risk_data: dict
 
 def fetch_route(from_source, to_destination, mode) -> List[Route]:
     from_source = urllib.parse.quote_plus(from_source)
@@ -28,10 +28,10 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
     results: List[Route] = []
     # https://developer.mapquest.com/documentation/open/directions-api/route/get/
 
-    if response_data['info']['messages']:
-        return [response_data]
+    if 'info' in response_data.keys():
+        if len(response_data['info']['messages']) > 0: return [response_data]
 
-    start_point, *destination_points = response_data['route']['locations']
+    #start_point, *destination_points = response_data['route']['locations']
     # Can we actually have multiple destinations?
     for leg in response_data['route']['legs']:
         for maneuver in leg['maneuvers']:
@@ -41,7 +41,7 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
                 name = " ".join(maneuver['streets'])
                 maneuver_street = Route(name=name, lat=lat, lng=lng, distance=maneuver['distance'],
                                               direction=maneuver['directionName'], mode=maneuver['transportMode'],
-                                              risk_score=0, infra_score=0, narrative=maneuver['narrative'][:-1], risk_metadata=[], mapUrl=maneuver['mapUrl'])
+                                              infra_score=0, narrative=maneuver['narrative'][:-1], risk_data={}, mapUrl=maneuver['mapUrl'])
                 results.append(maneuver_street)
 
     '''

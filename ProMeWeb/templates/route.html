@@ -27,22 +27,6 @@
                         <td>{{ all_streets }}</td>
                     </tr>
                     <tr align="center">
-                        <td><b>Potentially Slightly Unsafe Streets</b></td>
-                        <td class="bg-secondary" style="color: white;"><b>
-                            {% if slight_streets.0|length > 0 %}
-                            <table>
-                                {% for street in slight_streets.0 %}
-                                    <tr>
-                                        <td>{{ street }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                            {% else %}
-                                None
-                            {% endif %}
-                        </b></td>
-                    </tr>
-                    <tr align="center">
                         <td><b>Potentially Moderately Unsafe Streets</b></td>
                         <td class="bg-warning" style="color: white;"><b>
                             {% if moderate_streets.0|length > 0 %}
@@ -94,7 +78,7 @@
                     <td class="col-sm-4">{{ forloop.counter }}. {{ item.narrative }} for {{ item.distance }} kilometers by {{ item.mode }}</td>
                     <td class="col-lg-auto"><img width="50%" src="{{ item.mapUrl }}"></td>
                     <td class="col-sm-1">
-                        Potentially {{ item.risk_score }}.
+                        Potentially {{ item.risk_data.risk_score }}.
                         {% if item.tag_data %} Reports available for {{ item.tag_data }} {% endif %}
                         <form action="/streets" method="POST">
                             {% csrf_token %}
