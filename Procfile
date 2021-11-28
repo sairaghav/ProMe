@@ -1,1 +1,1 @@
-web: gunicorn ProMe.asgi
+web: gunicorn ProMe.wsgi
