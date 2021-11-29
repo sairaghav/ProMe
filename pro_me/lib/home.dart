@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pro_me/login.dart';
 import 'package:pro_me/reportincident.dart';
 import 'package:pro_me/saferoute.dart';
 import 'package:pro_me/streetrisk.dart';
@@ -14,6 +15,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   List<Widget> _screens = [
+    Login(),
     SafeRoute(),
     StreetRisk(),
     ReportIncident(),
@@ -42,11 +44,21 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Icon(Icons.alt_route), label: 'SafeRoute'),
+            icon: Icon(Icons.person),
+            label: 'Login',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.manage_search), label: 'StreetRisk'),
+            icon: Icon(Icons.alt_route),
+            label: 'SafeRoute',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.report), label: 'ReportIncident'),
+            icon: Icon(Icons.manage_search),
+            label: 'StreetRisk',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.report),
+            label: 'ReportIncident',
+          ),
         ],
       ),
     );
