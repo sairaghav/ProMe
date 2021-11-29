@@ -37,6 +37,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.blue,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.white,
