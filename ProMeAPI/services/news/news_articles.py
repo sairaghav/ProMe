@@ -88,6 +88,27 @@ def get_top_timeline(results: RiskData, limit=3) -> RiskData:
         user_top_timeline=dict(collections.Counter(user_timeline).most_common(limit))
     )
 
+def calculate_risk_score(results: RiskData, requested_from: datetime.datetime, requested_till: datetime.datetime) -> RiskData:
+    risk_score = results._asdict()['risk_score']
+    all_tags = results._asdict()['all_tags']
+
+    for tag in all_tags.keys():
+        if tag in config.trackingTags.keys():
+            risk_score += all_tags[tag]*config.trackingTags[tag]
+
+    #TODO: Change the logic for risk_score calculation. Right now, it's sum of risk scores for individual tags specified in config.py/no. of days evaluated
+    risk_score = risk_score/(requested_till-requested_from).days
+    
+    # Add risk score for street to DB 
+    update_street_db(results._asdict()['street'],{ 'risk_score': risk_score })
+
+    # Change risk_score from float to text
+    if risk_score <= 0.05: risk_score = 'Safe'
+    elif risk_score <= 0.15: risk_score = 'Moderately Unsafe'
+    else: risk_score = 'Unsafe'
+
+    return results._replace(risk_score=risk_score)
+
 def update_risk_db(street: str, available_from: datetime.datetime, available_till: datetime.datetime, requested_from: datetime.datetime, requested_till: datetime.datetime) -> RiskData:
     #time_range = (available_till - available_from).days
 
@@ -115,20 +136,10 @@ def update_risk_db(street: str, available_from: datetime.datetime, available_til
     queryset = StreetRisk.objects.all()
     queryset = queryset.filter(street=street)
     queryset = queryset.filter(date__range=[requested_from,requested_till])
-    
-    # Add risk score for street to DB 
-    risk_score = len(queryset)/(requested_till-requested_from).days 
-    #TODO: Change the logic for risk_score calculation. Right now, it's just no. of articles/no. of days evaluated
-    update_street_db(street,{ 'risk_score': risk_score })
-
-    # Change risk_score from float to text
-    if risk_score <= 0.05: risk_score = 'Safe'
-    elif risk_score <= 0.2: risk_score = 'Moderately Unsafe'
-    else: risk_score = 'Unsafe'
 
     return RiskData(street=street,
                     risk_metadata=list(queryset.values()),
-                    risk_score=risk_score,
+                    risk_score=0.0,
                     all_tags={},
                     all_timeline={},
                     all_top_tag={},
@@ -149,8 +160,11 @@ def get_risk(street: str, from_date: str, to_date: str) -> dict:
     results = update_risk_db(street, available_from, available_till, requested_from, requested_till)
 
     # Get top 3 tags and timelines
-    results = get_top_tags(results)
-    results = get_top_timeline(results)
+    results = get_top_tags(results=results)
+    results = get_top_timeline(results=results)
+
+    # Calculate and update risk score
+    results = calculate_risk_score(results, requested_from, requested_till)
 
     return results._asdict()
 
@@ -188,7 +202,7 @@ def fetch_from_source(street: str, start_date: str, end_date: str, source: Abstr
         query = query._replace(page=page)
         page_url = source.get_url(query)
         for partial_news in source.parse_news_list(fetch_soup(page_url)):
-            if not any(tag in config.trackingTags for tag in partial_news.tags.split(",")):
+            if not any(tag in config.trackingTags.keys() for tag in partial_news.tags.split(",")):
                 continue  # No tag we want is included in the news, skip
             result = source.parse_news_page(fetch_soup(partial_news.link), partial_news)
             result = result._replace(source=source.name, street=street)

@@ -4,7 +4,7 @@ from ProMeAPI.services.config import trackingTags
 
 tag_list = []
 
-for tag in trackingTags:
+for tag in trackingTags.keys():
     tag_list.append((tag.lower(),tag.capitalize()))
 
 class StreetReportForm(forms.ModelForm):
