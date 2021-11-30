@@ -28,7 +28,7 @@ class _SafeRouteState extends State<SafeRoute> {
         headers: {HttpHeaders.authorizationHeader: token},
       );
       var riskData = jsonDecode(response.body);
-      result['risk_metadata'] = riskData;
+      result['risk_metadata'] = riskData['results'];
       //print(riskData);
     }
     Navigator.push(
