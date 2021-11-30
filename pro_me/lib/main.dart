@@ -8,6 +8,10 @@ class ProMe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(title: 'ProMe', home: HomePage());
+    return MaterialApp(
+        title: 'ProMe',
+        home: HomePage(
+          selectedIndex: 0,
+        ));
   }
 }

@@ -1,46 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:pro_me/profile.dart';
-import 'package:pro_me/reportincident.dart';
-import 'package:pro_me/saferoute.dart';
-import 'package:pro_me/streetrisk.dart';
+import 'package:pro_me/home.dart';
+import 'package:pro_me/topbar.dart';
 
-class HomePage extends StatefulWidget {
-  int selectedIndex = 0;
-  HomePage({Key? key, required this.selectedIndex}) : super(key: key);
+class SafeRouteDetails extends StatefulWidget {
+  final List<dynamic> details;
+  const SafeRouteDetails({Key? key, required this.details}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _SafeRouteDetailsState createState() => _SafeRouteDetailsState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final List<Widget> _screens = [
-    const SafeRoute(),
-    const StreetRisk(),
-    const ReportIncident(),
-    const UserProfile(),
-  ];
+class _SafeRouteDetailsState extends State<SafeRouteDetails> {
+  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
-      widget.selectedIndex = index;
+      _selectedIndex = index;
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(selectedIndex: index)));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ProMe'),
-        backgroundColor: Colors.blue,
-        centerTitle: true,
+      appBar: const ProMeAppBar(),
+      body: Column(
+        children: [
+          Text('${widget.details}'),
+          ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  Navigator.pop(context);
+                });
+              },
+              child: const Text('Go Back')),
+        ],
       ),
-      body: _screens[widget.selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.blue,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.white,
-        currentIndex: widget.selectedIndex,
+        currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
