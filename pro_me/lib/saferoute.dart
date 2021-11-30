@@ -7,8 +7,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pro_me/login.dart';
 import 'package:pro_me/saferoutedetails.dart';
 
-enum _modes { pedestrian, fastest, bicycle }
-
 class SafeRoute extends StatefulWidget {
   const SafeRoute({Key? key}) : super(key: key);
 
@@ -20,8 +18,7 @@ class _SafeRouteState extends State<SafeRoute> {
   TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
   TextEditingController modeController = TextEditingController();
-  String _source = '', _destination = '';
-  _modes? _mode = _modes.pedestrian;
+  String _source = '', _destination = '', _mode = 'pedestrian';
   final storage = const FlutterSecureStorage();
 
   void _getRiskData(Map<dynamic, dynamic> routeData, String token) async {
@@ -48,13 +45,8 @@ class _SafeRouteState extends State<SafeRoute> {
       _source = sourceController.text;
       _destination = destinationController.text;
     });
-    String mode = _mode == _modes.pedestrian
-        ? 'pedestrian'
-        : _mode == _modes.fastest
-            ? 'fastest'
-            : 'bicycle';
     String? token = await storage.read(key: 'token');
-    var params = {'start': _source, 'end': _destination, 'mode': mode};
+    var params = {'start': _source, 'end': _destination, 'mode': _mode};
     var response = await http.get(
       Uri.https('pro-me.herokuapp.com', '/api/directions', params),
       headers: {HttpHeaders.authorizationHeader: '$token'},
@@ -118,6 +110,7 @@ class _SafeRouteState extends State<SafeRoute> {
         const Text(
           'Mode of Transport: ',
           style: TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -125,12 +118,12 @@ class _SafeRouteState extends State<SafeRoute> {
           child: ListTile(
             title: const Text('Pedestrian'),
             leading: Radio(
-              value: _modes.pedestrian,
+              value: 'pedestrian',
               groupValue: _mode,
-              onChanged: (_modes? value) {
+              onChanged: (String? value) {
                 setState(
                   () {
-                    _mode = value;
+                    _mode = '$value';
                   },
                 );
               },
@@ -141,12 +134,12 @@ class _SafeRouteState extends State<SafeRoute> {
           child: ListTile(
             title: const Text('Fastest'),
             leading: Radio(
-              value: _modes.fastest,
+              value: 'fastest',
               groupValue: _mode,
-              onChanged: (_modes? value) {
+              onChanged: (String? value) {
                 setState(
                   () {
-                    _mode = value;
+                    _mode = '$value';
                   },
                 );
               },
@@ -157,12 +150,12 @@ class _SafeRouteState extends State<SafeRoute> {
           child: ListTile(
             title: const Text('Bicycle'),
             leading: Radio(
-              value: _modes.bicycle,
+              value: 'bicycle',
               groupValue: _mode,
-              onChanged: (_modes? value) {
+              onChanged: (String? value) {
                 setState(
                   () {
-                    _mode = value;
+                    _mode = '$value';
                   },
                 );
               },
