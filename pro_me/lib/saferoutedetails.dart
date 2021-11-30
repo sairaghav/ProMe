@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pro_me/navbar.dart';
+import 'package:pro_me/streetriskdetails.dart';
 import 'package:pro_me/topbar.dart';
 
 class SafeRouteDetails extends StatefulWidget {
@@ -17,7 +18,7 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
       appBar: const ProMeAppBar(),
       body: Column(
         children: <Widget>[
-          Text(
+          const Text(
             'Route Safety Information',
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -31,10 +32,16 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
                 final item = widget.details[index];
                 item['directions'] = item['narrative'] +
                     " for " +
-                    "${item['distance']} kilometers";
+                    "${item['distance']} kilometers" +
+                    " by " +
+                    item['mode'];
+                final tags =
+                    item['risk_metadata']['all_tags'].keys.toList().join(', ');
                 return ListTile(
                     title: Text(item['directions']),
-                    subtitle: Text(item['mode']),
+                    subtitle: tags.length == 0
+                        ? const Text('No reports found.')
+                        : Text('Reports available for ' + tags),
                     leading: ConstrainedBox(
                       constraints: const BoxConstraints(
                         minWidth: 100,
@@ -46,7 +53,15 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
                     ),
                     trailing: ElevatedButton(
                         child: Text(item['risk_metadata']['risk_score']),
-                        onPressed: () {},
+                        onPressed: () => {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => StreetRiskDetails(
+                                          details: item['risk_metadata'],
+                                        )),
+                              )
+                            },
                         style: ButtonStyle(
                           backgroundColor:
                               item['risk_metadata']['risk_score'] == 'Safe'
