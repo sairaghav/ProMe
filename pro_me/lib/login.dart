@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pro_me/home.dart';
-import 'package:pro_me/profile.dart';
-import 'package:pro_me/reportincident.dart';
-import 'package:pro_me/saferoute.dart';
-import 'package:pro_me/streetrisk.dart';
+import 'package:pro_me/navbar.dart';
+import 'package:pro_me/topbar.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -22,18 +20,6 @@ class _LoginState extends State<Login> {
   String _email = '', _password = '';
   String token = '';
   final storage = const FlutterSecureStorage();
-
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => HomePage(selectedIndex: index)));
-    });
-  }
 
   void _getUserCreds() async {
     setState(() {
@@ -53,9 +39,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ProMe'),
-      ),
+      appBar: const ProMeAppBar(),
       body: Column(children: [
         TextField(
             controller: emailController,
@@ -83,31 +67,8 @@ class _LoginState extends State<Login> {
           child: const Text('Login'),
         ),
       ]),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.blue,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.white,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.alt_route),
-            label: 'SafeRoute',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.manage_search),
-            label: 'StreetRisk',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.report),
-            label: 'ReportIncident',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+      bottomNavigationBar: const ProMeNavBar(
+        selectedIndex: 3,
       ),
     );
   }

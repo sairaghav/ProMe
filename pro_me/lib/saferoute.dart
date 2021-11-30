@@ -50,7 +50,7 @@ class _SafeRouteState extends State<SafeRoute> {
           );
           var riskData = jsonDecode(response.body);
           result['risk_metadata'] = riskData;
-          print(riskData);
+          //print(riskData);
         }
         Navigator.push(
           context,
@@ -60,7 +60,9 @@ class _SafeRouteState extends State<SafeRoute> {
                   )),
         );
       }
-    } catch (exception) {}
+    } catch (exception) {
+      print(jsonDecode(response.body));
+    }
   }
 
   @override

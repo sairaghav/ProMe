@@ -10,6 +10,6 @@ class StreetRisk extends StatefulWidget {
 class _StreetRiskState extends State<StreetRisk> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: const Center(child: Text('StreetRisk page')));
+    return const Scaffold(body: Center(child: Text('StreetRisk page')));
   }
 }

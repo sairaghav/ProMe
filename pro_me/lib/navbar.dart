@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:pro_me/profile.dart';
-import 'package:pro_me/reportincident.dart';
-import 'package:pro_me/saferoute.dart';
-import 'package:pro_me/streetrisk.dart';
+import 'package:pro_me/home.dart';
 
 class ProMeNavBar extends StatefulWidget {
-  const ProMeNavBar({Key? key}) : super(key: key);
+  final int selectedIndex;
+  const ProMeNavBar({Key? key, required this.selectedIndex}) : super(key: key);
 
   @override
   _ProMeNavBarState createState() => _ProMeNavBarState();
 }
 
 class _ProMeNavBarState extends State<ProMeNavBar> {
-  int _selectedIndex = 0;
-  List<Widget> _screens = [
-    SafeRoute(),
-    StreetRisk(),
-    ReportIncident(),
-    UserProfile(),
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      Navigator.pop(context);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(selectedIndex: index)));
     });
   }
 
@@ -33,7 +27,7 @@ class _ProMeNavBarState extends State<ProMeNavBar> {
       backgroundColor: Colors.blue,
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.white,
-      currentIndex: _selectedIndex,
+      currentIndex: widget.selectedIndex,
       onTap: _onItemTapped,
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(

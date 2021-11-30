@@ -10,6 +10,6 @@ class ReportIncident extends StatefulWidget {
 class _ReportIncidentState extends State<ReportIncident> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: const Center(child: Text('ReportIncident page')));
+    return const Scaffold(body: Center(child: Text('ReportIncident page')));
   }
 }
