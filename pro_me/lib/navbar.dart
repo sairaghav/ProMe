@@ -46,10 +46,10 @@ class _ProMeNavBarState extends State<ProMeNavBar> {
           icon: Icon(Icons.report),
           label: 'ReportIncident',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
+        //BottomNavigationBarItem(
+        //  icon: Icon(Icons.person),
+        //  label: 'Profile',
+        //),
       ],
     );
   }

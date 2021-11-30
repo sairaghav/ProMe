@@ -6,7 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro_me/login.dart';
 import 'package:pro_me/streetriskdetails.dart';
-import 'package:intl/intl.dart';
 
 class StreetRisk extends StatefulWidget {
   const StreetRisk({Key? key}) : super(key: key);
@@ -32,7 +31,7 @@ class _StreetRiskState extends State<StreetRisk> {
     var params = {'street': _street};
 
     if (_startDate != '' && _endDate != '') {
-      var params = {'street': _street, 'from': _startDate, 'to': _endDate};
+      params = {'street': _street, 'from': _startDate, 'to': _endDate};
     }
 
     var response = await http.get(

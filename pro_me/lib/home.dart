@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
     const SafeRoute(),
     const StreetRisk(),
     const ReportIncident(),
-    const UserProfile(),
+    //const UserProfile(),
   ];
 
   @override

@@ -64,7 +64,7 @@ class _LoginState extends State<Login> {
           child: const Text('Login'),
         ),
       ]),
-      bottomNavigationBar: const ProMeNavBar(selectedIndex: 3),
+      bottomNavigationBar: const ProMeNavBar(selectedIndex: 0),
     );
   }
 }
