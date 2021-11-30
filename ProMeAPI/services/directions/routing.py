@@ -39,14 +39,14 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
                 name = " ".join(maneuver['streets'])
                 maneuver_street = Route(name=name, lat=lat, lng=lng, distance=maneuver['distance'],
                                               direction=maneuver['directionName'], mode=maneuver['transportMode'],
-                                              narrative=maneuver['narrative'][:-1], mapUrl=maneuver['mapUrl'])
+                                              narrative=maneuver['narrative'][:-1], mapUrl=maneuver['mapUrl'].replace('http://','https://'))
                 results.append(maneuver_street)
 
     #'''
     # Add the start point for the journey
     start_street = Route(name=start_point["street"], distance=0, lng=start_point["latLng"]["lng"],
                                lat=start_point["latLng"]["lat"], direction=results[0].direction, mode=results[0].mode,
-                               narrative="Start from starting point", mapUrl='')
+                               narrative=f"Start at {start_point['street']}", mapUrl=f"{config.mapBaseUrl}/directions/v2/route?key={config.mapApiKey}&locations={start_point['latLng']['lat']},{start_point['latLng']['lng']}")
     results.insert(0, start_street)
     
     # Add the destination points for the journey
@@ -54,7 +54,7 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
         destination_street = Route(name=destination_point["street"], distance=0,
                                          lng=destination_point["latLng"]["lng"], lat=destination_point["latLng"]["lat"],
                                          direction=results[-1].direction, mode=results[-1].mode,
-                                         narrative="Reach end point", mapUrl='')
+                                         narrative=f"Reach {destination_point['street']}", mapUrl=f"{config.mapBaseUrl}/directions/v2/route?key={config.mapApiKey}&locations={start_point['latLng']['lat']},{start_point['latLng']['lng']}")
         results.append(destination_street)
     #'''
     return results
