@@ -36,32 +36,10 @@ class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(children: [
-      TextField(
-          controller: emailController,
-          decoration: const InputDecoration(
-              hintText: 'Enter Email',
-              labelText: 'Email',
-              labelStyle: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-              ))),
-      TextField(
-        controller: passwordController,
-        decoration: const InputDecoration(
-            hintText: 'Enter Password',
-            labelText: 'Password',
-            labelStyle: TextStyle(
-              fontSize: 24,
-              color: Colors.black,
-            )),
-        obscureText: true,
-        autocorrect: false,
-      ),
-      ElevatedButton(
-        onPressed: _getUserCreds,
-        child: const Text('Login'),
-      ),
-    ]));
+        body: Column(
+      children: const <Widget>[
+        Text('Profile page'),
+      ],
+    ));
   }
 }

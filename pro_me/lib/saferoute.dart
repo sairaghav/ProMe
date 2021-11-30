@@ -20,6 +20,26 @@ class _SafeRouteState extends State<SafeRoute> {
   String _source = '', _destination = '';
   final storage = const FlutterSecureStorage();
 
+  void _getRiskData(Map<dynamic, dynamic> routeData, String token) async {
+    for (var result in routeData['results']) {
+      var params = {'street': result['name']};
+      var response = await http.get(
+        Uri.https('pro-me.herokuapp.com', '/api/getriskdata', params),
+        headers: {HttpHeaders.authorizationHeader: token},
+      );
+      var riskData = jsonDecode(response.body);
+      result['risk_metadata'] = riskData;
+      //print(riskData);
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => SafeRouteDetails(
+                details: routeData['results'],
+              )),
+    );
+  }
+
   void _getRoute() async {
     setState(() {
       _source = sourceController.text;
@@ -31,37 +51,22 @@ class _SafeRouteState extends State<SafeRoute> {
       Uri.https('pro-me.herokuapp.com', '/api/directions', params),
       headers: {HttpHeaders.authorizationHeader: '$token'},
     );
-
+    var routeData = jsonDecode(response.body);
     try {
-      var routeData = jsonDecode(response.body);
       if (routeData['detail'] ==
               "Authentication credentials were not provided." ||
           routeData['detail'] == "Invalid token.") {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const Login()),
+          MaterialPageRoute(
+            builder: (context) => const Login(),
+          ),
         );
       } else {
-        for (var result in routeData['results']) {
-          params = {'street': result['name']};
-          response = await http.get(
-            Uri.https('pro-me.herokuapp.com', '/api/getriskdata', params),
-            headers: {HttpHeaders.authorizationHeader: '$token'},
-          );
-          var riskData = jsonDecode(response.body);
-          result['risk_metadata'] = riskData;
-          //print(riskData);
-        }
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => SafeRouteDetails(
-                    details: routeData['results'],
-                  )),
-        );
+        _getRiskData(routeData, '$token');
       }
     } catch (exception) {
-      print(jsonDecode(response.body));
+      print(jsonDecode(routeData));
     }
   }
 
@@ -69,13 +74,20 @@ class _SafeRouteState extends State<SafeRoute> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(children: [
+      const Text(
+        'SafeRoute',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 24,
+        ),
+      ),
       TextField(
           controller: sourceController,
           decoration: const InputDecoration(
               hintText: 'Enter Source',
               labelText: 'Source',
               labelStyle: TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 color: Colors.black,
               ))),
       TextField(
@@ -84,7 +96,7 @@ class _SafeRouteState extends State<SafeRoute> {
             hintText: 'Enter Destination',
             labelText: 'Destination',
             labelStyle: TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               color: Colors.black,
             )),
       ),

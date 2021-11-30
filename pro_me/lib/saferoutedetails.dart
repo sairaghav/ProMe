@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pro_me/home.dart';
 import 'package:pro_me/navbar.dart';
 import 'package:pro_me/topbar.dart';
 
@@ -19,14 +18,6 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
       body: Column(
         children: <Widget>[
           Flexible(child: Text('${widget.details}')),
-          Flexible(
-              child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      Navigator.pop(context);
-                    });
-                  },
-                  child: const Text('Go Back'))),
         ],
       ),
       bottomNavigationBar: const ProMeNavBar(

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:pro_me/home.dart';
 import 'package:pro_me/navbar.dart';
 import 'package:pro_me/topbar.dart';
 
@@ -18,7 +17,6 @@ class _LoginState extends State<Login> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   String _email = '', _password = '';
-  String token = '';
   final storage = const FlutterSecureStorage();
 
   void _getUserCreds() async {
@@ -30,7 +28,7 @@ class _LoginState extends State<Login> {
       Uri.https('pro-me.herokuapp.com', '/api/auth/token/login'),
       body: {'email': _email, 'password': _password},
     );
-    token = "Token " + jsonDecode(response.body)['auth_token'];
+    var token = "Token " + jsonDecode(response.body)['auth_token'];
     await storage.write(key: 'token', value: token);
     print(token);
     Navigator.pop(context);
@@ -67,9 +65,7 @@ class _LoginState extends State<Login> {
           child: const Text('Login'),
         ),
       ]),
-      bottomNavigationBar: const ProMeNavBar(
-        selectedIndex: 3,
-      ),
+      bottomNavigationBar: const ProMeNavBar(selectedIndex: 3),
     );
   }
 }

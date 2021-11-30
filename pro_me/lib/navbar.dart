@@ -3,7 +3,9 @@ import 'package:pro_me/home.dart';
 
 class ProMeNavBar extends StatefulWidget {
   final int selectedIndex;
-  const ProMeNavBar({Key? key, required this.selectedIndex}) : super(key: key);
+  final bool shouldPop = true;
+  const ProMeNavBar({Key? key, required this.selectedIndex, shouldPop})
+      : super(key: key);
 
   @override
   _ProMeNavBarState createState() => _ProMeNavBarState();
@@ -12,7 +14,10 @@ class ProMeNavBar extends StatefulWidget {
 class _ProMeNavBarState extends State<ProMeNavBar> {
   void _onItemTapped(int index) {
     setState(() {
-      Navigator.pop(context);
+      if (widget.shouldPop) {
+        print('Popping');
+        Navigator.pop(context);
+      }
       Navigator.push(
           context,
           MaterialPageRoute(
