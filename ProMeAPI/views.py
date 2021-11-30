@@ -33,6 +33,7 @@ def index(request) -> HttpResponse:
     return JsonResponse(response._asdict())
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_tags(request):
     response = Response(results=config.trackingTags.keys() ,errors=None)
 
