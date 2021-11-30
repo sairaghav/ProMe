@@ -17,7 +17,6 @@ class SafeRoute extends StatefulWidget {
 class _SafeRouteState extends State<SafeRoute> {
   TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
-  TextEditingController modeController = TextEditingController();
   String _source = '', _destination = '', _mode = 'pedestrian';
   final storage = const FlutterSecureStorage();
 
@@ -51,8 +50,8 @@ class _SafeRouteState extends State<SafeRoute> {
       Uri.https('pro-me.herokuapp.com', '/api/directions', params),
       headers: {HttpHeaders.authorizationHeader: '$token'},
     );
-    var routeData = jsonDecode(response.body);
     try {
+      var routeData = jsonDecode(response.body);
       if (routeData['detail'] ==
               "Authentication credentials were not provided." ||
           routeData['detail'] == "Invalid token.") {

@@ -29,7 +29,12 @@ class _StreetRiskState extends State<StreetRisk> {
       _endDate = endDateController.text;
     });
     String? token = await storage.read(key: 'token');
-    var params = {'street': _street, 'from': _startDate, 'to': _endDate};
+    var params = {'street': _street};
+
+    if (_startDate != '' && _endDate != '') {
+      var params = {'street': _street, 'from': _startDate, 'to': _endDate};
+    }
+
     var response = await http.get(
       Uri.https('pro-me.herokuapp.com', '/api/getriskdata', params),
       headers: {HttpHeaders.authorizationHeader: '$token'},
