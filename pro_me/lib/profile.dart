@@ -12,27 +12,6 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  String _email = '', _password = '';
-  String token = '';
-  final storage = const FlutterSecureStorage();
-
-  void _getUserCreds() async {
-    setState(() {
-      _email = emailController.text;
-      _password = passwordController.text;
-    });
-    var response = await http.post(
-      Uri.https('pro-me.herokuapp.com', '/api/auth/token/login'),
-      body: {'email': _email, 'password': _password},
-    );
-    token = "Token " + jsonDecode(response.body)['auth_token'];
-    await storage.write(key: 'token', value: token);
-    print(token);
-    Navigator.pop(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
