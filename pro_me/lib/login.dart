@@ -30,7 +30,6 @@ class _LoginState extends State<Login> {
     );
     var token = "Token " + jsonDecode(response.body)['auth_token'];
     await storage.write(key: 'token', value: token);
-    print(token);
     Navigator.pop(context);
   }
 

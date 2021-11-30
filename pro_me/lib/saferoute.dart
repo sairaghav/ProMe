@@ -7,6 +7,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pro_me/login.dart';
 import 'package:pro_me/saferoutedetails.dart';
 
+enum _modes { pedestrian, fastest, bicycle }
+
 class SafeRoute extends StatefulWidget {
   const SafeRoute({Key? key}) : super(key: key);
 
@@ -17,7 +19,9 @@ class SafeRoute extends StatefulWidget {
 class _SafeRouteState extends State<SafeRoute> {
   TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
+  TextEditingController modeController = TextEditingController();
   String _source = '', _destination = '';
+  _modes? _mode = _modes.pedestrian;
   final storage = const FlutterSecureStorage();
 
   void _getRiskData(Map<dynamic, dynamic> routeData, String token) async {
@@ -29,7 +33,6 @@ class _SafeRouteState extends State<SafeRoute> {
       );
       var riskData = jsonDecode(response.body);
       result['risk_metadata'] = riskData['results'];
-      //print(riskData);
     }
     Navigator.push(
       context,
@@ -45,8 +48,13 @@ class _SafeRouteState extends State<SafeRoute> {
       _source = sourceController.text;
       _destination = destinationController.text;
     });
+    String mode = _mode == _modes.pedestrian
+        ? 'pedestrian'
+        : _mode == _modes.fastest
+            ? 'fastest'
+            : 'bicycle';
     String? token = await storage.read(key: 'token');
-    var params = {'start': _source, 'end': _destination};
+    var params = {'start': _source, 'end': _destination, 'mode': mode};
     var response = await http.get(
       Uri.https('pro-me.herokuapp.com', '/api/directions', params),
       headers: {HttpHeaders.authorizationHeader: '$token'},
@@ -66,44 +74,106 @@ class _SafeRouteState extends State<SafeRoute> {
         _getRiskData(routeData, '$token');
       }
     } catch (exception) {
-      print(jsonDecode(routeData));
+      print(routeData);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(children: [
-      const Text(
-        'SafeRoute',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 24,
+      body: Column(children: <Widget>[
+        const Text(
+          'SafeRoute',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
         ),
-      ),
-      TextField(
-          controller: sourceController,
-          decoration: const InputDecoration(
-              hintText: 'Enter Source',
+        Expanded(
+          child: TextField(
+            controller: sourceController,
+            decoration: const InputDecoration(
               labelText: 'Source',
               labelStyle: TextStyle(
                 fontSize: 18,
+                fontWeight: FontWeight.bold,
                 color: Colors.black,
-              ))),
-      TextField(
-        controller: destinationController,
-        decoration: const InputDecoration(
-            hintText: 'Enter Destination',
-            labelText: 'Destination',
-            labelStyle: TextStyle(
-              fontSize: 18,
-              color: Colors.black,
-            )),
-      ),
-      ElevatedButton(
-        onPressed: _getRoute,
-        child: const Text('Get route'),
-      ),
-    ]));
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: TextField(
+            controller: destinationController,
+            decoration: const InputDecoration(
+              labelText: 'Destination',
+              labelStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
+        const Text(
+          'Mode of Transport: ',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Expanded(
+          child: ListTile(
+            title: const Text('Pedestrian'),
+            leading: Radio(
+              value: _modes.pedestrian,
+              groupValue: _mode,
+              onChanged: (_modes? value) {
+                setState(
+                  () {
+                    _mode = value;
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListTile(
+            title: const Text('Fastest'),
+            leading: Radio(
+              value: _modes.fastest,
+              groupValue: _mode,
+              onChanged: (_modes? value) {
+                setState(
+                  () {
+                    _mode = value;
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListTile(
+            title: const Text('Bicycle'),
+            leading: Radio(
+              value: _modes.bicycle,
+              groupValue: _mode,
+              onChanged: (_modes? value) {
+                setState(
+                  () {
+                    _mode = value;
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: _getRoute,
+          child: const Text('Get route'),
+        ),
+      ]),
+    );
   }
 }

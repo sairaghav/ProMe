@@ -15,7 +15,6 @@ class _ProMeNavBarState extends State<ProMeNavBar> {
   void _onItemTapped(int index) {
     setState(() {
       if (widget.shouldPop) {
-        print('Popping');
         Navigator.pop(context);
       }
       Navigator.push(

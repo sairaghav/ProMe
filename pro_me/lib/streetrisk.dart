@@ -41,7 +41,6 @@ class _StreetRiskState extends State<StreetRisk> {
           ),
         );
       } else {
-        print(riskData['results']);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -50,9 +49,7 @@ class _StreetRiskState extends State<StreetRisk> {
                   )),
         );
       }
-    } catch (exception) {
-      print(jsonDecode(riskData));
-    }
+    } catch (exception) {}
   }
 
   @override
