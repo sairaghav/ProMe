@@ -28,15 +28,16 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
     return Scaffold(
       appBar: const ProMeAppBar(),
       body: Column(
-        children: [
-          Text('${widget.details}'),
-          ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  Navigator.pop(context);
-                });
-              },
-              child: const Text('Go Back')),
+        children: <Widget>[
+          Flexible(child: Text('${widget.details}')),
+          Flexible(
+              child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  },
+                  child: const Text('Go Back'))),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
