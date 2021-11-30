@@ -65,9 +65,7 @@ class _SafeRouteState extends State<SafeRoute> {
       } else {
         _getRiskData(routeData, '$token');
       }
-    } catch (exception) {
-      print(routeData);
-    }
+    } catch (exception) {}
   }
 
   @override
