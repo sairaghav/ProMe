@@ -42,7 +42,6 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
                                               narrative=maneuver['narrative'][:-1], mapUrl=maneuver['mapUrl'].replace('http://','https://'))
                 results.append(maneuver_street)
 
-    #'''
     # Add the start point for the journey
     start_street = Route(name=start_point["street"], distance=0, lng=start_point["latLng"]["lng"],
                                lat=start_point["latLng"]["lat"], direction=results[0].direction, mode=results[0].mode,
@@ -56,5 +55,5 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
                                          direction=results[-1].direction, mode=results[-1].mode,
                                          narrative=f"Reach {destination_point['street']}", mapUrl=f"{config.mapBaseUrl}/staticmap/v5/map?key={config.mapApiKey}&locations={start_point['latLng']['lat']},{start_point['latLng']['lng']}".replace('http://','https://'))
         results.append(destination_street)
-    #'''
+        
     return results

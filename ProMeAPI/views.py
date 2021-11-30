@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from ProMeAPI.services.news import news_articles
 from ProMeAPI.services.directions import routing
+from ProMeAPI.services import config
 
 from typing import NamedTuple
 
@@ -29,6 +30,12 @@ def get_risk_data(request) -> JsonResponse:
 
 def index(request) -> HttpResponse:
     response = Response(results="Welcome to the ProMe API index page!", errors=None)
+    return JsonResponse(response._asdict())
+
+@api_view(['GET'])
+def get_tags(request):
+    response = Response(results=config.trackingTags.keys() ,errors=None)
+
     return JsonResponse(response._asdict())
 
 @api_view(['GET'])
