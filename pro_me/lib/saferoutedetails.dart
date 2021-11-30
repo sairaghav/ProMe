@@ -38,39 +38,41 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
                 final tags =
                     item['risk_metadata']['all_tags'].keys.toList().join(', ');
                 return ListTile(
-                    title: Text(item['directions']),
-                    subtitle: tags.length == 0
-                        ? const Text('No reports found.')
-                        : Text('Reports available for ' + tags),
-                    leading: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        minWidth: 100,
-                        minHeight: 150,
-                        maxWidth: 150,
-                        maxHeight: 200,
-                      ),
-                      child: Image.network(item['mapUrl'], fit: BoxFit.cover),
+                  title: Text(item['directions']),
+                  subtitle: tags.length == 0
+                      ? const Text('No reports found.')
+                      : Text('Reports available for ' + tags),
+                  leading: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 100,
+                      minHeight: 150,
+                      maxWidth: 150,
+                      maxHeight: 200,
                     ),
-                    trailing: ElevatedButton(
-                        child: Text(item['risk_metadata']['risk_score']),
-                        onPressed: () => {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => StreetRiskDetails(
-                                          details: item['risk_metadata'],
-                                        )),
-                              )
-                            },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              item['risk_metadata']['risk_score'] == 'Safe'
-                                  ? MaterialStateProperty.all(Colors.green)
-                                  : item['risk_metadata']['risk_score'] ==
-                                          'Moderately Unsafe'
-                                      ? MaterialStateProperty.all(Colors.orange)
-                                      : MaterialStateProperty.all(Colors.red),
-                        )));
+                    child: Image.network(item['mapUrl'], fit: BoxFit.cover),
+                  ),
+                  trailing: ElevatedButton(
+                    child: Text(item['risk_metadata']['risk_score']),
+                    onPressed: () => {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StreetRiskDetails(
+                                  details: item['risk_metadata'],
+                                )),
+                      )
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          item['risk_metadata']['risk_score'] == 'Safe'
+                              ? MaterialStateProperty.all(Colors.green)
+                              : item['risk_metadata']['risk_score'] ==
+                                      'Moderately Unsafe'
+                                  ? MaterialStateProperty.all(Colors.orange)
+                                  : MaterialStateProperty.all(Colors.red),
+                    ),
+                  ),
+                );
               },
             ),
           ),
