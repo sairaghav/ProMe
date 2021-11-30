@@ -46,7 +46,7 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
     # Add the start point for the journey
     start_street = Route(name=start_point["street"], distance=0, lng=start_point["latLng"]["lng"],
                                lat=start_point["latLng"]["lat"], direction=results[0].direction, mode=results[0].mode,
-                               narrative=f"Start at {start_point['street']}", mapUrl=f"{config.mapBaseUrl}/directions/v2/route?key={config.mapApiKey}&locations={start_point['latLng']['lat']},{start_point['latLng']['lng']}")
+                               narrative=f"Start at {start_point['street']}", mapUrl=f"{config.mapBaseUrl}/staticmap/v5/map?key={config.mapApiKey}&locations={start_point['latLng']['lat']},{start_point['latLng']['lng']}".replace('http://','https://'))
     results.insert(0, start_street)
     
     # Add the destination points for the journey
@@ -54,7 +54,7 @@ def fetch_route(from_source, to_destination, mode) -> List[Route]:
         destination_street = Route(name=destination_point["street"], distance=0,
                                          lng=destination_point["latLng"]["lng"], lat=destination_point["latLng"]["lat"],
                                          direction=results[-1].direction, mode=results[-1].mode,
-                                         narrative=f"Reach {destination_point['street']}", mapUrl=f"{config.mapBaseUrl}/directions/v2/route?key={config.mapApiKey}&locations={start_point['latLng']['lat']},{start_point['latLng']['lng']}")
+                                         narrative=f"Reach {destination_point['street']}", mapUrl=f"{config.mapBaseUrl}/staticmap/v5/map?key={config.mapApiKey}&locations={start_point['latLng']['lat']},{start_point['latLng']['lng']}".replace('http://','https://'))
         results.append(destination_street)
     #'''
     return results

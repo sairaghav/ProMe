@@ -29,9 +29,6 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
               itemCount: widget.details.length,
               itemBuilder: (context, index) {
                 final item = widget.details[index];
-                if (item['mapUrl'] == '') {
-                  item['mapUrl'] = 'https://picsum.photos/250?image=9';
-                }
                 item['directions'] = item['narrative'] +
                     " for " +
                     "${item['distance']} kilometers";
