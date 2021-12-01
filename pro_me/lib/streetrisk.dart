@@ -61,7 +61,7 @@ class _StreetRiskState extends State<StreetRisk> {
         );
       }
     } catch (exception) {
-      throw Exception('Error in request sent to get risk data');
+      throw Exception('Error in getting risk data');
     }
   }
 

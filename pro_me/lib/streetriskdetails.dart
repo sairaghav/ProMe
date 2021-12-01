@@ -55,7 +55,7 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
                 widget.details['all_top_timeline'].keys.toList().length > 0
                     ? widget.details['all_top_timeline'].keys
                         .toList()
-                        .join(', ')
+                        .join('\n')
                     : 'None',
                 style: const TextStyle(
                   color: Colors.black,
@@ -71,7 +71,7 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
               ),
               trailing: Text(
                 widget.details['all_top_tag'].keys.toList().length > 0
-                    ? widget.details['all_top_tag'].keys.toList().join(', ')
+                    ? widget.details['all_top_tag'].keys.toList().join('\n')
                     : 'None',
                 style: const TextStyle(
                   color: Colors.black,

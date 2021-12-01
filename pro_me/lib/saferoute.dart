@@ -73,7 +73,7 @@ class _SafeRouteState extends State<SafeRoute> {
         _getRiskData(routeData, '$token');
       }
     } catch (exception) {
-      throw Exception('Error in getting risk data.');
+      throw Exception('Error in getting route data.');
     }
   }
 
