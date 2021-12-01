@@ -80,8 +80,10 @@ class _SafeRouteState extends State<SafeRoute> {
         ),
         Expanded(
           child: TextField(
+            textAlign: TextAlign.center,
             controller: sourceController,
             decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(20.0),
               labelText: 'Source',
               labelStyle: TextStyle(
                 fontSize: 18,
@@ -93,8 +95,10 @@ class _SafeRouteState extends State<SafeRoute> {
         ),
         Expanded(
           child: TextField(
+            textAlign: TextAlign.center,
             controller: destinationController,
             decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(20.0),
               labelText: 'Destination',
               labelStyle: TextStyle(
                 fontSize: 18,

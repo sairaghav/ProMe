@@ -70,8 +70,10 @@ class _ReportIncidentState extends State<ReportIncident> {
         ),
       ),
       TextField(
+        textAlign: TextAlign.center,
         controller: streetController,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.all(20.0),
           hintText: 'Enter Street',
           labelText: 'Street',
           labelStyle: TextStyle(
@@ -82,8 +84,10 @@ class _ReportIncidentState extends State<ReportIncident> {
         ),
       ),
       TextField(
+        textAlign: TextAlign.center,
         controller: summaryController,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.all(20.0),
           hintText: 'Enter summary of your report',
           labelText: 'Summary',
           labelStyle: TextStyle(

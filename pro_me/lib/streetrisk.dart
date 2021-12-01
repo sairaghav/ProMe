@@ -74,8 +74,10 @@ class _StreetRiskState extends State<StreetRisk> {
         ),
       ),
       TextField(
+        textAlign: TextAlign.center,
         controller: streetController,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.all(20.0),
           hintText: 'Enter Street',
           labelText: 'Street',
           labelStyle: TextStyle(
@@ -86,8 +88,10 @@ class _StreetRiskState extends State<StreetRisk> {
         ),
       ),
       TextField(
+        textAlign: TextAlign.center,
         controller: startDateController,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.all(20.0),
           hintText: 'yyyy-mm-dd',
           labelText: 'Evaluate From',
           labelStyle: TextStyle(
@@ -98,8 +102,10 @@ class _StreetRiskState extends State<StreetRisk> {
         ),
       ),
       TextField(
+        textAlign: TextAlign.center,
         controller: endDateController,
         decoration: const InputDecoration(
+          contentPadding: EdgeInsets.all(20.0),
           hintText: 'yyyy-mm-dd',
           labelText: 'Evaluate Till',
           labelStyle: TextStyle(
