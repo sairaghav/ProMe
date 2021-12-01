@@ -21,7 +21,7 @@ def get_risk_data(request) -> JsonResponse:
     from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
 
     if street is not None:
-        response = Response(results=news_articles.get_risk(street, from_date, to_date), errors=None)
+        response = Response(results=news_articles.get_risk(street.lower(), from_date, to_date), errors=None)
 
     else:
         response = Response(results=None, errors="Expected Format: /api/getriskdata?street=<street>&from=<from_date_yyyy-mm-dd>&to=<to_date_yyyy-mm-dd>")
@@ -44,8 +44,6 @@ def get_directions(request) -> JsonResponse:
     start = request.GET.get('start',None)
     end = request.GET.get('end',None)
     mode = request.GET.get('mode','pedestrian')
-    
-    from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(None, None)]
 
     if start is not None and end is not None:
         result = []
@@ -56,7 +54,6 @@ def get_directions(request) -> JsonResponse:
                 response = Response(results=None, errors=route['info']['messages'])
                 break
             else:
-                #route = route._replace(risk_data=news_articles.get_risk(route.name, from_date, to_date))
                 result.append(route._asdict())
             
                 response = Response(results=result, errors=None)
@@ -75,7 +72,7 @@ def report_incident(request) -> JsonResponse:
     user = request.POST.get('user', None)
 
     if street is not None and summary is not None and tags is not None and user is not None:
-        queryset = news_articles.add_user_reported_incidents(street, summary, tags, user)
+        queryset = news_articles.add_user_reported_incidents(street.lower(), summary, tags, user)
         response = Response(results=list(queryset.values()), errors=None)
 
     else:
