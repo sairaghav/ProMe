@@ -221,7 +221,7 @@ async def route(request):
                 risk_data = await asyncio.gather(*[make_async_api_call('http://'+str(get_current_site(request))+'/api/getriskdata?street='+street, headers) for street in all_streets])
                 for street in response['results']:
                     for data in risk_data:
-                        if street['name'] == data['street']:
+                        if street['name'].lower() == data['street']:
                             street['risk_data'] = data
 
                     if street['risk_data']['risk_score'] == 'Moderately Unsafe' and street['name'] not in moderate_streets: moderate_streets.append(street['name'])
