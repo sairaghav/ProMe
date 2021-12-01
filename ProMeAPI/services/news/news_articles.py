@@ -45,11 +45,12 @@ def add_user_reported_incidents(street: str, summary: str, tags: str, user) -> L
 # Convert all time values to UTC
 def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.datetime,datetime.datetime)]:
     # Convert input dates from string to datetime and assign default values if None
-    to_date = datetime.datetime.now(datetime.timezone.utc) if to_date is None else datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(hours=24, minutes=59)
+    to_date = datetime.datetime.now(datetime.timezone.utc) if to_date is None else datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1, minutes=59)
     from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days) if from_date is None else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(hours=1)
     # Avoid future dates and from_date greater than to_date
-    if to_date > datetime.datetime.now(datetime.timezone.utc) or from_date > to_date:
+    if to_date > datetime.datetime.now(datetime.timezone.utc):
         to_date = datetime.datetime.now(datetime.timezone.utc)
+    if from_date > to_date:
         from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days)
 
     return from_date, to_date
