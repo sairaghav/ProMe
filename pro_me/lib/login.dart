@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pro_me/navbar.dart';
+import 'package:pro_me/register.dart';
 import 'package:pro_me/topbar.dart';
 
 class Login extends StatefulWidget {
@@ -19,6 +20,15 @@ class _LoginState extends State<Login> {
   String _email = '', _password = '';
   final storage = const FlutterSecureStorage();
   bool isLoginCorrect = true;
+
+  void _doUserRegistration() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const RegisterPage(),
+      ),
+    );
+  }
 
   void _getUserCreds() async {
     setState(() {
@@ -80,6 +90,10 @@ class _LoginState extends State<Login> {
           child: isLoginCorrect
               ? const Text('Please login to continue.')
               : const Text('Email or password is incorrect.'),
+        ),
+        ElevatedButton(
+          onPressed: _doUserRegistration,
+          child: const Text('Register'),
         ),
       ]),
       bottomNavigationBar: const ProMeNavBar(selectedIndex: 0),
