@@ -43,12 +43,11 @@ class _ReportIncidentState extends State<ReportIncident> {
           ),
         );
       } else {
-        String _user = 'User ' + reponseData['username'];
         var params = {
           'street': _street,
           'summary': _summary,
           'tags': _tag,
-          'user': _user,
+          'user': reponseData['username'],
         };
 
         response = await http.post(

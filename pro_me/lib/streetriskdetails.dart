@@ -35,9 +35,8 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
               trailing: Text(
                 widget.details['risk_score'],
                 style: TextStyle(
-                  color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  backgroundColor: widget.details['risk_score'] == 'Safe'
+                  color: widget.details['risk_score'] == 'Safe'
                       ? Colors.green
                       : widget.details['risk_score'] == 'Unsafe'
                           ? Colors.red
@@ -80,59 +79,61 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: DataTable(
-                    columns: const <DataColumn>[
-                      DataColumn(
-                        label: Text(
-                          'Date',
-                          style: TextStyle(fontStyle: FontStyle.italic),
+              child: widget.details['risk_metadata'].length > 0
+                  ? SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: DataTable(
+                          columns: const <DataColumn>[
+                            DataColumn(
+                              label: Text(
+                                'Date',
+                                style: TextStyle(fontStyle: FontStyle.italic),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Source',
+                                style: TextStyle(fontStyle: FontStyle.italic),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Tags',
+                                style: TextStyle(fontStyle: FontStyle.italic),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Summary',
+                                style: TextStyle(fontStyle: FontStyle.italic),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Link',
+                                style: TextStyle(fontStyle: FontStyle.italic),
+                              ),
+                            ),
+                          ],
+                          rows: widget.details['risk_metadata']
+                              .map<DataRow>(
+                                ((element) => DataRow(
+                                      cells: <DataCell>[
+                                        DataCell(Text(element['date'])),
+                                        DataCell(Text(element['source'])),
+                                        DataCell(Text(element['tags'])),
+                                        DataCell(Text(element['news'])),
+                                        DataCell(Text(element['link'])),
+                                      ],
+                                    )),
+                              )
+                              .toList(),
                         ),
                       ),
-                      DataColumn(
-                        label: Text(
-                          'Source',
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Tags',
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Summary',
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Link',
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ),
-                    ],
-                    rows: widget.details['risk_metadata']
-                        .map<DataRow>(
-                          ((element) => DataRow(
-                                cells: <DataCell>[
-                                  DataCell(Text(element['date'])),
-                                  DataCell(Text(element['source'])),
-                                  DataCell(Text(element['tags'])),
-                                  DataCell(Text(element['news'])),
-                                  DataCell(Text(element['link'])),
-                                ],
-                              )),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ),
+                    )
+                  : const Text('No Reports Available'),
             ),
           ],
         ),
