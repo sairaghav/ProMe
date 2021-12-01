@@ -46,7 +46,7 @@ def add_user_reported_incidents(street: str, summary: str, tags: str, user) -> L
 def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.datetime,datetime.datetime)]:
     # Convert input dates from string to datetime and assign default values if None
     to_date = datetime.datetime.now(datetime.timezone.utc) if to_date in [None, ''] else datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1, minutes=59)
-    from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days) if from_date in [None, ''] else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(hours=1)
+    from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days) if from_date in [None, ''] else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
     # Avoid future dates and from_date greater than to_date
     if to_date > datetime.datetime.now(datetime.timezone.utc):
         to_date = datetime.datetime.now(datetime.timezone.utc)
@@ -185,7 +185,8 @@ def update_street_risk_db(street: str, from_date: str, to_date: str) -> List[New
     queryset = queryset.filter(date__range=[from_date, to_date])
 
     for result in results:
-        if len(queryset.filter(link=result.link)) == 0:
+        queryset = queryset.filter(date=result.date)
+        if len(queryset) == 0:
             print('Adding to DB for '+street)
             risk = StreetRisk(news=result.title, date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
             risk.save()
@@ -215,6 +216,6 @@ def fetch_from_source(street: str, start_date: str, end_date: str, source: Abstr
 def fetch_from_all_sources(street: str, start_date: str, end_date: str) -> List[News]:
     news = []
     for source in config.sources:
-        print('Querying '+source.name+' for '+street)
+        print('Querying '+source.name+' for '+street+' between '+start_date+' and '+end_date)
         news.extend(fetch_from_source(street, start_date, end_date, source))
     return news
