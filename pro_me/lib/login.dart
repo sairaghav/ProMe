@@ -18,6 +18,7 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   String _email = '', _password = '';
   final storage = const FlutterSecureStorage();
+  bool isLoginCorrect = true;
 
   void _getUserCreds() async {
     setState(() {
@@ -28,9 +29,15 @@ class _LoginState extends State<Login> {
       Uri.https('pro-me.herokuapp.com', '/api/auth/token/login'),
       body: {'email': _email, 'password': _password},
     );
-    var token = "Token " + jsonDecode(response.body)['auth_token'];
-    await storage.write(key: 'token', value: token);
-    Navigator.pop(context);
+    if (jsonDecode(response.body)['auth_token'] == null) {
+      setState(() {
+        isLoginCorrect = false;
+      });
+    } else {
+      var token = "Token " + jsonDecode(response.body)['auth_token'];
+      await storage.write(key: 'token', value: token);
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -68,6 +75,11 @@ class _LoginState extends State<Login> {
         ElevatedButton(
           onPressed: _getUserCreds,
           child: const Text('Login'),
+        ),
+        Center(
+          child: isLoginCorrect
+              ? const Text('Please login to continue.')
+              : const Text('Email or password is incorrect.'),
         ),
       ]),
       bottomNavigationBar: const ProMeNavBar(selectedIndex: 0),

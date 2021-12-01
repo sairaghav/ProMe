@@ -60,6 +60,9 @@ class _SafeRouteState extends State<SafeRoute> {
       if (routeData['detail'] ==
               "Authentication credentials were not provided." ||
           routeData['detail'] == "Invalid token.") {
+        setState(() {
+          isLoading = false;
+        });
         Navigator.push(
           context,
           MaterialPageRoute(

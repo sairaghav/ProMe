@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -20,19 +19,11 @@ class _ProMeAppBarState extends State<ProMeAppBar> {
   final storage = const FlutterSecureStorage();
   void _onTapLogout() async {
     String? token = await storage.read(key: 'token');
-    var response = await http.post(
-      Uri.https('pro-me.herokuapp.com', '/api/auth/users/me'),
+    await http.post(
+      Uri.https('pro-me.herokuapp.com', '/api/auth/token/logout'),
       headers: {HttpHeaders.authorizationHeader: '$token'},
     );
 
-    var userData = jsonDecode(response.body);
-    if (userData['detail'] != "Authentication credentials were not provided." ||
-        userData['detail'] != "Invalid token.") {
-      await http.post(
-        Uri.https('pro-me.herokuapp.com', '/api/auth/token/logout'),
-        headers: {HttpHeaders.authorizationHeader: '$token'},
-      );
-    }
     Navigator.pop(context);
     Navigator.push(
       context,
