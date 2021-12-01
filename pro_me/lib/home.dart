@@ -7,9 +7,7 @@ import 'package:pro_me/topbar.dart';
 
 class HomePage extends StatefulWidget {
   final int selectedIndex;
-  final bool isLoggedIn = false;
-  const HomePage({Key? key, required this.selectedIndex, isLoggedIn})
-      : super(key: key);
+  const HomePage({Key? key, required this.selectedIndex}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();

@@ -39,22 +39,28 @@ class _LoginState extends State<Login> {
       appBar: const ProMeAppBar(),
       body: Column(children: [
         TextField(
+            textAlign: TextAlign.center,
             controller: emailController,
             decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(20.0),
                 hintText: 'Enter Email',
                 labelText: 'Email',
                 labelStyle: TextStyle(
-                  fontSize: 24,
+                  fontSize: 18,
                   color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ))),
         TextField(
+          textAlign: TextAlign.center,
           controller: passwordController,
           decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(20.0),
               hintText: 'Enter Password',
               labelText: 'Password',
               labelStyle: TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 color: Colors.black,
+                fontWeight: FontWeight.bold,
               )),
           obscureText: true,
           autocorrect: false,

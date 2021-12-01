@@ -19,6 +19,7 @@ class _SafeRouteState extends State<SafeRoute> {
   TextEditingController destinationController = TextEditingController();
   String _source = '', _destination = '', _mode = 'pedestrian';
   final storage = const FlutterSecureStorage();
+  bool isLoading = false;
 
   void _getRiskData(Map<dynamic, dynamic> routeData, String token) async {
     for (var result in routeData['results']) {
@@ -30,6 +31,9 @@ class _SafeRouteState extends State<SafeRoute> {
       var riskData = jsonDecode(response.body);
       result['risk_metadata'] = riskData['results'];
     }
+    setState(() {
+      isLoading = false;
+    });
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -43,6 +47,7 @@ class _SafeRouteState extends State<SafeRoute> {
     setState(() {
       _source = sourceController.text;
       _destination = destinationController.text;
+      isLoading = true;
     });
     String? token = await storage.read(key: 'token');
     var params = {'start': _source, 'end': _destination, 'mode': _mode};
@@ -64,110 +69,122 @@ class _SafeRouteState extends State<SafeRoute> {
       } else {
         _getRiskData(routeData, '$token');
       }
-    } catch (exception) {}
+    } catch (exception) {
+      throw Exception('Error in getting risk data.');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(children: <Widget>[
-        const Text(
-          'SafeRoute',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
-        ),
-        Expanded(
-          child: TextField(
-            textAlign: TextAlign.center,
-            controller: sourceController,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(20.0),
-              labelText: 'Source',
-              labelStyle: TextStyle(
-                fontSize: 18,
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            const Text(
+              'SafeRoute',
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                fontSize: 24,
               ),
             ),
-          ),
-        ),
-        Expanded(
-          child: TextField(
-            textAlign: TextAlign.center,
-            controller: destinationController,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(20.0),
-              labelText: 'Destination',
-              labelStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            TextField(
+              textAlign: TextAlign.center,
+              controller: sourceController,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(20.0),
+                labelText: 'Source',
+                hintText: 'Enter Source for Route',
+                labelStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
             ),
-          ),
-        ),
-        const Text(
-          'Mode of Transport: ',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Expanded(
-          child: ListTile(
-            title: const Text('Pedestrian'),
-            leading: Radio(
-              value: 'pedestrian',
-              groupValue: _mode,
-              onChanged: (String? value) {
-                setState(
-                  () {
-                    _mode = '$value';
-                  },
-                );
-              },
+            TextField(
+              textAlign: TextAlign.center,
+              controller: destinationController,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(20.0),
+                labelText: 'Destination',
+                hintText: 'Enter Destination for Route',
+                labelStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
             ),
-          ),
-        ),
-        Expanded(
-          child: ListTile(
-            title: const Text('Fastest'),
-            leading: Radio(
-              value: 'fastest',
-              groupValue: _mode,
-              onChanged: (String? value) {
-                setState(
-                  () {
-                    _mode = '$value';
-                  },
-                );
-              },
+            const Text(
+              'Mode of Transport: ',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        ),
-        Expanded(
-          child: ListTile(
-            title: const Text('Bicycle'),
-            leading: Radio(
-              value: 'bicycle',
-              groupValue: _mode,
-              onChanged: (String? value) {
-                setState(
-                  () {
-                    _mode = '$value';
+            Center(
+              child: ListTile(
+                title: const Text('Pedestrian'),
+                leading: Radio(
+                  value: 'pedestrian',
+                  groupValue: _mode,
+                  onChanged: (String? value) {
+                    setState(
+                      () {
+                        _mode = '$value';
+                      },
+                    );
                   },
-                );
-              },
+                ),
+              ),
             ),
-          ),
+            Center(
+              child: ListTile(
+                title: const Text('Fastest'),
+                leading: Radio(
+                  value: 'fastest',
+                  groupValue: _mode,
+                  onChanged: (String? value) {
+                    setState(
+                      () {
+                        _mode = '$value';
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+            Center(
+              child: ListTile(
+                title: const Text('Bicycle'),
+                leading: Radio(
+                  value: 'bicycle',
+                  groupValue: _mode,
+                  onChanged: (String? value) {
+                    setState(
+                      () {
+                        _mode = '$value';
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: _getRoute,
+                child: const Text('Get route'),
+              ),
+            ),
+            Center(
+              child: isLoading
+                  ? const LinearProgressIndicator()
+                  : const Text(
+                      'Please provide the source, destination and mode of travel to get safety metrics for all streets along the route.'),
+            )
+          ],
         ),
-        ElevatedButton(
-          onPressed: _getRoute,
-          child: const Text('Get route'),
-        ),
-      ]),
+      ),
     );
   }
 }

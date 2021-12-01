@@ -20,6 +20,7 @@ class _StreetRiskState extends State<StreetRisk> {
   TextEditingController endDateController = TextEditingController();
   String _street = '', _startDate = '', _endDate = '';
   final storage = const FlutterSecureStorage();
+  bool isLoading = false;
 
   void _getRisk() async {
     setState(() {
@@ -27,12 +28,9 @@ class _StreetRiskState extends State<StreetRisk> {
       _startDate = startDateController.text;
       _endDate = endDateController.text;
     });
+    isLoading = true;
     String? token = await storage.read(key: 'token');
-    var params = {'street': _street};
-
-    if (_startDate != '' && _endDate != '') {
-      params = {'street': _street, 'from': _startDate, 'to': _endDate};
-    }
+    var params = {'street': _street, 'from': _startDate, 'to': _endDate};
 
     var response = await http.get(
       Uri.https('pro-me.herokuapp.com', '/api/getriskdata', params),
@@ -51,6 +49,9 @@ class _StreetRiskState extends State<StreetRisk> {
           ),
         );
       } else {
+        setState(() {
+          isLoading = false;
+        });
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -59,66 +60,79 @@ class _StreetRiskState extends State<StreetRisk> {
                   )),
         );
       }
-    } catch (exception) {}
+    } catch (exception) {
+      throw Exception('Error in request sent to get risk data');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(children: [
-      const Text(
-        'StreetRisk',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 24,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Text(
+              'StreetRisk',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+            TextField(
+              textAlign: TextAlign.center,
+              controller: streetController,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(20.0),
+                hintText: 'Enter Street',
+                labelText: 'Street',
+                labelStyle: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextField(
+              textAlign: TextAlign.center,
+              controller: startDateController,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(20.0),
+                hintText: 'yyyy-mm-dd',
+                labelText: 'Evaluate From',
+                labelStyle: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextField(
+              textAlign: TextAlign.center,
+              controller: endDateController,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(20.0),
+                hintText: 'yyyy-mm-dd',
+                labelText: 'Evaluate Till',
+                labelStyle: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _getRisk,
+              child: const Text('Get Risk'),
+            ),
+            Center(
+              child: isLoading
+                  ? const LinearProgressIndicator()
+                  : const Text(
+                      'If you do not provide a date for "Evaluate Till", the current date will be taken as default and the "Evaluate From" date is always 30 days from "Evaluate Till" date unless explicitly provided.'),
+            )
+          ],
         ),
       ),
-      TextField(
-        textAlign: TextAlign.center,
-        controller: streetController,
-        decoration: const InputDecoration(
-          contentPadding: EdgeInsets.all(20.0),
-          hintText: 'Enter Street',
-          labelText: 'Street',
-          labelStyle: TextStyle(
-            fontSize: 18,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      TextField(
-        textAlign: TextAlign.center,
-        controller: startDateController,
-        decoration: const InputDecoration(
-          contentPadding: EdgeInsets.all(20.0),
-          hintText: 'yyyy-mm-dd',
-          labelText: 'Evaluate From',
-          labelStyle: TextStyle(
-            fontSize: 18,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      TextField(
-        textAlign: TextAlign.center,
-        controller: endDateController,
-        decoration: const InputDecoration(
-          contentPadding: EdgeInsets.all(20.0),
-          hintText: 'yyyy-mm-dd',
-          labelText: 'Evaluate Till',
-          labelStyle: TextStyle(
-            fontSize: 18,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      ElevatedButton(
-        onPressed: _getRisk,
-        child: const Text('Get Risk'),
-      ),
-    ]));
+    );
   }
 }
