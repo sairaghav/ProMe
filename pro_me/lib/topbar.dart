@@ -42,7 +42,7 @@ class _ProMeAppBarState extends State<ProMeAppBar> {
       //leading: widget.leading,
       actions: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(right: 20.0),
+          padding: const EdgeInsets.only(right: 10.0),
           child: GestureDetector(
             onTap: _onTapLogout,
             child: const Icon(Icons.power_settings_new_rounded),

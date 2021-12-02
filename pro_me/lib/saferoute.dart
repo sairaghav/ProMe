@@ -47,33 +47,36 @@ class _SafeRouteState extends State<SafeRoute> {
     setState(() {
       _source = sourceController.text;
       _destination = destinationController.text;
-      isLoading = true;
     });
     String? token = await storage.read(key: 'token');
-    var params = {'start': _source, 'end': _destination, 'mode': _mode};
-    var response = await http.get(
-      Uri.https('pro-me.herokuapp.com', '/api/directions', params),
-      headers: {HttpHeaders.authorizationHeader: '$token'},
-    );
-    try {
-      var routeData = jsonDecode(response.body);
-      if (routeData['detail'] ==
-              "Authentication credentials were not provided." ||
-          routeData['detail'] == "Invalid token.") {
-        setState(() {
-          isLoading = false;
-        });
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const Login(),
-          ),
-        );
-      } else {
-        _getRiskData(routeData, '$token');
+    if (_source.isNotEmpty && _destination.isNotEmpty) {
+      setState(() {
+        isLoading = true;
+      });
+      var params = {'start': _source, 'end': _destination, 'mode': _mode};
+      var response = await http.get(
+        Uri.https('pro-me.herokuapp.com', '/api/directions', params),
+        headers: {HttpHeaders.authorizationHeader: '$token'},
+      );
+      try {
+        var routeData = jsonDecode(response.body);
+        if (response.statusCode == HttpStatus.unauthorized ||
+            response.statusCode == HttpStatus.forbidden) {
+          setState(() {
+            isLoading = false;
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Login(),
+            ),
+          );
+        } else {
+          _getRiskData(routeData, '$token');
+        }
+      } catch (exception) {
+        throw Exception('Error in getting route data.');
       }
-    } catch (exception) {
-      throw Exception('Error in getting route data.');
     }
   }
 
@@ -83,11 +86,14 @@ class _SafeRouteState extends State<SafeRoute> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            const Text(
-              'SafeRoute',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'SafeRoute',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
               ),
             ),
             TextField(
@@ -118,11 +124,14 @@ class _SafeRouteState extends State<SafeRoute> {
                 ),
               ),
             ),
-            const Text(
-              'Mode of Transport: ',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'Mode of Transport: ',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Center(
@@ -173,18 +182,25 @@ class _SafeRouteState extends State<SafeRoute> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: isLoading
+                  ? Column(
+                      children: const <Widget>[
+                        Text(
+                            'Getting the details... This may take some time...'),
+                        CircularProgressIndicator(),
+                      ],
+                    )
+                  : const Text(
+                      'Please provide the source, destination and mode of travel to get safety metrics for all streets along the route.'),
+            ),
             Center(
               child: ElevatedButton(
                 onPressed: _getRoute,
                 child: const Text('Get route'),
               ),
             ),
-            Center(
-              child: isLoading
-                  ? const LinearProgressIndicator()
-                  : const Text(
-                      'Please provide the source, destination and mode of travel to get safety metrics for all streets along the route.'),
-            )
           ],
         ),
       ),

@@ -18,11 +18,17 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
       body: Center(
         child: Column(
           children: <Widget>[
-            Text(
-              'Safety Information for ' + widget.details["street"],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                'Safety Information for ' +
+                    widget.details["street"][0].toUpperCase() +
+                    '' +
+                    widget.details["street"].substring(1),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
               ),
             ),
             ListTile(

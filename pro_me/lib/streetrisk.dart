@@ -39,19 +39,18 @@ class _StreetRiskState extends State<StreetRisk> {
     try {
       var riskData = jsonDecode(response.body);
 
-      if (riskData['detail'] ==
-              "Authentication credentials were not provided." ||
-          riskData['detail'] == "Invalid token.") {
+      if (response.statusCode == HttpStatus.unauthorized ||
+          response.statusCode == HttpStatus.forbidden) {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => const Login(),
           ),
         );
-      } else {
         setState(() {
           isLoading = false;
         });
+      } else {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -59,6 +58,9 @@ class _StreetRiskState extends State<StreetRisk> {
                     details: riskData['results'],
                   )),
         );
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (exception) {
       throw Exception('Error in getting risk data');
@@ -71,11 +73,14 @@ class _StreetRiskState extends State<StreetRisk> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Text(
-              'StreetRisk',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'StreetSafety',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
               ),
             ),
             TextField(
@@ -120,16 +125,23 @@ class _StreetRiskState extends State<StreetRisk> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: isLoading
+                  ? Column(
+                      children: const <Widget>[
+                        Text(
+                            'Getting the details... This may take some time...'),
+                        CircularProgressIndicator(),
+                      ],
+                    )
+                  : const Text(
+                      'If you do not provide a date for "Evaluate Till", the current date will be taken as default and the "Evaluate From" date is always 30 days from "Evaluate Till" date unless explicitly provided.'),
+            ),
             ElevatedButton(
               onPressed: _getRisk,
               child: const Text('Get Risk'),
             ),
-            Center(
-              child: isLoading
-                  ? const LinearProgressIndicator()
-                  : const Text(
-                      'If you do not provide a date for "Evaluate Till", the current date will be taken as default and the "Evaluate From" date is always 30 days from "Evaluate Till" date unless explicitly provided.'),
-            )
           ],
         ),
       ),

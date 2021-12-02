@@ -34,9 +34,8 @@ class _ReportIncidentState extends State<ReportIncident> {
 
     try {
       var reponseData = jsonDecode(response.body);
-      if (reponseData['detail'] ==
-              "Authentication credentials were not provided." ||
-          reponseData['detail'] == "Invalid token.") {
+      if (response.statusCode == HttpStatus.unauthorized ||
+          response.statusCode == HttpStatus.forbidden) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -77,11 +76,14 @@ class _ReportIncidentState extends State<ReportIncident> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Text(
-              'Report an Incident',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'Report an Incident',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
               ),
             ),
             TextField(
@@ -112,11 +114,14 @@ class _ReportIncidentState extends State<ReportIncident> {
                 ),
               ),
             ),
-            const Text(
-              'Tags: ',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'Tags: ',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             ListTile(
@@ -273,17 +278,17 @@ class _ReportIncidentState extends State<ReportIncident> {
                 },
               ),
             ),
-            ElevatedButton(
-              onPressed: _addReport,
-              child: const Text('Add Report'),
-            ),
             Center(
               child: isLoading
                   ? const Text(
                       'The incident report has been added to our risk database.')
                   : const Text(
                       'Please enter all the fields to report an incident.'),
-            )
+            ),
+            ElevatedButton(
+              onPressed: _addReport,
+              child: const Text('Add Report'),
+            ),
           ],
         ),
       ),

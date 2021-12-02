@@ -18,11 +18,14 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
       appBar: const ProMeAppBar(),
       body: Column(
         children: <Widget>[
-          const Text(
-            'Route Safety Information',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
+          const Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text(
+              'Route Safety Information',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
             ),
           ),
           Expanded(

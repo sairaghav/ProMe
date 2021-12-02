@@ -40,16 +40,12 @@ class _ProMeNavBarState extends State<ProMeNavBar> {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.manage_search),
-          label: 'StreetRisk',
+          label: 'StreetSafety',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.report),
           label: 'ReportIncident',
         ),
-        //BottomNavigationBarItem(
-        //  icon: Icon(Icons.person),
-        //  label: 'Profile',
-        //),
       ],
     );
   }

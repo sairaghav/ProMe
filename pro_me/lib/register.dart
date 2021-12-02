@@ -73,11 +73,14 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Text(
-              'User Registration',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'User Registration',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
               ),
             ),
             TextField(
@@ -165,17 +168,18 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: _registerUser,
-              child: const Text('Register'),
-            ),
-            Center(
+            Padding(
+              padding: const EdgeInsets.all(10.0),
               child: isValid
                   ? const Text(
                       'Please enter all the fields to create a user account.')
                   : const Text(
                       'There is some error with the information entered.'),
-            )
+            ),
+            ElevatedButton(
+              onPressed: _registerUser,
+              child: const Text('Register'),
+            ),
           ],
         ),
       ),

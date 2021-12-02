@@ -54,48 +54,72 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const ProMeAppBar(),
-      body: Column(children: [
-        TextField(
+      body: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text(
+              'Login',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          TextField(
+              textAlign: TextAlign.center,
+              controller: emailController,
+              decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.all(20.0),
+                  hintText: 'Enter Email',
+                  labelText: 'Email',
+                  labelStyle: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ))),
+          TextField(
             textAlign: TextAlign.center,
-            controller: emailController,
+            controller: passwordController,
             decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter Email',
-                labelText: 'Email',
+                hintText: 'Enter Password',
+                labelText: 'Password',
                 labelStyle: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
-                ))),
-        TextField(
-          textAlign: TextAlign.center,
-          controller: passwordController,
-          decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(20.0),
-              hintText: 'Enter Password',
-              labelText: 'Password',
-              labelStyle: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              )),
-          obscureText: true,
-          autocorrect: false,
-        ),
-        ElevatedButton(
-          onPressed: _getUserCreds,
-          child: const Text('Login'),
-        ),
-        Center(
-          child: isLoginCorrect
-              ? const Text('Please login to continue.')
-              : const Text('Email or password is incorrect.'),
-        ),
-        ElevatedButton(
-          onPressed: _doUserRegistration,
-          child: const Text('Register'),
-        ),
-      ]),
+                )),
+            obscureText: true,
+            autocorrect: false,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: isLoginCorrect
+                ? const Text('Please login to continue.')
+                : const Text('Email or password is incorrect.'),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ElevatedButton(
+                  onPressed: _getUserCreds,
+                  child: const Text('Login'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ElevatedButton(
+                  onPressed: _doUserRegistration,
+                  child: const Text('Register'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       bottomNavigationBar: const ProMeNavBar(selectedIndex: 0),
     );
   }
