@@ -172,15 +172,13 @@ def update_street_db(street: str, update_fields: dict) -> List[StreetList]:
 
 def update_street_risk_db(street: str, from_date: datetime.datetime, to_date: datetime.datetime) -> List[StreetRisk]:
     results = fetch_from_all_sources(street, from_date, to_date)
-    queryset = StreetRisk.objects.all().filter(street=street).filter(date__range=[from_date, to_date])
 
     for result in results:
+        queryset = StreetRisk.objects.all().filter(street=street)
         if len(queryset.filter(date=result.date)) == 0:
             print('Adding to DB for '+street)
             risk = StreetRisk(news=result.title, date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
             risk.save()
-
-            queryset = StreetRisk.objects.all().filter(street=street)
 
     return StreetRisk.objects.all().filter(street=street)
 
