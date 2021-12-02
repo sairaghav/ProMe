@@ -37,8 +37,7 @@ def add_user_reported_incidents(street: str, summary: str, tags: str, user) -> L
     risk.save()
 
     queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street)
-    queryset = queryset.filter(source=username)
+    queryset = queryset.filter(street=street).filter(source=username)
 
     return queryset
 
@@ -111,8 +110,6 @@ def calculate_risk_score(results: RiskData, requested_from: datetime.datetime, r
     return results._replace(risk_score=risk_score)
 
 def update_risk_db(street: str, available_from: datetime.datetime, available_till: datetime.datetime, requested_from: datetime.datetime, requested_till: datetime.datetime) -> RiskData:
-    #time_range = (available_till - available_from).days
-
     # Check news articles for only the dates that were not analysed already
     if requested_from < available_from:
         # requested_from to requested_till = requested_from to available_from + available_till to requested_till + already available data
@@ -120,23 +117,18 @@ def update_risk_db(street: str, available_from: datetime.datetime, available_til
             update_street_risk_db(street, requested_from.strftime('%Y-%m-%d'), available_from.strftime('%Y-%m-%d'))
             update_street_risk_db(street, available_till.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
             update_street_db(street,{'news_from': requested_from.strftime('%Y-%m-%d'),'news_till': requested_till.strftime('%Y-%m-%d')})
-            #time_range = (requested_till - requested_from).days
         # requested_from to available_till = requested_from to available_from + + already available data
         else:
             update_street_risk_db(street, requested_from.strftime('%Y-%m-%d'), available_from.strftime('%Y-%m-%d'))
             update_street_db(street,{'news_from': requested_from.strftime('%Y-%m-%d')})
-            #time_range = (available_till - requested_from).days
 
     else:
         # available_from to requested_till = available_till to requested_till + already available data
         if requested_till > available_till:
             update_street_risk_db(street, available_till.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
             update_street_db(street,{'news_till': requested_till.strftime('%Y-%m-%d')})
-            #time_range = (requested_till - available_from).days
 
-    queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street)
-    queryset = queryset.filter(date__range=[requested_from,requested_till])
+    queryset = StreetRisk.objects.all().filter(street=street).filter(date__range=[requested_from,requested_till])
 
     return RiskData(street=street,
                     risk_metadata=list(queryset.values()),
@@ -176,13 +168,13 @@ def update_street_db(street: str, update_fields: dict) -> List[StreetList]:
         setattr(street_list, field_name, update_fields[field_name])
         street_list.save(update_fields=[field_name])
 
-def update_street_risk_db(street: str, from_date: str, to_date: str) -> List[News]:
+    return StreetList.objects.get(street=street)
+
+def update_street_risk_db(street: str, from_date: str, to_date: str) -> List[StreetRisk]:
     results = fetch_from_all_sources(street, from_date, to_date)
     from_date, to_date = get_utc_from_to_date(from_date, to_date)
 
-    queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street)
-    queryset = queryset.filter(date__range=[from_date, to_date])
+    queryset = StreetRisk.objects.all().filter(street=street).filter(date__range=[from_date, to_date])
 
     for result in results:
         if len(queryset.filter(date=result.date)) == 0:
@@ -190,10 +182,9 @@ def update_street_risk_db(street: str, from_date: str, to_date: str) -> List[New
             risk = StreetRisk(news=result.title, date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
             risk.save()
 
-            queryset = StreetRisk.objects.all()
-            queryset = queryset.filter(street=street)
+            queryset = StreetRisk.objects.all().filter(street=street)
 
-    return results
+    return StreetRisk.objects.all().filter(street=street)
 
 def fetch_soup(url: str) -> BS:
     return BS(requests.get(url).text, "html.parser")
