@@ -19,7 +19,7 @@ class RiskData(NamedTuple):
     user_timeline: dict
     user_top_timeline: dict
 
-def is_street_first_time(street: str, from_date: str, to_date: str) -> List[StreetList]:
+def is_street_first_time(street: str, from_date: datetime.datetime, to_date: datetime.datetime) -> List[StreetList]:
     try:
         street_list = StreetList.objects.get(street=street)
 
@@ -43,9 +43,9 @@ def add_user_reported_incidents(street: str, summary: str, tags: str, user) -> L
 
 # Convert all time values to UTC
 def get_utc_from_to_date(from_date: str, to_date: str) -> tuple[(datetime.datetime,datetime.datetime)]:
-    # Convert input dates from string to datetime and assign default values if None
-    to_date = datetime.datetime.now(datetime.timezone.utc) if to_date in [None, ''] else datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1, minutes=59)
-    from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days) if from_date in [None, ''] else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc)+datetime.timedelta(days=1)
+    # Convert input dates from string to datetime and assign default values if ''
+    to_date = datetime.datetime.now(datetime.timezone.utc) if to_date == '' else datetime.datetime.strptime(to_date, '%Y-%m-%d').astimezone(datetime.timezone.utc).replace(hour=23, minute=59, second=59)+datetime.timedelta(days=1)
+    from_date = to_date - datetime.timedelta(days=config.fetch_news_for_interval_days) if from_date == '' else datetime.datetime.strptime(from_date, '%Y-%m-%d').astimezone(datetime.timezone.utc).replace(hour=0, minute=0)+datetime.timedelta(days=1)
     # Avoid future dates and from_date greater than to_date
     if to_date > datetime.datetime.now(datetime.timezone.utc):
         to_date = datetime.datetime.now(datetime.timezone.utc)
@@ -114,19 +114,19 @@ def update_risk_db(street: str, available_from: datetime.datetime, available_til
     if requested_from < available_from:
         # requested_from to requested_till = requested_from to available_from + available_till to requested_till + already available data
         if requested_till > available_till:
-            update_street_risk_db(street, requested_from.strftime('%Y-%m-%d'), available_from.strftime('%Y-%m-%d'))
-            update_street_risk_db(street, available_till.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
-            update_street_db(street,{'news_from': requested_from.strftime('%Y-%m-%d'),'news_till': requested_till.strftime('%Y-%m-%d')})
+            update_street_risk_db(street, requested_from, available_from)
+            update_street_risk_db(street, available_till, requested_till)
+            update_street_db(street,{'news_from': requested_from,'news_till': requested_till})
         # requested_from to available_till = requested_from to available_from + + already available data
         else:
-            update_street_risk_db(street, requested_from.strftime('%Y-%m-%d'), available_from.strftime('%Y-%m-%d'))
-            update_street_db(street,{'news_from': requested_from.strftime('%Y-%m-%d')})
+            update_street_risk_db(street, requested_from, available_from)
+            update_street_db(street,{'news_from': requested_from})
 
     else:
         # available_from to requested_till = available_till to requested_till + already available data
         if requested_till > available_till:
-            update_street_risk_db(street, available_till.strftime('%Y-%m-%d'), requested_till.strftime('%Y-%m-%d'))
-            update_street_db(street,{'news_till': requested_till.strftime('%Y-%m-%d')})
+            update_street_risk_db(street, available_till, requested_till)
+            update_street_db(street,{'news_till': requested_till})
 
     queryset = StreetRisk.objects.all().filter(street=street).filter(date__range=[requested_from,requested_till])
 
@@ -142,12 +142,12 @@ def update_risk_db(street: str, available_from: datetime.datetime, available_til
                     user_top_tag={},
                     user_top_timeline={})
 
-def get_risk(street: str, from_date: str, to_date: str) -> dict:
+def get_risk(street: str, from_date: datetime.datetime, to_date: datetime.datetime) -> dict:
     street_list =  is_street_first_time(street, from_date, to_date)
 
     # Check already available data range
-    available_from, available_till = get_utc_from_to_date(street_list.news_from, street_list.news_till)
-    requested_from, requested_till = get_utc_from_to_date(from_date, to_date)
+    available_from, available_till = street_list.news_from, street_list.news_till
+    requested_from, requested_till = from_date, to_date
 
     # Update DB if new data is required
     results = update_risk_db(street, available_from, available_till, requested_from, requested_till)
@@ -170,10 +170,8 @@ def update_street_db(street: str, update_fields: dict) -> List[StreetList]:
 
     return StreetList.objects.get(street=street)
 
-def update_street_risk_db(street: str, from_date: str, to_date: str) -> List[StreetRisk]:
+def update_street_risk_db(street: str, from_date: datetime.datetime, to_date: datetime.datetime) -> List[StreetRisk]:
     results = fetch_from_all_sources(street, from_date, to_date)
-    from_date, to_date = get_utc_from_to_date(from_date, to_date)
-
     queryset = StreetRisk.objects.all().filter(street=street).filter(date__range=[from_date, to_date])
 
     for result in results:
@@ -189,9 +187,9 @@ def update_street_risk_db(street: str, from_date: str, to_date: str) -> List[Str
 def fetch_soup(url: str) -> BS:
     return BS(requests.get(url).text, "html.parser")
 
-def fetch_from_source(street: str, start_date: str, end_date: str, source: AbstractNewsSource) -> List[News]:
+def fetch_from_source(street: str, from_date: datetime.datetime, to_date: datetime.datetime, source: AbstractNewsSource) -> List[News]:
     results = []
-    query = NewsQuery(street, start_date, end_date)
+    query = NewsQuery(street, from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
     pagination_url = source.get_url(query)
     for page in source.parse_page_ids(fetch_soup(pagination_url)):
         query = query._replace(page=page)
@@ -206,9 +204,9 @@ def fetch_from_source(street: str, start_date: str, end_date: str, source: Abstr
 
 
 # Returns news data for the last few days for a street on specified news URL
-def fetch_from_all_sources(street: str, start_date: str, end_date: str) -> List[News]:
+def fetch_from_all_sources(street: str, from_date: datetime.datetime, to_date: datetime.datetime) -> List[News]:
     news = []
     for source in config.sources:
-        print('Querying '+source.name+' for '+street+' between '+start_date+' and '+end_date)
-        news.extend(fetch_from_source(street, start_date, end_date, source))
+        print('Querying '+source.name+' for '+street+' between '+from_date.strftime('%Y-%m-%d %H:%M:%S')+' and '+to_date.strftime('%Y-%m-%d %H:%M:%S'))
+        news.extend(fetch_from_source(street, from_date, to_date, source))
     return news

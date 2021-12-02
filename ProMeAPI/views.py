@@ -18,7 +18,7 @@ class Response(NamedTuple):
 @permission_classes([IsAuthenticated])
 def get_risk_data(request) -> JsonResponse:
     street = request.GET.get('street', None)
-    from_date, to_date = [date.strftime('%Y-%m-%d') for date in news_articles.get_utc_from_to_date(request.GET.get('from', None), request.GET.get('to', None))]
+    from_date, to_date = [date for date in news_articles.get_utc_from_to_date(request.GET.get('from', ''), request.GET.get('to', ''))]
 
     if street is not None:
         response = Response(results=news_articles.get_risk(street.lower(), from_date, to_date), errors=None)
