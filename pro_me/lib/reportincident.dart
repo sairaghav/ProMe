@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro_me/login.dart';
+import 'package:pro_me/unauthenticated.dart';
 
 class ReportIncident extends StatefulWidget {
   const ReportIncident({Key? key}) : super(key: key);
@@ -39,7 +39,9 @@ class _ReportIncidentState extends State<ReportIncident> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const Login(),
+            builder: (context) => const UnauthenticatedPage(
+              selectedIndex: 0,
+            ),
           ),
         );
       } else {
@@ -117,7 +119,7 @@ class _ReportIncidentState extends State<ReportIncident> {
             const Padding(
               padding: EdgeInsets.all(10.0),
               child: Text(
-                'Tags: ',
+                'Type of Activity: ',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

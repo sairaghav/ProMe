@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pro_me/navbar.dart';
-import 'package:pro_me/topbar.dart';
+import 'package:pro_me/appbar.dart';
 
 class StreetRiskDetails extends StatefulWidget {
   final Map<dynamic, dynamic> details;
@@ -14,7 +14,7 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const ProMeAppBar(),
+      appBar: const AuthAppBar(),
       body: Center(
         child: Column(
           children: <Widget>[
@@ -100,7 +100,7 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
                             ),
                             DataColumn(
                               label: Text(
-                                'Source',
+                                'Summary',
                                 style: TextStyle(fontStyle: FontStyle.italic),
                               ),
                             ),
@@ -112,13 +112,13 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
                             ),
                             DataColumn(
                               label: Text(
-                                'Summary',
+                                'Link',
                                 style: TextStyle(fontStyle: FontStyle.italic),
                               ),
                             ),
                             DataColumn(
                               label: Text(
-                                'Link',
+                                'Source',
                                 style: TextStyle(fontStyle: FontStyle.italic),
                               ),
                             ),
@@ -128,10 +128,10 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
                                 ((element) => DataRow(
                                       cells: <DataCell>[
                                         DataCell(Text(element['date'])),
-                                        DataCell(Text(element['source'])),
-                                        DataCell(Text(element['tags'])),
                                         DataCell(Text(element['news'])),
+                                        DataCell(Text(element['tags'])),
                                         DataCell(Text(element['link'])),
+                                        DataCell(Text(element['source'])),
                                       ],
                                     )),
                               )
@@ -139,12 +139,12 @@ class _StreetRiskDetailsState extends State<StreetRiskDetails> {
                         ),
                       ),
                     )
-                  : const Text('No Reports Available'),
+                  : const Text('No Reports Available.'),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: const ProMeNavBar(
+      bottomNavigationBar: const AuthNavBar(
         selectedIndex: 1,
       ),
     );

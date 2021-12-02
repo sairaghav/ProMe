@@ -3,7 +3,7 @@ import 'package:pro_me/navbar.dart';
 import 'package:pro_me/reportincident.dart';
 import 'package:pro_me/saferoute.dart';
 import 'package:pro_me/streetrisk.dart';
-import 'package:pro_me/topbar.dart';
+import 'package:pro_me/appbar.dart';
 
 class HomePage extends StatefulWidget {
   final int selectedIndex;
@@ -18,15 +18,14 @@ class _HomePageState extends State<HomePage> {
     const SafeRoute(),
     const StreetRisk(),
     const ReportIncident(),
-    //const UserProfile(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const ProMeAppBar(),
+      appBar: const AuthAppBar(),
       body: _screens[widget.selectedIndex],
-      bottomNavigationBar: ProMeNavBar(
+      bottomNavigationBar: AuthNavBar(
         selectedIndex: widget.selectedIndex,
       ),
     );

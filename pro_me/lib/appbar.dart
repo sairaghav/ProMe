@@ -3,19 +3,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:pro_me/login.dart';
+import 'package:pro_me/unauthenticated.dart';
 
-class ProMeAppBar extends StatefulWidget with PreferredSizeWidget {
-  const ProMeAppBar({Key? key}) : super(key: key);
+class AuthAppBar extends StatefulWidget with PreferredSizeWidget {
+  const AuthAppBar({Key? key}) : super(key: key);
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
-  _ProMeAppBarState createState() => _ProMeAppBarState();
+  _AuthAppBarState createState() => _AuthAppBarState();
 }
 
-class _ProMeAppBarState extends State<ProMeAppBar> {
+class _AuthAppBarState extends State<AuthAppBar> {
   final storage = const FlutterSecureStorage();
   void _onTapLogout() async {
     String? token = await storage.read(key: 'token');
@@ -28,8 +28,7 @@ class _ProMeAppBarState extends State<ProMeAppBar> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const Login(),
-      ),
+          builder: (context) => const UnauthenticatedPage(selectedIndex: 0)),
     );
   }
 

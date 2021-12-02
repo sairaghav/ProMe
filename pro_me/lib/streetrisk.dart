@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro_me/login.dart';
 import 'package:pro_me/streetriskdetails.dart';
+import 'package:pro_me/unauthenticated.dart';
 
 class StreetRisk extends StatefulWidget {
   const StreetRisk({Key? key}) : super(key: key);
@@ -44,7 +44,9 @@ class _StreetRiskState extends State<StreetRisk> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const Login(),
+            builder: (context) => const UnauthenticatedPage(
+              selectedIndex: 0,
+            ),
           ),
         );
         setState(() {
@@ -136,7 +138,7 @@ class _StreetRiskState extends State<StreetRisk> {
                       ],
                     )
                   : const Text(
-                      'If you do not provide a date for "Evaluate Till", the current date will be taken as default and the "Evaluate From" date is always 30 days from "Evaluate Till" date unless explicitly provided.'),
+                      'If "Evaluate Till" is not provided, default value will be the current date and the "Evaluate From" date is 30 days from "Evaluate Till" date unless explicitly specified.'),
             ),
             ElevatedButton(
               onPressed: _getRisk,

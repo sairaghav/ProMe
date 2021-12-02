@@ -3,18 +3,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:pro_me/navbar.dart';
-import 'package:pro_me/register.dart';
-import 'package:pro_me/topbar.dart';
+import 'package:pro_me/home.dart';
+import 'package:pro_me/unauthenticated.dart';
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  _LoginState createState() => _LoginState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   String _email = '', _password = '';
@@ -24,10 +23,13 @@ class _LoginState extends State<Login> {
   bool isSuccess = false;
 
   void _doUserRegistration() async {
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const RegisterPage(),
+        builder: (context) => const UnauthenticatedPage(
+          selectedIndex: 1,
+        ),
       ),
     );
   }
@@ -60,13 +62,20 @@ class _LoginState extends State<Login> {
       var token = "Token " + jsonDecode(response.body)['auth_token'];
       await storage.write(key: 'token', value: token);
       Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(
+            selectedIndex: 0,
+          ),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const ProMeAppBar(),
       body: Column(
         children: [
           const Padding(
@@ -142,7 +151,6 @@ class _LoginState extends State<Login> {
           ),
         ],
       ),
-      bottomNavigationBar: const ProMeNavBar(selectedIndex: 0),
     );
   }
 }

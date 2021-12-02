@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:pro_me/login.dart';
 import 'package:pro_me/saferoutedetails.dart';
+import 'package:pro_me/unauthenticated.dart';
 
 class SafeRoute extends StatefulWidget {
   const SafeRoute({Key? key}) : super(key: key);
@@ -68,7 +68,9 @@ class _SafeRouteState extends State<SafeRoute> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const Login(),
+              builder: (context) => const UnauthenticatedPage(
+                selectedIndex: 0,
+              ),
             ),
           );
         } else {

@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro_me/login.dart';
-import 'package:pro_me/navbar.dart';
-import 'package:pro_me/topbar.dart';
+import 'package:pro_me/unauthenticated.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -72,7 +70,9 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const Login(),
+          builder: (context) => const UnauthenticatedPage(
+            selectedIndex: 0,
+          ),
         ),
       );
     }
@@ -81,7 +81,6 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const ProMeAppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -206,7 +205,6 @@ class _RegisterPageState extends State<RegisterPage> {
           ],
         ),
       ),
-      bottomNavigationBar: const ProMeNavBar(selectedIndex: 0),
     );
   }
 }

@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:pro_me/home.dart';
 
-class ProMeNavBar extends StatefulWidget {
+class AuthNavBar extends StatefulWidget {
   final int selectedIndex;
-  final bool shouldPop = true;
-  const ProMeNavBar({Key? key, required this.selectedIndex, shouldPop})
-      : super(key: key);
+  const AuthNavBar({Key? key, required this.selectedIndex}) : super(key: key);
 
   @override
-  _ProMeNavBarState createState() => _ProMeNavBarState();
+  _AuthNavBarState createState() => _AuthNavBarState();
 }
 
-class _ProMeNavBarState extends State<ProMeNavBar> {
+class _AuthNavBarState extends State<AuthNavBar> {
   void _onItemTapped(int index) {
     setState(() {
-      if (widget.shouldPop) {
-        Navigator.pop(context);
-      }
+      Navigator.pop(context);
       Navigator.push(
           context,
           MaterialPageRoute(

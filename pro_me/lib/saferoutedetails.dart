@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pro_me/appbar.dart';
 import 'package:pro_me/navbar.dart';
 import 'package:pro_me/streetriskdetails.dart';
-import 'package:pro_me/topbar.dart';
 
 class SafeRouteDetails extends StatefulWidget {
   final List<dynamic> details;
@@ -15,7 +15,7 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const ProMeAppBar(),
+      appBar: const AuthAppBar(),
       body: Column(
         children: <Widget>[
           const Padding(
@@ -81,7 +81,7 @@ class _SafeRouteDetailsState extends State<SafeRouteDetails> {
           ),
         ],
       ),
-      bottomNavigationBar: const ProMeNavBar(
+      bottomNavigationBar: const AuthNavBar(
         selectedIndex: 0,
       ),
     );
