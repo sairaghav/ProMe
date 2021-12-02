@@ -28,6 +28,8 @@ class _RegisterPageState extends State<RegisterPage> {
       _lName = '';
 
   bool isValid = true;
+  bool isLoading = false;
+  bool isSuccess = false;
 
   void _registerUser() async {
     setState(() {
@@ -50,12 +52,22 @@ class _RegisterPageState extends State<RegisterPage> {
     var response = await http.post(
         Uri.https('pro-me.herokuapp.com', '/api/auth/users/'),
         body: params);
+    setState(() {
+      isLoading = true;
+    });
 
     if (response.statusCode != HttpStatus.created) {
       setState(() {
         isValid = false;
+        isLoading = false;
       });
     } else {
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() {
+        isLoading = false;
+        isSuccess = true;
+      });
+      await Future.delayed(const Duration(seconds: 1));
       Navigator.pop(context);
       Navigator.push(
         context,
@@ -85,10 +97,38 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             TextField(
               textAlign: TextAlign.center,
+              controller: firstNameController,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(20.0),
+                hintText: 'Your First Name',
+                labelText: 'First Name',
+                labelStyle: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextField(
+              textAlign: TextAlign.center,
+              controller: lastNameController,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(20.0),
+                hintText: 'Your Last Name',
+                labelText: 'Last Name',
+                labelStyle: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextField(
+              textAlign: TextAlign.center,
               controller: userController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter Username',
+                hintText: 'This will be used to recognize you',
                 labelText: 'Username',
                 labelStyle: TextStyle(
                   fontSize: 18,
@@ -102,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: emailController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter Email',
+                hintText: 'This email will be used for login',
                 labelText: 'Email',
                 labelStyle: TextStyle(
                   fontSize: 18,
@@ -116,7 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: phoneController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter Phone Number',
+                hintText: 'Your Phone Number',
                 labelText: 'Phone',
                 labelStyle: TextStyle(
                   fontSize: 18,
@@ -131,36 +171,8 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: passwordController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter Password',
+                hintText: 'Minimum of 8 characters',
                 labelText: 'Password',
-                labelStyle: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            TextField(
-              textAlign: TextAlign.center,
-              controller: firstNameController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter First Name',
-                labelText: 'First Name',
-                labelStyle: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            TextField(
-              textAlign: TextAlign.center,
-              controller: lastNameController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter Last Name',
-                labelText: 'Last Name',
                 labelStyle: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
@@ -170,11 +182,22 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             Padding(
               padding: const EdgeInsets.all(10.0),
-              child: isValid
+              child: isSuccess
                   ? const Text(
-                      'Please enter all the fields to create a user account.')
-                  : const Text(
-                      'There is some error with the information entered.'),
+                      'User account has been created. You will now be redirected to the login screen.')
+                  : isLoading
+                      ? Column(
+                          children: const <Widget>[
+                            CircularProgressIndicator(),
+                            Text(
+                                'Creating a new user account... Please wait...'),
+                          ],
+                        )
+                      : isValid
+                          ? const Text(
+                              'Please enter all the fields to create a user account.')
+                          : const Text(
+                              'There is some error with the information provided. Please check the data entered.'),
             ),
             ElevatedButton(
               onPressed: _registerUser,
