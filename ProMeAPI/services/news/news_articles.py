@@ -185,11 +185,13 @@ def update_street_risk_db(street: str, from_date: str, to_date: str) -> List[New
     queryset = queryset.filter(date__range=[from_date, to_date])
 
     for result in results:
-        queryset = queryset.filter(date=result.date)
-        if len(queryset) == 0:
+        if len(queryset.filter(date=result.date)) == 0:
             print('Adding to DB for '+street)
             risk = StreetRisk(news=result.title, date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
             risk.save()
+
+            queryset = StreetRisk.objects.all()
+            queryset = queryset.filter(street=street)
 
     return results
 
