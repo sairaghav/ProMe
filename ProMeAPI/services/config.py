@@ -3,17 +3,16 @@ import os
 from ProMeAPI.services.news.parsers import MilanoToday
 
 trackingTags = {
-                'terrorismo': 3,
-                'furti': 2,
-                'rapine': 2,
-                'droga': 2,
-                'aggressioni':2,
-                'arresti': 1,
-                'incidenti': 1,
-                'vandali': 1,
-                'incidenti-stradali': 1,
-                'indagini':1,
-                'morti':1
+                'terrorism': 3,
+                'theft': 2,
+                'robbery': 2,
+                'drugs': 2,
+                'aggressions': 2,
+                'arrest': 1,
+                'accident': 1,
+                'vandalism': 1,
+                'investigation': 1,
+                'death': 1
             }  # Will hold exhaustive collection of all tags to check
 
 mapBaseUrl = "http://open.mapquestapi.com"

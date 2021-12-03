@@ -1,19 +1,36 @@
 from .classes import *
 import datetime, pytz
 
-month_number_map = {"gennaio":"01",
-                    "febbraio":"02",
-                    "marzo":"03",
-                    "aprile":"04",
-                    "maggio":"05",
-                    "giugno":"06",
-                    "luglio":"07",
-                    "agosto":"08",
-                    "settembre":"09",
-                    "ottobre":"10",
-                    "novembre":"11",
-                    "dicembre":"12"
-                }
+month_number_map = {
+    "gennaio": "01",
+    "febbraio": "02",
+    "marzo": "03",
+    "aprile": "04",
+    "maggio": "05",
+    "giugno": "06",
+    "luglio": "07",
+    "agosto": "08",
+    "settembre": "09",
+    "ottobre": "10",
+    "novembre": "11",
+    "dicembre": "12"
+    }
+
+tag_italian_map = {
+    "terrorismo": "terrorism",
+    "terroristi": "terrorism",
+    "jihadisti": "terrorism",
+    "furti": "theft",
+    "rapine": "robbery",
+    "droga": "drugs",
+    "aggressioni": "aggression",
+    "arresti": "arrest",
+    "incidenti": "accident",
+    "vandali": "vandalism",
+    "incidenti-stradali": "accident",
+    "indagini": "investigation",
+    "morti": "death"
+}
 
 class MilanoToday(AbstractNewsSource):
     _base_url = "https://www.milanotoday.it"
@@ -41,10 +58,13 @@ class MilanoToday(AbstractNewsSource):
                 for tag_list in article_content_div.findAll('ul'):
                     for tag_element in tag_list.findAll('li'):
                         try:
-                            tag = tag_element.find('a')['href'].replace('/tag/', '')[:-1]
+                            tag = tag_italian_map[tag_element.find('a')['href'].replace('/tag/', '')[:-1]]
                             tags.append(tag)
                         except TypeError:
                             break
+                        except KeyError:
+                            tag = tag_element.find('a')['href'].replace('/tag/', '')[:-1]
+                            tags.append(tag)
                 tag_str = ",".join(set(tags))
                 news = News(source=MilanoToday.name, title=title, link=MilanoToday._base_url+link, tags=tag_str, date="", street="")
                 result.append(news)
