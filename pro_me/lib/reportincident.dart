@@ -20,11 +20,25 @@ class _ReportIncidentState extends State<ReportIncident> {
   String _street = '', _summary = '', _tag = '';
   final storage = const FlutterSecureStorage();
   bool isLoading = false;
+  bool isValid = false;
+  final _tagList = [
+    'terrorism',
+    'theft',
+    'robbery',
+    'drugs',
+    'aggression',
+    'arrest',
+    'accident',
+    'vandalism',
+    'investigation',
+    'death',
+  ];
 
   void _addReport() async {
     setState(() {
       _street = streetController.text;
       _summary = summaryController.text;
+      isLoading = true;
     });
 
     String? token = await storage.read(key: 'token');
@@ -52,6 +66,7 @@ class _ReportIncidentState extends State<ReportIncident> {
             'tags': _tag,
             'user': reponseData['username'],
           };
+          await Future.delayed(const Duration(seconds: 1));
 
           response = await http.post(
               Uri.https('pro-me.herokuapp.com', '/api/report'),
@@ -59,7 +74,8 @@ class _ReportIncidentState extends State<ReportIncident> {
               body: params);
 
           setState(() {
-            isLoading = true;
+            isLoading = false;
+            isValid = true;
           });
         } else {
           setState(() {
@@ -74,226 +90,97 @@ class _ReportIncidentState extends State<ReportIncident> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                'Report an Incident',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Text(
+            'Report an Incident',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
+          ),
+        ),
+        TextField(
+          textAlign: TextAlign.center,
+          controller: streetController,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(20.0),
+            hintText: 'Enter Street',
+            labelText: 'Street',
+            labelStyle: TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        TextField(
+          textAlign: TextAlign.center,
+          controller: summaryController,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(20.0),
+            hintText: 'Enter summary of your report',
+            labelText: 'Summary',
+            labelStyle: TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Text(
+            'Type of Activity: ',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _tagList.length,
+            itemBuilder: (context, index) {
+              var item = _tagList[index];
+              return ListTile(
+                title: Text(item),
+                leading: Radio(
+                  value: item,
+                  groupValue: _tag,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _tag = '$value';
+                    });
+                  },
                 ),
-              ),
-            ),
-            TextField(
-              textAlign: TextAlign.center,
-              controller: streetController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter Street',
-                labelText: 'Street',
-                labelStyle: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            TextField(
-              textAlign: TextAlign.center,
-              controller: summaryController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter summary of your report',
-                labelText: 'Summary',
-                labelStyle: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                'Type of Activity: ',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            ListTile(
-              title: const Text('Terrorismo'),
-              leading: Radio(
-                value: 'terrorismo',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Furti'),
-              leading: Radio(
-                value: 'furti',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Rapine'),
-              leading: Radio(
-                value: 'rapine',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Droga'),
-              leading: Radio(
-                value: 'droga',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Aggressioni'),
-              leading: Radio(
-                value: 'aggressioni',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Arresti'),
-              leading: Radio(
-                value: 'arresti',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Incidenti'),
-              leading: Radio(
-                value: 'incidenti',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Vandali'),
-              leading: Radio(
-                value: 'vandali',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Incidenti-stradali'),
-              leading: Radio(
-                value: 'incidenti-stradali',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Indagini'),
-              leading: Radio(
-                value: 'indagini',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Morti'),
-              leading: Radio(
-                value: 'morti',
-                groupValue: _tag,
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      _tag = '$value';
-                    },
-                  );
-                },
-              ),
-            ),
-            Center(
-              child: isLoading
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: isLoading
+              ? Column(
+                  children: const <Widget>[
+                    Text(
+                        'Adding report to risk database... This may take some time...'),
+                    CircularProgressIndicator(),
+                  ],
+                )
+              : isValid
                   ? const Text(
                       'The incident report has been added to our risk database.')
                   : const Text(
                       'Please enter all the fields to report an incident.'),
-            ),
-            ElevatedButton(
-              onPressed: _addReport,
-              child: const Text('Add Report'),
-            ),
-          ],
         ),
-      ),
+        ElevatedButton(
+          onPressed: _addReport,
+          child: const Text('Add Report'),
+        ),
+      ],
     );
   }
 }

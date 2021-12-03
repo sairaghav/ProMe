@@ -36,11 +36,11 @@ class _AuthNavBarState extends State<AuthNavBar> {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.manage_search),
-          label: 'StreetSafety',
+          label: 'SafetyMeter',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.report),
-          label: 'ReportIncident',
+          label: 'IncidentReport',
         ),
       ],
     );

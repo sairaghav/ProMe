@@ -78,7 +78,7 @@ class _StreetRiskState extends State<StreetRisk> {
             const Padding(
               padding: EdgeInsets.all(10.0),
               child: Text(
-                'StreetSafety',
+                'SafetyMeter',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -90,7 +90,7 @@ class _StreetRiskState extends State<StreetRisk> {
               controller: streetController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Enter Street',
+                hintText: 'Enter Street Name',
                 labelText: 'Street',
                 labelStyle: TextStyle(
                   fontSize: 18,
@@ -142,7 +142,7 @@ class _StreetRiskState extends State<StreetRisk> {
             ),
             ElevatedButton(
               onPressed: _getRisk,
-              child: const Text('Get Risk'),
+              child: const Text('Get Safety Score'),
             ),
           ],
         ),
