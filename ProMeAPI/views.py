@@ -32,8 +32,6 @@ def index(request) -> HttpResponse:
     response = Response(results="Welcome to the ProMe API index page!", errors=None)
     return JsonResponse(response._asdict())
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_tags(request):
     response = Response(results=config.trackingTags ,errors=None)
     return JsonResponse(response._asdict())
