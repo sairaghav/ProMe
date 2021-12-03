@@ -7,7 +7,7 @@ trackingTags = {
                 'theft': 2,
                 'robbery': 2,
                 'drugs': 2,
-                'aggressions': 2,
+                'aggression': 2,
                 'arrest': 1,
                 'accident': 1,
                 'vandalism': 1,
