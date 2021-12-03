@@ -27,45 +27,53 @@ class _StreetRiskState extends State<StreetRisk> {
       _street = streetController.text;
       _startDate = startDateController.text;
       _endDate = endDateController.text;
+      isLoading = true;
     });
-    isLoading = true;
     String? token = await storage.read(key: 'token');
-    var params = {'street': _street, 'from': _startDate, 'to': _endDate};
 
-    var response = await http.get(
-      Uri.https('pro-me.herokuapp.com', '/api/getriskdata', params),
-      headers: {HttpHeaders.authorizationHeader: '$token'},
-    );
-    try {
-      var riskData = jsonDecode(response.body);
+    if (_street.isNotEmpty) {
+      var params = {'street': _street, 'from': _startDate, 'to': _endDate};
 
-      if (response.statusCode == HttpStatus.unauthorized ||
-          response.statusCode == HttpStatus.forbidden) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const UnauthenticatedPage(
-              selectedIndex: 0,
+      var response = await http.get(
+        Uri.https('pro-me.herokuapp.com', '/api/getriskdata', params),
+        headers: {HttpHeaders.authorizationHeader: '$token'},
+      );
+      try {
+        var riskData = jsonDecode(response.body);
+
+        if (response.statusCode == HttpStatus.unauthorized ||
+            response.statusCode == HttpStatus.forbidden) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const UnauthenticatedPage(
+                selectedIndex: 0,
+              ),
             ),
-          ),
-        );
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => StreetRiskDetails(
-                    details: riskData['results'],
-                  )),
-        );
-        setState(() {
-          isLoading = false;
-        });
+          );
+          setState(() {
+            isLoading = false;
+          });
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => StreetRiskDetails(
+                      details: riskData['results'],
+                    )),
+          );
+          setState(() {
+            isLoading = false;
+          });
+        }
+      } catch (exception) {
+        throw Exception('Error in getting risk data');
       }
-    } catch (exception) {
-      throw Exception('Error in getting risk data');
+    } else {
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -138,7 +146,7 @@ class _StreetRiskState extends State<StreetRisk> {
                       ],
                     )
                   : const Text(
-                      'If "Evaluate Till" is not provided, default value will be the current date and the "Evaluate From" date is 30 days from "Evaluate Till" date unless explicitly specified.'),
+                      'Please provide the street name to get safety score. If "Evaluate Till" is not provided, the current date will be the default value. The "Evaluate From" date is 30 days from "Evaluate Till" date unless explicitly specified.'),
             ),
             ElevatedButton(
               onPressed: _getRisk,

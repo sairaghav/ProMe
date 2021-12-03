@@ -178,7 +178,7 @@ class _ReportIncidentState extends State<ReportIncident> {
                   ? const Text(
                       'The incident report has been added to our risk database.')
                   : const Text(
-                      'Please enter all the fields to report an incident.'),
+                      'Please provide all the fields to report an incident.'),
         ),
         Flexible(
           child: ElevatedButton(

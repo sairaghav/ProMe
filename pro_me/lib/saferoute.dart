@@ -49,12 +49,10 @@ class _SafeRouteState extends State<SafeRoute> {
     setState(() {
       _source = sourceController.text;
       _destination = destinationController.text;
+      isLoading = true;
     });
     String? token = await storage.read(key: 'token');
     if (_source.isNotEmpty && _destination.isNotEmpty) {
-      setState(() {
-        isLoading = true;
-      });
       var params = {'start': _source, 'end': _destination, 'mode': _mode};
       var response = await http.get(
         Uri.https('pro-me.herokuapp.com', '/api/directions', params),
@@ -81,6 +79,11 @@ class _SafeRouteState extends State<SafeRoute> {
       } catch (exception) {
         throw Exception('Error in getting route data.');
       }
+    } else {
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
