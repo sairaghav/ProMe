@@ -91,7 +91,7 @@ class _ReportIncidentState extends State<ReportIncident> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         const Padding(
           padding: EdgeInsets.all(10.0),
           child: Text(
@@ -146,7 +146,7 @@ class _ReportIncidentState extends State<ReportIncident> {
             itemBuilder: (context, index) {
               var item = _tagList[index];
               return ListTile(
-                title: Text(item),
+                title: Text(item[0].toUpperCase() + item.substring(1)),
                 leading: Radio(
                   value: item,
                   groupValue: _tag,
@@ -176,9 +176,11 @@ class _ReportIncidentState extends State<ReportIncident> {
                   : const Text(
                       'Please enter all the fields to report an incident.'),
         ),
-        ElevatedButton(
-          onPressed: _addReport,
-          child: const Text('Add Report'),
+        Flexible(
+          child: ElevatedButton(
+            onPressed: _addReport,
+            child: const Text('Add Report'),
+          ),
         ),
       ],
     );

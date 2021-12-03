@@ -21,6 +21,8 @@ class _SafeRouteState extends State<SafeRoute> {
   final storage = const FlutterSecureStorage();
   bool isLoading = false;
 
+  List<String> modes = ['pedestrian', 'fastest', 'bicycle'];
+
   void _getRiskData(Map<dynamic, dynamic> routeData, String token) async {
     for (var result in routeData['results']) {
       var params = {'street': result['name']};
@@ -84,128 +86,94 @@ class _SafeRouteState extends State<SafeRoute> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                'SafeRoute',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
-              ),
+    return Column(
+      children: <Widget>[
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Text(
+            'SafeRoute',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
             ),
-            TextField(
-              textAlign: TextAlign.center,
-              controller: sourceController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.all(20.0),
-                labelText: 'Source',
-                hintText: 'Enter Source for Route',
-                labelStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            TextField(
-              textAlign: TextAlign.center,
-              controller: destinationController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.all(20.0),
-                labelText: 'Destination',
-                hintText: 'Enter Destination for Route',
-                labelStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                'Mode of Transport: ',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Center(
-              child: ListTile(
-                title: const Text('Pedestrian'),
-                leading: Radio(
-                  value: 'pedestrian',
-                  groupValue: _mode,
-                  onChanged: (String? value) {
-                    setState(
-                      () {
-                        _mode = '$value';
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-            Center(
-              child: ListTile(
-                title: const Text('Fastest'),
-                leading: Radio(
-                  value: 'fastest',
-                  groupValue: _mode,
-                  onChanged: (String? value) {
-                    setState(
-                      () {
-                        _mode = '$value';
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-            Center(
-              child: ListTile(
-                title: const Text('Bicycle'),
-                leading: Radio(
-                  value: 'bicycle',
-                  groupValue: _mode,
-                  onChanged: (String? value) {
-                    setState(
-                      () {
-                        _mode = '$value';
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: isLoading
-                  ? Column(
-                      children: const <Widget>[
-                        Text(
-                            'Getting the details... This may take some time...'),
-                        CircularProgressIndicator(),
-                      ],
-                    )
-                  : const Text(
-                      'Please provide the source, destination and mode of travel to get safety metrics for all streets along the route.'),
-            ),
-            Center(
-              child: ElevatedButton(
-                onPressed: _getRoute,
-                child: const Text('Get route'),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        TextField(
+          textAlign: TextAlign.center,
+          controller: sourceController,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(20.0),
+            labelText: 'Source',
+            hintText: 'Enter Source for Route',
+            labelStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        TextField(
+          textAlign: TextAlign.center,
+          controller: destinationController,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(20.0),
+            labelText: 'Destination',
+            hintText: 'Enter Destination for Route',
+            labelStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Text(
+            'Mode of Transport: ',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: modes.length,
+            itemBuilder: (context, index) {
+              var item = modes[index];
+              return ListTile(
+                  title: Text(item[0].toUpperCase() + item.substring(1)),
+                  leading: Radio(
+                    groupValue: _mode,
+                    value: item,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _mode = '$value';
+                      });
+                    },
+                  ));
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: isLoading
+              ? Column(
+                  children: const <Widget>[
+                    Text('Getting the details... This may take some time...'),
+                    CircularProgressIndicator(),
+                  ],
+                )
+              : const Text(
+                  'Please provide the source, destination and mode of travel to get safety metrics for all streets along the route.'),
+        ),
+        Flexible(
+          child: ElevatedButton(
+            onPressed: _getRoute,
+            child: const Text('Get route'),
+          ),
+        ),
+      ],
     );
   }
 }
