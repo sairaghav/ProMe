@@ -142,16 +142,19 @@ class _SafeRouteState extends State<SafeRoute> {
             itemBuilder: (context, index) {
               var item = modes[index];
               return ListTile(
-                  title: Text(item[0].toUpperCase() + item.substring(1)),
-                  leading: Radio(
-                    groupValue: _mode,
-                    value: item,
-                    onChanged: (String? value) {
-                      setState(() {
+                title: Text(item[0].toUpperCase() + item.substring(1)),
+                leading: Radio(
+                  groupValue: _mode,
+                  value: item,
+                  onChanged: (String? value) {
+                    setState(
+                      () {
                         _mode = '$value';
-                      });
-                    },
-                  ));
+                      },
+                    );
+                  },
+                ),
+              );
             },
           ),
         ),

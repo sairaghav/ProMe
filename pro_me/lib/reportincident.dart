@@ -73,14 +73,18 @@ class _ReportIncidentState extends State<ReportIncident> {
               headers: {HttpHeaders.authorizationHeader: '$token'},
               body: params);
 
-          setState(() {
-            isLoading = false;
-            isValid = true;
-          });
+          setState(
+            () {
+              isLoading = false;
+              isValid = true;
+            },
+          );
         } else {
-          setState(() {
-            isLoading = false;
-          });
+          setState(
+            () {
+              isLoading = false;
+            },
+          );
         }
       }
     } catch (exception) {
@@ -107,7 +111,7 @@ class _ReportIncidentState extends State<ReportIncident> {
           controller: streetController,
           decoration: const InputDecoration(
             contentPadding: EdgeInsets.all(20.0),
-            hintText: 'Enter Street',
+            hintText: 'Enter Street Name',
             labelText: 'Street',
             labelStyle: TextStyle(
               fontSize: 18,
