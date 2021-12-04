@@ -32,12 +32,11 @@ def is_street_first_time(street: str, from_date: datetime.datetime, to_date: dat
     return street_list
 
 def add_user_reported_incidents(street: str, summary: str, tags: str, user) -> List[StreetRisk]:
-    username = 'User '+user
-    risk = StreetRisk(news=summary, date=datetime.datetime.now(datetime.timezone.utc), source=username, street=street, tags=tags, link='')
+    risk = StreetRisk(news=summary, date=datetime.datetime.now(datetime.timezone.utc), source='User', street=street, tags=tags, link='', reporter=user)
     risk.save()
 
     queryset = StreetRisk.objects.all()
-    queryset = queryset.filter(street=street).filter(source=username)
+    queryset = queryset.filter(street=street).filter(source='User')
 
     return queryset
 
@@ -129,9 +128,13 @@ def update_risk_db(street: str, available_from: datetime.datetime, available_til
             update_street_db(street,{'news_till': requested_till})
 
     queryset = StreetRisk.objects.all().filter(street=street).filter(date__range=[requested_from,requested_till])
+    risk_metadata = list(queryset.values())
+
+    for metadata in risk_metadata:
+        metadata.pop('reporter')
 
     return RiskData(street=street,
-                    risk_metadata=list(queryset.values()),
+                    risk_metadata=risk_metadata,
                     risk_score=0.0,
                     all_tags={},
                     all_timeline={},
@@ -177,7 +180,7 @@ def update_street_risk_db(street: str, from_date: datetime.datetime, to_date: da
         queryset = StreetRisk.objects.all().filter(street=street)
         if len(queryset.filter(date=result.date)) == 0:
             print('Adding to DB for '+street)
-            risk = StreetRisk(news=result.title, date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link)
+            risk = StreetRisk(news=result.title, date=result.date, source=result.source, street=result.street, tags=result.tags, link=result.link, reporter=result.source)
             risk.save()
 
     return StreetRisk.objects.all().filter(street=street)

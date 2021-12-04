@@ -14,6 +14,7 @@ class StreetRisk(models.Model):
     source = models.CharField('Report Source', max_length=200)
     tags = models.CharField('Tags', max_length=200)
     link = models.CharField('Reference Link', max_length=500)
+    reporter = models.CharField('Reported By', max_length=500)
 
 class User(AbstractUser):
     email = models.EmailField('Email', max_length=255, unique=True, primary_key=True)
