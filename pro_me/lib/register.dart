@@ -99,7 +99,7 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: firstNameController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Your First Name',
+                hintText: 'This will NOT be visible to other users',
                 labelText: 'First Name',
                 labelStyle: TextStyle(
                   fontSize: 18,
@@ -113,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: lastNameController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Your Last Name',
+                hintText: 'This will NOT be visible to other users',
                 labelText: 'Last Name',
                 labelStyle: TextStyle(
                   fontSize: 18,
@@ -127,8 +127,8 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: userController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'This will be used to recognize you',
-                labelText: 'Username',
+                hintText: 'This will be visible to all the users of the app',
+                labelText: 'User Handle',
                 labelStyle: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
@@ -141,7 +141,8 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: emailController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'This email will be used for login',
+                hintText:
+                    'This will be used for login and will NOT be visible to other users',
                 labelText: 'Email',
                 labelStyle: TextStyle(
                   fontSize: 18,
@@ -155,7 +156,8 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: phoneController,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.all(20.0),
-                hintText: 'Your Phone Number',
+                hintText:
+                    'This will be used to verify you and will NOT be visible on your profile',
                 labelText: 'Phone',
                 labelStyle: TextStyle(
                   fontSize: 18,
